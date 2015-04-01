@@ -50,7 +50,13 @@ IDList: ID IDListRepeat
 
 IDListRepeat: IDListRepeat "," ID
 			|
-			;		  
+			;
+
+StatPart:
+		;
+
+FuncPart:
+		;		
 
 %%
 int main(int argc, char *argv[]){
