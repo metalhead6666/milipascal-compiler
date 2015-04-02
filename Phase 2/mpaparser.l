@@ -7,7 +7,6 @@
 %X STATE
 %option case-insensitive
 
-tokens (begin|do|if|then|else|end|forward|function|output|paramstr|program|repeat|until|var|val|while|writeln|":="|":"|","|"."|"("|")"|";")
 reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|pack|packed|page|pred|procedure|put|read|readln|record|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|to|trunc|type|unpack|with|write)
 
 %%
@@ -21,7 +20,30 @@ reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|f
 {reserved} {count_column += yyleng; return RESERVED;}
 [0-9]+((e("+"|"-")?[0-9]+)|("."[0-9]+((e("+"|"-")?)?[0-9]+)?)) {count_column += yyleng; return REAL;}
 [0-9]+ {count_column += yyleng; return INTEGER;}
-tokens {count_column += yyleng; return *yytext;}
+begin {count_column += yyleng; return START;}
+do {count_column += yyleng; return DO;}
+if {count_column += yyleng; return IF;}
+then {count_column += yyleng; return THEN;}
+else {count_column += yyleng; return ELSE;}
+end {count_column += yyleng; return END;}
+forward {count_column += yyleng; return FORWARD;}
+function {count_column += yyleng; return FUNCTION;}
+output {count_column += yyleng; return OUTPUT;}
+paramstr {count_column += yyleng; return PARAMSTR;}
+repeat {count_column += yyleng; return REPEAT;}
+until {count_column += yyleng; return UNTIL;}
+var {count_column += yyleng; return VAR;}
+val {count_column += yyleng; return VAL;}
+while {count_column += yyleng; return WHILE;}
+writeln {count_column += yyleng; return WRITELN;}
+program {count_column += yyleng; return PROGRAM;}
+":=" {count_column += yyleng; return ASSIGN;}
+":" {count_column += yyleng; return *yytext;}
+"," {count_column += yyleng; return *yytext;}
+"." {count_column += yyleng; return *yytext;}
+"(" {count_column += yyleng; return *yytext;}
+")" {count_column += yyleng; return *yytext;}
+";" {count_column += yyleng; return *yytext;}
 
 not {count_column += yyleng; return NOT;}
 and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
