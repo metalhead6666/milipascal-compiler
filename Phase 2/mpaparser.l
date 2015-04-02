@@ -38,24 +38,19 @@ while {count_column += yyleng; return WHILE;}
 writeln {count_column += yyleng; return WRITELN;}
 program {count_column += yyleng; return PROGRAM;}
 ":=" {count_column += yyleng; return ASSIGN;}
-":" {count_column += yyleng; return *yytext;}
-"," {count_column += yyleng; return *yytext;}
-"." {count_column += yyleng; return *yytext;}
-"(" {count_column += yyleng; return *yytext;}
-")" {count_column += yyleng; return *yytext;}
-";" {count_column += yyleng; return *yytext;}
+":"|","|"."|"("|")"|";" {count_column += yyleng; return yytext[0];}
 
 not {count_column += yyleng; return NOT;}
 and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
 "+"|"-"|or {count_column += yyleng; return OP3;}
 "<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; return OP4;}
 
-[a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; return ID;}
+[a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; printf("%s\n", yytext); return ID;}
 "'"("''"|[^'\n])*"'" {count_column += yyleng; return STRING;}
-"'"([^'\n]*("''")*)* {printf("Line %d, col %d: unterminated string\n", count_line, count_column); count_column += yyleng;}
+"'"([^'\n]*("''")*)* {printf("Line %d, col %d: unterminated string\n", count_line, count_column); count_column += yyleng; return *yytext;}
 "\t"|" " {count_column += yyleng;}
 "\n" {++count_line; count_column = 1;}
-. {printf("Line %d, col %d: illegal character ('%s')\n", count_line, count_column, yytext); count_column += yyleng;}
+. {printf("Line %d, col %d: illegal character ('%s')\n", count_line, count_column, yytext); count_column += yyleng; return *yytext;}
 
 %%
 int yywrap(){
