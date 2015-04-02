@@ -23,7 +23,7 @@ reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|f
 [0-9]+ {count_column += yyleng; return INTEGER;}
 tokens {count_column += yyleng; return *yytext;}
 
-not {count_column += yyleng; return OP1;}
+not {count_column += yyleng; return NOT;}
 and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
 "+"|"-"|or {count_column += yyleng; return OP3;}
 "<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; return OP4;}
