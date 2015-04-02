@@ -53,6 +53,7 @@ and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
 . {printf("Line %d, col %d: illegal character ('%s')\n", count_line, count_column, yytext); count_column += yyleng; return *yytext;}
 
 %%
+
 int yywrap(){
 	return 1;
 }	
