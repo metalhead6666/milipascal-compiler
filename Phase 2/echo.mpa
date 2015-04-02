@@ -1,0 +1,8 @@
+program echo(output);
+var x: integer;
+x = 1.2-1;
+x = 'pila'';';
+begin
+	val(paramstr(1), x);
+	writeln(x)
+end.
