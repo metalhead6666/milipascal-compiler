@@ -53,7 +53,8 @@ extern int yydebug;
     OP3 = 263,
     OP4 = 264,
     ID = 265,
-    STRING = 266
+    STRING = 266,
+    IF = 267
   };
 #endif
 /* Tokens.  */
@@ -66,6 +67,7 @@ extern int yydebug;
 #define OP4 264
 #define ID 265
 #define STRING 266
+#define IF 267
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
