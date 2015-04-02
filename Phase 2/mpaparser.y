@@ -23,6 +23,9 @@
 %left OP3
 %left OP4
 
+%nonassoc IF
+%nonassoc "else"
+
 %%
 
 Prog: ProgHeading ";" ProgBlock "."
@@ -52,23 +55,17 @@ IDListRepeat: IDListRepeat "," ID
 			|
 			;
 
-FuncPart: FuncPartRepeat		
+FuncPart: FuncPart FuncDeclaration ";"
+		|		
 		;
 
-FuncPartRepeat: FuncPartRepeat FuncDeclaration ";"
-			  |
-			  ;
-
 FuncDeclaration: FuncHeading ";" "forward"
-			   | FuncIdent ";" FuncBlock
+			   | "function" ID ";" FuncBlock
 			   | FuncHeading ";" FuncBlock
 			   ;
 
 FuncHeading: "function" ID FormalParamList ":" ID
-		   ;
-
-FuncIdent: "function" ID
-		 ;		   
+		   ;		   
 
 FormalParamList: "(" FormalParams FormalParamListRepeat ")"
 			   |
@@ -78,12 +75,9 @@ FormalParamListRepeat: FormalParamListRepeat ";" FormalParams
 					 |
 					 ;
 
-FormalParams: VarOptional IDList ":" IDList
+FormalParams: "var" IDList ":" ID
+			| IDList ":" ID
 			;
-
-VarOptional: "var"
-		   |
-		   ;
 
 FuncBlock: VarPart StatPart
 		 ;
@@ -99,56 +93,43 @@ StatListRepeat: StatListRepeat ";" Stat
 			  ;
 
 Stat: StatPart
-	| "if" Expr "then" Stat StatElse
+	| "if" Expr "then" Stat %prec IF
+	| "if" Expr "then" Stat "else" Stat
 	| "while" Expr "do" Stat
 	| "repeat" StatList "until" Expr
 	| "val" "(" "paramstr" "(" Expr ")" "," ID ")"
-	| StatOptional
+	| ID "assign" Expr
 	| "writeln" WriteInPList
+	|
 	;
 
-StatElse: "else" Stat
-		|
-		;
-
-StatOptional: ID "assign" Expr
+WriteInPList: "(" Expr WriteInPListOptional ")"
+			| "(" STRING WriteInPListOptional ")"
 			|
 			;
 
-WriteInPList: "(" WriteInPListChoose WriteInPListOptional ")"
-			|
-			;
-
-WriteInPListChoose: Expr
-				  | STRING
-				  ;
-
-WriteInPListOptional: "," WriteInPListChoose
+WriteInPListOptional: WriteInPListOptional "," Expr
+					| WriteInPListOptional "," STRING
 					|
 					;
 
-Expr: Expr ExprOP Expr
-	| ExprChoose Expr
+Expr: Expr OP2 Expr
+	| Expr OP3 Expr
+	| Expr OP4 Expr
+	| OP3 Expr
+	| NOT Expr	
 	| "(" Expr ")"
 	| INTEGER
 	| REAL
 	| ID ParamList
 	;
 
-ExprOP: OP2
-	  | OP3
-	  | OP4
-	  ;
-
-ExprChoose: OP3
-		  | NOT
-		  ;
-
 ParamList: "(" Expr ParamListOptional ")"
 		 |
-		 ;
+		 ;	
 
-ParamListOptional: "," Expr
+ParamListOptional: ParamListOptional "," Expr
+				 |
 				 ;		 
 
 %%
