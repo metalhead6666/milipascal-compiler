@@ -11,6 +11,24 @@
 %token RESERVED
 %token REAL
 %token INTEGER
+%token START
+%token DO
+%token IF
+%token THEN
+%token ELSE
+%token END
+%token FORWARD
+%token FUNCTION
+%token OUTPUT
+%token PARAMSTR
+%token REPEAT
+%token UNTIL
+%token VAR
+%token VAL
+%token WHILE
+%token WRITELN
+%token PROGRAM
+%token ASSIGN
 %token NOT
 %token OP2
 %token OP3
@@ -23,66 +41,66 @@
 %left OP3
 %left OP4
 
-%nonassoc IF
-%nonassoc "else"
+%nonassoc IFX
+%nonassoc ELSE
 
 %%
 
-Prog: ProgHeading ";" ProgBlock "."
+Prog: ProgHeading ';' ProgBlock '.'
 	;
 
-ProgHeading: "program" ID "(" "output" ")"
+ProgHeading: PROGRAM ID '(' OUTPUT ')'
 		   ;
 
 ProgBlock: VarPart FuncPart StatPart
 		 ;
 
-VarPart: "var" VarDeclaration ";" VarDeclarationRepeat
+VarPart: VAR VarDeclaration ';' VarDeclarationRepeat
 	   |
 	   ;
 
-VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ";"
+VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ';'
 					|
 					;		   
 
-VarDeclaration: IDList ":" ID
+VarDeclaration: IDList ':' ID
 			  ;
 
 IDList: ID IDListRepeat
 	  ;			 
 
-IDListRepeat: IDListRepeat "," ID
+IDListRepeat: IDListRepeat ',' ID
 			|
 			;
 
-FuncPart: FuncPart FuncDeclaration ";"
+FuncPart: FuncPart FuncDeclaration ';'
 		|		
 		;
 
-FuncDeclaration: FuncHeading ";" "forward"
-			   | "function" ID ";" FuncBlock
-			   | FuncHeading ";" FuncBlock
+FuncDeclaration: FuncHeading ';' FORWARD
+			   | FUNCTION ID ';' FuncBlock
+			   | FuncHeading ';' FuncBlock
 			   ;
 
-FuncHeading: "function" ID FormalParamList ":" ID
+FuncHeading: FUNCTION ID FormalParamList ':' ID
 		   ;		   
 
-FormalParamList: "(" FormalParams FormalParamListRepeat ")"
+FormalParamList: '(' FormalParams FormalParamListRepeat ')'
 			   |
 			   ;
 
-FormalParamListRepeat: FormalParamListRepeat ";" FormalParams
+FormalParamListRepeat: FormalParamListRepeat ';' FormalParams
 					 |
 					 ;
 
-FormalParams: "var" IDList ":" ID
-			| IDList ":" ID
+FormalParams: VAR IDList ':' ID
+			| IDList ':' ID
 			;
 
 FuncBlock: VarPart StatPart
 		 ;
 
-StatPart: "begin" StatList "end"
+StatPart: START StatList END
 		;
 
 StatList: Stat StatListRepeat
@@ -93,23 +111,23 @@ StatListRepeat: StatListRepeat ";" Stat
 			  ;
 
 Stat: StatPart
-	| "if" Expr "then" Stat %prec IF
-	| "if" Expr "then" Stat "else" Stat
-	| "while" Expr "do" Stat
-	| "repeat" StatList "until" Expr
-	| "val" "(" "paramstr" "(" Expr ")" "," ID ")"
-	| ID "assign" Expr
-	| "writeln" WriteInPList
+	| IF Expr THEN Stat %prec IFX
+	| IF Expr THEN Stat ELSE Stat
+	| WHILE Expr DO Stat
+	| REPEAT StatList UNTIL Expr
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')'
+	| ID ASSIGN Expr
+	| WRITELN WriteInPList
 	|
 	;
 
-WriteInPList: "(" Expr WriteInPListOptional ")"
-			| "(" STRING WriteInPListOptional ")"
+WriteInPList: '(' Expr WriteInPListOptional ')'
+			| '(' STRING WriteInPListOptional ')'
 			|
 			;
 
-WriteInPListOptional: WriteInPListOptional "," Expr
-					| WriteInPListOptional "," STRING
+WriteInPListOptional: WriteInPListOptional ',' Expr
+					| WriteInPListOptional ',' STRING
 					|
 					;
 
@@ -118,17 +136,17 @@ Expr: Expr OP2 Expr
 	| Expr OP4 Expr
 	| OP3 Expr
 	| NOT Expr	
-	| "(" Expr ")"
+	| '(' Expr ')'
 	| INTEGER
 	| REAL
 	| ID ParamList
 	;
 
-ParamList: "(" Expr ParamListOptional ")"
+ParamList: '(' Expr ParamListOptional ')'
 		 |
 		 ;	
 
-ParamListOptional: ParamListOptional "," Expr
+ParamListOptional: ParamListOptional ',' Expr
 				 |
 				 ;		 
 
