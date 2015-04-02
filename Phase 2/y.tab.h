@@ -48,7 +48,7 @@ extern int yydebug;
     RESERVED = 258,
     REAL = 259,
     INTEGER = 260,
-    OP1 = 261,
+    NOT = 261,
     OP2 = 262,
     OP3 = 263,
     OP4 = 264,
@@ -60,7 +60,7 @@ extern int yydebug;
 #define RESERVED 258
 #define REAL 259
 #define INTEGER 260
-#define OP1 261
+#define NOT 261
 #define OP2 262
 #define OP3 263
 #define OP4 264

@@ -968,7 +968,7 @@ YY_RULE_SETUP
 case 9:
 YY_RULE_SETUP
 #line 26 "mpaparser.l"
-{count_column += yyleng; return OP1;}
+{count_column += yyleng; return NOT;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
