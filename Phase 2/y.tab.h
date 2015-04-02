@@ -48,26 +48,62 @@ extern int yydebug;
     RESERVED = 258,
     REAL = 259,
     INTEGER = 260,
-    NOT = 261,
-    OP2 = 262,
-    OP3 = 263,
-    OP4 = 264,
-    ID = 265,
-    STRING = 266,
-    IF = 267
+    START = 261,
+    DO = 262,
+    IF = 263,
+    THEN = 264,
+    ELSE = 265,
+    END = 266,
+    FORWARD = 267,
+    FUNCTION = 268,
+    OUTPUT = 269,
+    PARAMSTR = 270,
+    REPEAT = 271,
+    UNTIL = 272,
+    VAR = 273,
+    VAL = 274,
+    WHILE = 275,
+    WRITELN = 276,
+    PROGRAM = 277,
+    ASSIGN = 278,
+    NOT = 279,
+    OP2 = 280,
+    OP3 = 281,
+    OP4 = 282,
+    ID = 283,
+    STRING = 284,
+    IFX = 285
   };
 #endif
 /* Tokens.  */
 #define RESERVED 258
 #define REAL 259
 #define INTEGER 260
-#define NOT 261
-#define OP2 262
-#define OP3 263
-#define OP4 264
-#define ID 265
-#define STRING 266
-#define IF 267
+#define START 261
+#define DO 262
+#define IF 263
+#define THEN 264
+#define ELSE 265
+#define END 266
+#define FORWARD 267
+#define FUNCTION 268
+#define OUTPUT 269
+#define PARAMSTR 270
+#define REPEAT 271
+#define UNTIL 272
+#define VAR 273
+#define VAL 274
+#define WHILE 275
+#define WRITELN 276
+#define PROGRAM 277
+#define ASSIGN 278
+#define NOT 279
+#define OP2 280
+#define OP3 281
+#define OP4 282
+#define ID 283
+#define STRING 284
+#define IFX 285
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
