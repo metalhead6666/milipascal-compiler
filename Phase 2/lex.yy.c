@@ -1004,7 +1004,7 @@ YY_RULE_SETUP
 case 8:
 YY_RULE_SETUP
 #line 23 "mpaparser.l"
-{count_column += yyleng; return START;}
+{count_column += yyleng; return BEG;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
@@ -1119,7 +1119,7 @@ YY_RULE_SETUP
 case 31:
 YY_RULE_SETUP
 #line 48 "mpaparser.l"
-{count_column += yyleng; printf("%s\n", yytext); return ID;}
+{count_column += yyleng; return ID;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
@@ -2151,6 +2151,7 @@ void yyfree (void * ptr )
 #define YYTABLES_NAME "yytables"
 
 #line 55 "mpaparser.l"
+
 
 
 int yywrap(){
