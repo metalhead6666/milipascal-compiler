@@ -11,7 +11,7 @@
 %token RESERVED
 %token REAL
 %token INTEGER
-%token START
+%token BEG
 %token DO
 %token IF
 %token THEN
@@ -46,7 +46,7 @@
 
 %%
 
-Prog: ProgHeading ';' ProgBlock '.'
+Prog: ProgHeading ';' ProgBlock '.' 
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'
@@ -100,15 +100,12 @@ FormalParams: VAR IDList ':' ID
 FuncBlock: VarPart StatPart
 		 ;
 
-StatPart: START StatList END
+StatPart: BEG StatList END
 		;
 
-StatList: Stat StatListRepeat
+StatList: StatList ';' Stat
+		| Stat
 		;
-
-StatListRepeat: StatListRepeat ";" Stat
-			  |
-			  ;
 
 Stat: StatPart
 	| IF Expr THEN Stat %prec IFX
@@ -154,7 +151,7 @@ ParamListOptional: ParamListOptional ',' Expr
 int main(int argc, char *argv[]){
 	if(argc > 0){
 		if(strcmp(argv[0], "-t") == 0){
-			//print tree here
+			/*print tree here*/
 		}
 	}
 
