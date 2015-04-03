@@ -1,4 +1,6 @@
 %{
+	#include <stdio.h>
+	#include <stdlib.h>
 	#include "y.tab.h"
 	
 	int start_line = 1, start_column = 1, count_line = 1, count_column = 1;
@@ -18,8 +20,8 @@ reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|f
 <STATE>. {++count_column;}
 
 {reserved} {count_column += yyleng; return RESERVED;}
-[0-9]+((e("+"|"-")?[0-9]+)|("."[0-9]+((e("+"|"-")?)?[0-9]+)?)) {count_column += yyleng; return REAL;}
-[0-9]+ {count_column += yyleng; return INTEGER;}
+[0-9]+((e("+"|"-")?[0-9]+)|("."[0-9]+((e("+"|"-")?)?[0-9]+)?)) {count_column += yyleng; yylval.string = (char*)strdup(yytext); return REAL;}
+[0-9]+ {count_column += yyleng; yylval.value = atoi((char*)strdup(yytext)); return INTEGER;}
 begin {count_column += yyleng; return BEG;}
 do {count_column += yyleng; return DO;}
 if {count_column += yyleng; return IF;}
@@ -45,8 +47,8 @@ and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
 "+"|"-"|or {count_column += yyleng; return OP3;}
 "<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; return OP4;}
 
-[a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; return ID;}
-"'"("''"|[^'\n])*"'" {count_column += yyleng; return STRING;}
+[a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ID;}
+"'"("''"|[^'\n])*"'" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return STRING;}
 "'"([^'\n]*("''")*)* {printf("Line %d, col %d: unterminated string\n", count_line, count_column); count_column += yyleng; return *yytext;}
 "\t"|" " {count_column += yyleng;}
 "\n" {++count_line; count_column = 1;}
