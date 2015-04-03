@@ -66,13 +66,15 @@
 
 	#include <stdio.h>
 	#include <string.h>
+	#include "structures.h"
+	#include "functions.h"
 
 	void yyerror(char *s);
 
 	extern char *yytext;
 	extern int count_line, count_column;	
 
-#line 76 "y.tab.c" /* yacc.c:339  */
+#line 78 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -169,7 +171,16 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
+{
+#line 13 "mpaparser.y" /* yacc.c:355  */
+
+	char *string;
+	int value;
+
+#line 183 "y.tab.c" /* yacc.c:355  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -183,7 +194,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 187 "y.tab.c" /* yacc.c:358  */
+#line 198 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -483,12 +494,12 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    52,    55,    58,    59,    62,    63,    66,
-      69,    72,    73,    76,    77,    80,    81,    82,    85,    88,
-      89,    92,    93,    96,    97,   100,   103,   106,   107,   110,
-     111,   112,   113,   114,   115,   116,   117,   118,   121,   122,
-     123,   126,   127,   128,   131,   132,   133,   134,   135,   136,
-     137,   138,   139,   142,   143,   146,   147
+       0,    56,    56,    59,    62,    65,    66,    69,    70,    73,
+      76,    79,    80,    83,    84,    87,    88,    89,    92,    95,
+      96,    99,   100,   103,   104,   107,   110,   113,   114,   117,
+     118,   119,   120,   121,   122,   123,   124,   125,   128,   129,
+     130,   133,   134,   135,   138,   139,   140,   141,   142,   143,
+     144,   145,   146,   149,   150,   153,   154
 };
 #endif
 
@@ -1342,7 +1353,7 @@ yyreduce:
   switch (yyn)
     {
       
-#line 1346 "y.tab.c" /* yacc.c:1646  */
+#line 1357 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1570,12 +1581,12 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 150 "mpaparser.y" /* yacc.c:1906  */
+#line 157 "mpaparser.y" /* yacc.c:1906  */
 
 int main(int argc, char *argv[]){
 	if(argc > 0){
 		if(strcmp(argv[0], "-t") == 0){
-			/*print tree here*/
+			print_tree();
 		}
 	}
 
