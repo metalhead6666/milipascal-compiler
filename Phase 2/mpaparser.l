@@ -20,7 +20,7 @@ reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|f
 {reserved} {count_column += yyleng; return RESERVED;}
 [0-9]+((e("+"|"-")?[0-9]+)|("."[0-9]+((e("+"|"-")?)?[0-9]+)?)) {count_column += yyleng; return REAL;}
 [0-9]+ {count_column += yyleng; return INTEGER;}
-begin {count_column += yyleng; return START;}
+begin {count_column += yyleng; return BEG;}
 do {count_column += yyleng; return DO;}
 if {count_column += yyleng; return IF;}
 then {count_column += yyleng; return THEN;}
@@ -45,7 +45,7 @@ and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
 "+"|"-"|or {count_column += yyleng; return OP3;}
 "<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; return OP4;}
 
-[a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; printf("%s\n", yytext); return ID;}
+[a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; return ID;}
 "'"("''"|[^'\n])*"'" {count_column += yyleng; return STRING;}
 "'"([^'\n]*("''")*)* {printf("Line %d, col %d: unterminated string\n", count_line, count_column); count_column += yyleng; return *yytext;}
 "\t"|" " {count_column += yyleng;}
