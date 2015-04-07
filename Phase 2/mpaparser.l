@@ -19,7 +19,7 @@ reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|f
 <STATE>"\n" {++count_line; count_column = 1;}
 <STATE>. {++count_column;}
 
-{reserved} {count_column += yyleng; return RESERVED;}
+{reserved} {count_column += yyleng; yylval.string = (char*)strdup(yytext); return RESERVED;}
 [0-9]+((e("+"|"-")?[0-9]+)|("."[0-9]+((e("+"|"-")?)?[0-9]+)?)) {count_column += yyleng; yylval.string = (char*)strdup(yytext); return REAL;}
 [0-9]+ {count_column += yyleng; yylval.value = atoi((char*)strdup(yytext)); return INTEGER;}
 begin {count_column += yyleng; return BEG;}
@@ -43,9 +43,9 @@ program {count_column += yyleng; return PROGRAM;}
 ":"|","|"."|"("|")"|";" {count_column += yyleng; return yytext[0];}
 
 not {count_column += yyleng; return NOT;}
-and|"*"|"/"|mod|div {count_column += yyleng; return OP2;}
-"+"|"-"|or {count_column += yyleng; return OP3;}
-"<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; return OP4;}
+and|"*"|"/"|mod|div {count_column += yyleng; yylval.string = (char*)strdup(yytext); return OP2;}
+"+"|"-"|or {count_column += yyleng; yylval.string = (char*)strdup(yytext); return OP3;}
+"<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return OP4;}
 
 [a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ID;}
 "'"("''"|[^'\n])*"'" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return STRING;}
