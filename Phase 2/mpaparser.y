@@ -15,7 +15,7 @@
 	int value;
 }
 
-%token RESERVED
+%token <string> RESERVED
 %token <string> REAL
 %token <value> INTEGER
 %token BEG
@@ -37,9 +37,9 @@
 %token PROGRAM
 %token ASSIGN
 %token NOT
-%token OP2
-%token OP3
-%token OP4
+%token <string> OP2
+%token <string> OP3
+%token <string> OP4
 %token <string> ID
 %token <string> STRING
 
