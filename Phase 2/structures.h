@@ -6,7 +6,7 @@ typedef enum{
 	IntLit, 
 	RealLit, 
 	String
-} Terminals;
+}Terminals;
 
 typedef enum{
 	Add,
@@ -39,52 +39,88 @@ typedef enum{
 	WriteLn
 }Statements;
 
-typedef struct _VarPart VarPart;
 typedef struct _Program Program;
+typedef struct _VarPart VarPart;
+typedef struct _VarDecl VarDecl;
+typedef struct _IdStruct IdStruct;
+typedef struct _FuncPart FuncPart;
 typedef struct _FuncDecl FuncDecl;
 typedef struct _FuncDef FuncDef;
 typedef struct _FuncDef2 FuncDef2;
 typedef struct _FuncParams FuncParams;
+typedef struct _Params Params;
+typedef struct _VarParams VarParams;
 
 //Program
 struct _Program{
-	Terminals id;
+	char* id;
 	VarPart* varPart;
+	FuncPart* funcPart;
+	Statements stat;
+};
+
+struct _VarPart{
+	VarPart* next;
+	VarDecl* varDecl;
+};
+
+struct _VarDecl{
+	char* first_id;
+	char* last_id;
+	IdStruct* id;
+};
+
+struct _IdStruct{
+	IdStruct* next;
+	char* id;
+};
+
+struct _FuncPart{
+	FuncPart* next;
+
 	union{
 		FuncDecl* funcDecl;
 		FuncDef* funcDef;
 		FuncDef2* funcDef2;
 	}funcPart;
-
 };
-
-struct _VarPart{
-	Terminals id1;
-	Terminals id2;
-	Terminals id3;
-};
-
 
 //Function Declaration
 struct _FuncDecl{
-	Terminals id;
+	char* first_id;
 	FuncParams* funcParams;
+	char* last_id;
 };
 
 struct _FuncDef{
-	//
+	FuncDecl* funcDecl;
+	VarPart* varPart;
+	Statements stat;
 };
 
 struct _FuncDef2{
-	//
+	char* id;
+	VarPart* varPart;
+	Statements stat;
 };
 
 struct _FuncParams{
 	union{
-		//
-		//
-	};
+		Params* params;
+		VarParams* varParams;
+	}OptionalParams;
 };
 
+struct _Params{
+	char* first_id;
+	char* last_id;
+	IdStruct* id;
+};
+
+struct _VarParams{
+	char* first_id;
+	char* last_id;
+	IdStruct* id;
+};
 
 #endif
