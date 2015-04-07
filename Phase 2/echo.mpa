@@ -1,13 +1,8 @@
 program echo(output);
 var x: integer;
-x = 1.2-1;
-x = 'pila'';';
 begin
-<<<<<<< HEAD
-=======
-	x = 1.2-1;
-	x = 'pila'';';
->>>>>>> parent of d92eb84... Examples modified.
+	x := 1.2-1;
+	x := 'something';
 	val(paramstr(1), x);
 	writeln(x)
 end.
