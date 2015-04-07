@@ -8,5 +8,4 @@ typedef enum Terminals{
 	String,
 }Terminals;
 
-
 #endif _STRUCTURES_
