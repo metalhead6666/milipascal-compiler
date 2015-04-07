@@ -66,7 +66,6 @@
 
 	#include <stdio.h>
 	#include <string.h>
-	#include "structures.h"
 	#include "functions.h"
 
 	void yyerror(char *s);
@@ -74,7 +73,7 @@
 	extern char *yytext;
 	extern int count_line, count_column;	
 
-#line 78 "y.tab.c" /* yacc.c:339  */
+#line 77 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -174,12 +173,26 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 13 "mpaparser.y" /* yacc.c:355  */
+#line 12 "mpaparser.y" /* yacc.c:355  */
+
+	struct _Program* program;
+	struct _VarPart* varPart;
+	struct _VarDecl* varDecl;
+	struct _IdStruct* ids;
+	struct _FuncPart* funcPart;
+	struct _FuncDecl* funcDecl;
+	struct _FuncDef* funcDef;
+	struct _FuncDef2* funcDef2;
+	struct _FuncParams* funcParams;
+	struct _Params* params;
+	struct _VarParams* varParams;
+	Terminals type;
+	Operators ops;
 
 	char *string;
 	int value;
 
-#line 183 "y.tab.c" /* yacc.c:355  */
+#line 196 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -194,7 +207,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 198 "y.tab.c" /* yacc.c:358  */
+#line 211 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -494,12 +507,12 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    56,    56,    59,    62,    65,    66,    69,    70,    73,
-      76,    79,    80,    83,    84,    87,    88,    89,    92,    95,
-      96,    99,   100,   103,   104,   107,   110,   113,   114,   117,
-     118,   119,   120,   121,   122,   123,   124,   125,   128,   129,
-     130,   133,   134,   135,   138,   139,   140,   141,   142,   143,
-     144,   145,   146,   149,   150,   153,   154
+       0,    71,    71,    74,    77,    80,    81,    84,    85,    88,
+      91,    94,    95,    98,    99,   102,   103,   104,   107,   110,
+     111,   114,   115,   118,   119,   122,   125,   128,   129,   132,
+     133,   134,   135,   136,   137,   138,   139,   140,   143,   144,
+     145,   148,   149,   150,   153,   154,   155,   156,   157,   158,
+     159,   160,   161,   164,   165,   168,   169
 };
 #endif
 
@@ -513,8 +526,8 @@ static const char *const yytname[] =
   "PARAMSTR", "REPEAT", "UNTIL", "VAR", "VAL", "WHILE", "WRITELN",
   "PROGRAM", "ASSIGN", "NOT", "OP2", "OP3", "OP4", "ID", "STRING", "IFX",
   "';'", "'.'", "'('", "')'", "':'", "','", "$accept", "Prog",
-  "ProgHeading", "ProgBlock", "VarPart", "VarDeclarationRepeat",
-  "VarDeclaration", "IDList", "IDListRepeat", "FuncPart",
+  "ProgHeading", "ProgBlock", "varPart", "VarDeclarationRepeat",
+  "VarDeclaration", "IDList", "IDListRepeat", "funcPart",
   "FuncDeclaration", "FuncHeading", "FormalParamList",
   "FormalParamListRepeat", "FormalParams", "FuncBlock", "StatPart",
   "StatList", "Stat", "WriteInPList", "WriteInPListOptional", "Expr",
@@ -1352,8 +1365,14 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-      
-#line 1357 "y.tab.c" /* yacc.c:1646  */
+        case 2:
+#line 71 "mpaparser.y" /* yacc.c:1646  */
+    {}
+#line 1372 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 1376 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1581,7 +1600,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 157 "mpaparser.y" /* yacc.c:1906  */
+#line 172 "mpaparser.y" /* yacc.c:1906  */
 
 int main(int argc, char *argv[]){
 	if(argc > 0){
