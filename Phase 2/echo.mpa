@@ -1,8 +1,8 @@
 program echo(output);
 var x: integer;
+x = 1.2-1;
+x = 'pila'';';
 begin
-	x := 1.2-1;
-	x := 'something';
 	val(paramstr(1), x);
 	writeln(x)
 end.

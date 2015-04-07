@@ -46,137 +46,142 @@ Grammar
 
    24 FuncBlock: VarPart StatPart
 
-   25 StatPart: BEG StatList END
+   25 StatPart: START StatList END
 
-   26 StatList: StatList ';' Stat
-   27         | Stat
+   26 StatList: Stat StatListRepeat
 
-   28 Stat: StatPart
-   29     | IF Expr THEN Stat
-   30     | IF Expr THEN Stat ELSE Stat
-   31     | WHILE Expr DO Stat
-   32     | REPEAT StatList UNTIL Expr
-   33     | VAL '(' PARAMSTR '(' Expr ')' ',' ID ')'
-   34     | ID ASSIGN Expr
-   35     | WRITELN WriteInPList
-   36     | %empty
+   27 StatListRepeat: StatListRepeat ";" Stat
+   28               | %empty
 
-   37 WriteInPList: '(' Expr WriteInPListOptional ')'
-   38             | '(' STRING WriteInPListOptional ')'
-   39             | %empty
+   29 Stat: StatPart
+   30     | IF Expr THEN Stat
+   31     | IF Expr THEN Stat ELSE Stat
+   32     | WHILE Expr DO Stat
+   33     | REPEAT StatList UNTIL Expr
+   34     | VAL '(' PARAMSTR '(' Expr ')' ',' ID ')'
+   35     | ID ASSIGN Expr
+   36     | WRITELN WriteInPList
+   37     | %empty
 
-   40 WriteInPListOptional: WriteInPListOptional ',' Expr
-   41                     | WriteInPListOptional ',' STRING
-   42                     | %empty
+   38 WriteInPList: '(' Expr WriteInPListOptional ')'
+   39             | '(' STRING WriteInPListOptional ')'
+   40             | %empty
 
-   43 Expr: Expr OP2 Expr
-   44     | Expr OP3 Expr
-   45     | Expr OP4 Expr
-   46     | OP3 Expr
-   47     | NOT Expr
-   48     | '(' Expr ')'
-   49     | INTEGER
-   50     | REAL
-   51     | ID ParamList
+   41 WriteInPListOptional: WriteInPListOptional ',' Expr
+   42                     | WriteInPListOptional ',' STRING
+   43                     | %empty
 
-   52 ParamList: '(' Expr ParamListOptional ')'
-   53          | %empty
+   44 Expr: Expr OP2 Expr
+   45     | Expr OP3 Expr
+   46     | Expr OP4 Expr
+   47     | OP3 Expr
+   48     | NOT Expr
+   49     | '(' Expr ')'
+   50     | INTEGER
+   51     | REAL
+   52     | ID ParamList
 
-   54 ParamListOptional: ParamListOptional ',' Expr
-   55                  | %empty
+   53 ParamList: '(' Expr ParamListOptional ')'
+   54          | %empty
+
+   55 ParamListOptional: ParamListOptional ',' Expr
+   56                  | %empty
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'(' (40) 2 18 33 37 38 48 52
-')' (41) 2 18 33 37 38 48 52
-',' (44) 10 33 40 41 54
+'(' (40) 2 18 34 38 39 49 53
+')' (41) 2 18 34 38 39 49 53
+',' (44) 10 34 41 42 55
 '.' (46) 1
 ':' (58) 8 17 22 23
-';' (59) 1 4 6 12 14 15 16 20 26
+';' (59) 1 4 6 12 14 15 16 20
 error (256)
 RESERVED (258)
-REAL (259) 50
-INTEGER (260) 49
-BEG (261) 25
-DO (262) 31
-IF (263) 29 30
-THEN (264) 29 30
-ELSE (265) 30
+REAL (259) 51
+INTEGER (260) 50
+START (261) 25
+DO (262) 32
+IF (263) 30 31
+THEN (264) 30 31
+ELSE (265) 31
 END (266) 25
 FORWARD (267) 14
 FUNCTION (268) 15 17
 OUTPUT (269) 2
-PARAMSTR (270) 33
-REPEAT (271) 32
-UNTIL (272) 32
+PARAMSTR (270) 34
+REPEAT (271) 33
+UNTIL (272) 33
 VAR (273) 4 22
-VAL (274) 33
-WHILE (275) 31
-WRITELN (276) 35
+VAL (274) 34
+WHILE (275) 32
+WRITELN (276) 36
 PROGRAM (277) 2
-ASSIGN (278) 34
-NOT (279) 47
-OP2 (280) 43
-OP3 (281) 44 46
-OP4 (282) 45
-ID (283) 2 8 9 10 15 17 22 23 33 34 51
-STRING (284) 38 41
+ASSIGN (278) 35
+NOT (279) 48
+OP2 (280) 44
+OP3 (281) 45 47
+OP4 (282) 46
+ID (283) 2 8 9 10 15 17 22 23 34 35 52
+STRING (284) 39 42
 IFX (285)
+";" (286) 27
 
 
 Nonterminals, with rules where they appear
 
-$accept (37)
+$accept (38)
     on left: 0
-Prog (38)
+Prog (39)
     on left: 1, on right: 0
-ProgHeading (39)
+ProgHeading (40)
     on left: 2, on right: 1
-ProgBlock (40)
+ProgBlock (41)
     on left: 3, on right: 1
-VarPart (41)
+VarPart (42)
     on left: 4 5, on right: 3 24
-VarDeclarationRepeat (42)
+VarDeclarationRepeat (43)
     on left: 6 7, on right: 4 6
-VarDeclaration (43)
+VarDeclaration (44)
     on left: 8, on right: 4 6
-IDList (44)
+IDList (45)
     on left: 9, on right: 8 22 23
-IDListRepeat (45)
+IDListRepeat (46)
     on left: 10 11, on right: 9 10
-FuncPart (46)
+FuncPart (47)
     on left: 12 13, on right: 3 12
-FuncDeclaration (47)
+FuncDeclaration (48)
     on left: 14 15 16, on right: 12
-FuncHeading (48)
+FuncHeading (49)
     on left: 17, on right: 14 16
-FormalParamList (49)
+FormalParamList (50)
     on left: 18 19, on right: 17
-FormalParamListRepeat (50)
+FormalParamListRepeat (51)
     on left: 20 21, on right: 18 20
-FormalParams (51)
+FormalParams (52)
     on left: 22 23, on right: 18 20
-FuncBlock (52)
+FuncBlock (53)
     on left: 24, on right: 15 16
-StatPart (53)
-    on left: 25, on right: 3 24 28
-StatList (54)
-    on left: 26 27, on right: 25 26 32
-Stat (55)
-    on left: 28 29 30 31 32 33 34 35 36, on right: 26 27 29 30 31
-WriteInPList (56)
-    on left: 37 38 39, on right: 35
-WriteInPListOptional (57)
-    on left: 40 41 42, on right: 37 38 40 41
-Expr (58)
-    on left: 43 44 45 46 47 48 49 50 51, on right: 29 30 31 32 33 34
-    37 40 43 44 45 46 47 48 52 54
-ParamList (59)
-    on left: 52 53, on right: 51
-ParamListOptional (60)
-    on left: 54 55, on right: 52 54
+StatPart (54)
+    on left: 25, on right: 3 24 29
+StatList (55)
+    on left: 26, on right: 25 33
+StatListRepeat (56)
+    on left: 27 28, on right: 26 27
+Stat (57)
+    on left: 29 30 31 32 33 34 35 36 37, on right: 26 27 30 31 32
+WriteInPList (58)
+    on left: 38 39 40, on right: 36
+WriteInPListOptional (59)
+    on left: 41 42 43, on right: 38 39 41 42
+Expr (60)
+    on left: 44 45 46 47 48 49 50 51 52, on right: 30 31 32 33 34 35
+    38 41 44 45 46 47 48 49 53 55
+ParamList (61)
+    on left: 53 54, on right: 52
+ParamListOptional (62)
+    on left: 55 56, on right: 53 55
 
 
 State 0
@@ -311,7 +316,7 @@ State 16
     3 ProgBlock: VarPart FuncPart . StatPart
    12 FuncPart: FuncPart . FuncDeclaration ';'
 
-    BEG       shift, and go to state 21
+    START     shift, and go to state 21
     FUNCTION  shift, and go to state 22
 
     FuncDeclaration  go to state 23
@@ -354,9 +359,9 @@ State 20
 
 State 21
 
-   25 StatPart: BEG . StatList END
+   25 StatPart: START . StatList END
 
-    BEG      shift, and go to state 21
+    START    shift, and go to state 21
     IF       shift, and go to state 29
     REPEAT   shift, and go to state 30
     VAL      shift, and go to state 31
@@ -364,7 +369,7 @@ State 21
     WRITELN  shift, and go to state 33
     ID       shift, and go to state 34
 
-    $default  reduce using rule 36 (Stat)
+    $default  reduce using rule 37 (Stat)
 
     StatPart  go to state 35
     StatList  go to state 36
@@ -430,8 +435,8 @@ State 28
 
 State 29
 
-   29 Stat: IF . Expr THEN Stat
-   30     | IF . Expr THEN Stat ELSE Stat
+   30 Stat: IF . Expr THEN Stat
+   31     | IF . Expr THEN Stat ELSE Stat
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -445,9 +450,9 @@ State 29
 
 State 30
 
-   32 Stat: REPEAT . StatList UNTIL Expr
+   33 Stat: REPEAT . StatList UNTIL Expr
 
-    BEG      shift, and go to state 21
+    START    shift, and go to state 21
     IF       shift, and go to state 29
     REPEAT   shift, and go to state 30
     VAL      shift, and go to state 31
@@ -455,7 +460,7 @@ State 30
     WRITELN  shift, and go to state 33
     ID       shift, and go to state 34
 
-    $default  reduce using rule 36 (Stat)
+    $default  reduce using rule 37 (Stat)
 
     StatPart  go to state 35
     StatList  go to state 50
@@ -464,14 +469,14 @@ State 30
 
 State 31
 
-   33 Stat: VAL . '(' PARAMSTR '(' Expr ')' ',' ID ')'
+   34 Stat: VAL . '(' PARAMSTR '(' Expr ')' ',' ID ')'
 
     '('  shift, and go to state 51
 
 
 State 32
 
-   31 Stat: WHILE . Expr DO Stat
+   32 Stat: WHILE . Expr DO Stat
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -485,43 +490,43 @@ State 32
 
 State 33
 
-   35 Stat: WRITELN . WriteInPList
+   36 Stat: WRITELN . WriteInPList
 
     '('  shift, and go to state 53
 
-    $default  reduce using rule 39 (WriteInPList)
+    $default  reduce using rule 40 (WriteInPList)
 
     WriteInPList  go to state 54
 
 
 State 34
 
-   34 Stat: ID . ASSIGN Expr
+   35 Stat: ID . ASSIGN Expr
 
     ASSIGN  shift, and go to state 55
 
 
 State 35
 
-   28 Stat: StatPart .
+   29 Stat: StatPart .
 
-    $default  reduce using rule 28 (Stat)
+    $default  reduce using rule 29 (Stat)
 
 
 State 36
 
-   25 StatPart: BEG StatList . END
-   26 StatList: StatList . ';' Stat
+   25 StatPart: START StatList . END
 
     END  shift, and go to state 56
-    ';'  shift, and go to state 57
 
 
 State 37
 
-   27 StatList: Stat .
+   26 StatList: Stat . StatListRepeat
 
-    $default  reduce using rule 27 (StatList)
+    $default  reduce using rule 28 (StatListRepeat)
+
+    StatListRepeat  go to state 57
 
 
 State 38
@@ -574,21 +579,21 @@ State 42
 
 State 43
 
-   50 Expr: REAL .
+   51 Expr: REAL .
 
-    $default  reduce using rule 50 (Expr)
+    $default  reduce using rule 51 (Expr)
 
 
 State 44
 
-   49 Expr: INTEGER .
+   50 Expr: INTEGER .
 
-    $default  reduce using rule 49 (Expr)
+    $default  reduce using rule 50 (Expr)
 
 
 State 45
 
-   47 Expr: NOT . Expr
+   48 Expr: NOT . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -602,7 +607,7 @@ State 45
 
 State 46
 
-   46 Expr: OP3 . Expr
+   47 Expr: OP3 . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -616,18 +621,18 @@ State 46
 
 State 47
 
-   51 Expr: ID . ParamList
+   52 Expr: ID . ParamList
 
     '('  shift, and go to state 67
 
-    $default  reduce using rule 53 (ParamList)
+    $default  reduce using rule 54 (ParamList)
 
     ParamList  go to state 68
 
 
 State 48
 
-   48 Expr: '(' . Expr ')'
+   49 Expr: '(' . Expr ')'
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -641,11 +646,11 @@ State 48
 
 State 49
 
-   29 Stat: IF Expr . THEN Stat
-   30     | IF Expr . THEN Stat ELSE Stat
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   30 Stat: IF Expr . THEN Stat
+   31     | IF Expr . THEN Stat ELSE Stat
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     THEN  shift, and go to state 70
     OP2   shift, and go to state 71
@@ -655,26 +660,24 @@ State 49
 
 State 50
 
-   26 StatList: StatList . ';' Stat
-   32 Stat: REPEAT StatList . UNTIL Expr
+   33 Stat: REPEAT StatList . UNTIL Expr
 
     UNTIL  shift, and go to state 74
-    ';'    shift, and go to state 57
 
 
 State 51
 
-   33 Stat: VAL '(' . PARAMSTR '(' Expr ')' ',' ID ')'
+   34 Stat: VAL '(' . PARAMSTR '(' Expr ')' ',' ID ')'
 
     PARAMSTR  shift, and go to state 75
 
 
 State 52
 
-   31 Stat: WHILE Expr . DO Stat
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   32 Stat: WHILE Expr . DO Stat
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     DO   shift, and go to state 76
     OP2  shift, and go to state 71
@@ -684,8 +687,8 @@ State 52
 
 State 53
 
-   37 WriteInPList: '(' . Expr WriteInPListOptional ')'
-   38             | '(' . STRING WriteInPListOptional ')'
+   38 WriteInPList: '(' . Expr WriteInPListOptional ')'
+   39             | '(' . STRING WriteInPListOptional ')'
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -700,14 +703,14 @@ State 53
 
 State 54
 
-   35 Stat: WRITELN WriteInPList .
+   36 Stat: WRITELN WriteInPList .
 
-    $default  reduce using rule 35 (Stat)
+    $default  reduce using rule 36 (Stat)
 
 
 State 55
 
-   34 Stat: ID ASSIGN . Expr
+   35 Stat: ID ASSIGN . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -721,27 +724,19 @@ State 55
 
 State 56
 
-   25 StatPart: BEG StatList END .
+   25 StatPart: START StatList END .
 
     $default  reduce using rule 25 (StatPart)
 
 
 State 57
 
-   26 StatList: StatList ';' . Stat
+   26 StatList: Stat StatListRepeat .
+   27 StatListRepeat: StatListRepeat . ";" Stat
 
-    BEG      shift, and go to state 21
-    IF       shift, and go to state 29
-    REPEAT   shift, and go to state 30
-    VAL      shift, and go to state 31
-    WHILE    shift, and go to state 32
-    WRITELN  shift, and go to state 33
-    ID       shift, and go to state 34
+    ";"  shift, and go to state 80
 
-    $default  reduce using rule 36 (Stat)
-
-    StatPart  go to state 35
-    Stat      go to state 80
+    $default  reduce using rule 26 (StatList)
 
 
 State 58
@@ -785,7 +780,7 @@ State 62
 
    24 FuncBlock: VarPart . StatPart
 
-    BEG  shift, and go to state 21
+    START  shift, and go to state 21
 
     StatPart  go to state 86
 
@@ -806,33 +801,33 @@ State 64
 
 State 65
 
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-   47     | NOT Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
+   48     | NOT Expr .
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 47 (Expr)
+    $default  reduce using rule 48 (Expr)
 
 
 State 66
 
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-   46     | OP3 Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
+   47     | OP3 Expr .
 
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 46 (Expr)
+    $default  reduce using rule 47 (Expr)
 
 
 State 67
 
-   52 ParamList: '(' . Expr ParamListOptional ')'
+   53 ParamList: '(' . Expr ParamListOptional ')'
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -846,17 +841,17 @@ State 67
 
 State 68
 
-   51 Expr: ID ParamList .
+   52 Expr: ID ParamList .
 
-    $default  reduce using rule 51 (Expr)
+    $default  reduce using rule 52 (Expr)
 
 
 State 69
 
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-   48     | '(' Expr . ')'
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
+   49     | '(' Expr . ')'
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
@@ -866,10 +861,10 @@ State 69
 
 State 70
 
-   29 Stat: IF Expr THEN . Stat
-   30     | IF Expr THEN . Stat ELSE Stat
+   30 Stat: IF Expr THEN . Stat
+   31     | IF Expr THEN . Stat ELSE Stat
 
-    BEG      shift, and go to state 21
+    START    shift, and go to state 21
     IF       shift, and go to state 29
     REPEAT   shift, and go to state 30
     VAL      shift, and go to state 31
@@ -877,7 +872,7 @@ State 70
     WRITELN  shift, and go to state 33
     ID       shift, and go to state 34
 
-    $default  reduce using rule 36 (Stat)
+    $default  reduce using rule 37 (Stat)
 
     StatPart  go to state 35
     Stat      go to state 89
@@ -885,7 +880,7 @@ State 70
 
 State 71
 
-   43 Expr: Expr OP2 . Expr
+   44 Expr: Expr OP2 . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -899,7 +894,7 @@ State 71
 
 State 72
 
-   44 Expr: Expr OP3 . Expr
+   45 Expr: Expr OP3 . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -913,7 +908,7 @@ State 72
 
 State 73
 
-   45 Expr: Expr OP4 . Expr
+   46 Expr: Expr OP4 . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -927,7 +922,7 @@ State 73
 
 State 74
 
-   32 Stat: REPEAT StatList UNTIL . Expr
+   33 Stat: REPEAT StatList UNTIL . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -941,16 +936,16 @@ State 74
 
 State 75
 
-   33 Stat: VAL '(' PARAMSTR . '(' Expr ')' ',' ID ')'
+   34 Stat: VAL '(' PARAMSTR . '(' Expr ')' ',' ID ')'
 
     '('  shift, and go to state 94
 
 
 State 76
 
-   31 Stat: WHILE Expr DO . Stat
+   32 Stat: WHILE Expr DO . Stat
 
-    BEG      shift, and go to state 21
+    START    shift, and go to state 21
     IF       shift, and go to state 29
     REPEAT   shift, and go to state 30
     VAL      shift, and go to state 31
@@ -958,7 +953,7 @@ State 76
     WRITELN  shift, and go to state 33
     ID       shift, and go to state 34
 
-    $default  reduce using rule 36 (Stat)
+    $default  reduce using rule 37 (Stat)
 
     StatPart  go to state 35
     Stat      go to state 95
@@ -966,48 +961,59 @@ State 76
 
 State 77
 
-   38 WriteInPList: '(' STRING . WriteInPListOptional ')'
+   39 WriteInPList: '(' STRING . WriteInPListOptional ')'
 
-    $default  reduce using rule 42 (WriteInPListOptional)
+    $default  reduce using rule 43 (WriteInPListOptional)
 
     WriteInPListOptional  go to state 96
 
 
 State 78
 
-   37 WriteInPList: '(' Expr . WriteInPListOptional ')'
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   38 WriteInPList: '(' Expr . WriteInPListOptional ')'
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 42 (WriteInPListOptional)
+    $default  reduce using rule 43 (WriteInPListOptional)
 
     WriteInPListOptional  go to state 97
 
 
 State 79
 
-   34 Stat: ID ASSIGN Expr .
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   35 Stat: ID ASSIGN Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 34 (Stat)
+    $default  reduce using rule 35 (Stat)
 
 
 State 80
 
-   26 StatList: StatList ';' Stat .
+   27 StatListRepeat: StatListRepeat ";" . Stat
 
-    $default  reduce using rule 26 (StatList)
+    START    shift, and go to state 21
+    IF       shift, and go to state 29
+    REPEAT   shift, and go to state 30
+    VAL      shift, and go to state 31
+    WHILE    shift, and go to state 32
+    WRITELN  shift, and go to state 33
+    ID       shift, and go to state 34
+
+    $default  reduce using rule 37 (Stat)
+
+    StatPart  go to state 35
+    Stat      go to state 98
 
 
 State 81
@@ -1023,14 +1029,14 @@ State 82
 
     ID  shift, and go to state 12
 
-    IDList  go to state 98
+    IDList  go to state 99
 
 
 State 83
 
    23 FormalParams: IDList . ':' ID
 
-    ':'  shift, and go to state 99
+    ':'  shift, and go to state 100
 
 
 State 84
@@ -1039,14 +1045,14 @@ State 84
 
     $default  reduce using rule 21 (FormalParamListRepeat)
 
-    FormalParamListRepeat  go to state 100
+    FormalParamListRepeat  go to state 101
 
 
 State 85
 
    17 FuncHeading: FUNCTION ID FormalParamList ':' . ID
 
-    ID  shift, and go to state 101
+    ID  shift, and go to state 102
 
 
 State 86
@@ -1058,89 +1064,89 @@ State 86
 
 State 87
 
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-   52 ParamList: '(' Expr . ParamListOptional ')'
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
+   53 ParamList: '(' Expr . ParamListOptional ')'
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 55 (ParamListOptional)
+    $default  reduce using rule 56 (ParamListOptional)
 
-    ParamListOptional  go to state 102
+    ParamListOptional  go to state 103
 
 
 State 88
 
-   48 Expr: '(' Expr ')' .
+   49 Expr: '(' Expr ')' .
 
-    $default  reduce using rule 48 (Expr)
+    $default  reduce using rule 49 (Expr)
 
 
 State 89
 
-   29 Stat: IF Expr THEN Stat .
-   30     | IF Expr THEN Stat . ELSE Stat
+   30 Stat: IF Expr THEN Stat .
+   31     | IF Expr THEN Stat . ELSE Stat
 
-    ELSE  shift, and go to state 103
+    ELSE  shift, and go to state 104
 
-    $default  reduce using rule 29 (Stat)
+    $default  reduce using rule 30 (Stat)
 
 
 State 90
 
-   43 Expr: Expr . OP2 Expr
-   43     | Expr OP2 Expr .
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   44 Expr: Expr . OP2 Expr
+   44     | Expr OP2 Expr .
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     OP3  shift, and go to state 72
-    OP4  shift, and go to state 73
-
-    $default  reduce using rule 43 (Expr)
-
-
-State 91
-
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   44     | Expr OP3 Expr .
-   45     | Expr . OP4 Expr
-
     OP4  shift, and go to state 73
 
     $default  reduce using rule 44 (Expr)
 
 
-State 92
+State 91
 
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-   45     | Expr OP4 Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   45     | Expr OP3 Expr .
+   46     | Expr . OP4 Expr
+
+    OP4  shift, and go to state 73
 
     $default  reduce using rule 45 (Expr)
 
 
+State 92
+
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
+   46     | Expr OP4 Expr .
+
+    $default  reduce using rule 46 (Expr)
+
+
 State 93
 
-   32 Stat: REPEAT StatList UNTIL Expr .
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   33 Stat: REPEAT StatList UNTIL Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 32 (Stat)
+    $default  reduce using rule 33 (Stat)
 
 
 State 94
 
-   33 Stat: VAL '(' PARAMSTR '(' . Expr ')' ',' ID ')'
+   34 Stat: VAL '(' PARAMSTR '(' . Expr ')' ',' ID ')'
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -1149,80 +1155,87 @@ State 94
     ID       shift, and go to state 47
     '('      shift, and go to state 48
 
-    Expr  go to state 104
+    Expr  go to state 105
 
 
 State 95
 
-   31 Stat: WHILE Expr DO Stat .
+   32 Stat: WHILE Expr DO Stat .
 
-    $default  reduce using rule 31 (Stat)
+    $default  reduce using rule 32 (Stat)
 
 
 State 96
 
-   38 WriteInPList: '(' STRING WriteInPListOptional . ')'
-   40 WriteInPListOptional: WriteInPListOptional . ',' Expr
-   41                     | WriteInPListOptional . ',' STRING
+   39 WriteInPList: '(' STRING WriteInPListOptional . ')'
+   41 WriteInPListOptional: WriteInPListOptional . ',' Expr
+   42                     | WriteInPListOptional . ',' STRING
 
-    ')'  shift, and go to state 105
-    ','  shift, and go to state 106
+    ')'  shift, and go to state 106
+    ','  shift, and go to state 107
 
 
 State 97
 
-   37 WriteInPList: '(' Expr WriteInPListOptional . ')'
-   40 WriteInPListOptional: WriteInPListOptional . ',' Expr
-   41                     | WriteInPListOptional . ',' STRING
+   38 WriteInPList: '(' Expr WriteInPListOptional . ')'
+   41 WriteInPListOptional: WriteInPListOptional . ',' Expr
+   42                     | WriteInPListOptional . ',' STRING
 
-    ')'  shift, and go to state 107
-    ','  shift, and go to state 106
+    ')'  shift, and go to state 108
+    ','  shift, and go to state 107
 
 
 State 98
 
-   22 FormalParams: VAR IDList . ':' ID
+   27 StatListRepeat: StatListRepeat ";" Stat .
 
-    ':'  shift, and go to state 108
+    $default  reduce using rule 27 (StatListRepeat)
 
 
 State 99
 
-   23 FormalParams: IDList ':' . ID
+   22 FormalParams: VAR IDList . ':' ID
 
-    ID  shift, and go to state 109
+    ':'  shift, and go to state 109
 
 
 State 100
 
-   18 FormalParamList: '(' FormalParams FormalParamListRepeat . ')'
-   20 FormalParamListRepeat: FormalParamListRepeat . ';' FormalParams
+   23 FormalParams: IDList ':' . ID
 
-    ';'  shift, and go to state 110
-    ')'  shift, and go to state 111
+    ID  shift, and go to state 110
 
 
 State 101
+
+   18 FormalParamList: '(' FormalParams FormalParamListRepeat . ')'
+   20 FormalParamListRepeat: FormalParamListRepeat . ';' FormalParams
+
+    ';'  shift, and go to state 111
+    ')'  shift, and go to state 112
+
+
+State 102
 
    17 FuncHeading: FUNCTION ID FormalParamList ':' ID .
 
     $default  reduce using rule 17 (FuncHeading)
 
 
-State 102
-
-   52 ParamList: '(' Expr ParamListOptional . ')'
-   54 ParamListOptional: ParamListOptional . ',' Expr
-
-    ')'  shift, and go to state 112
-    ','  shift, and go to state 113
-
-
 State 103
 
-   30 Stat: IF Expr THEN Stat ELSE . Stat
+   53 ParamList: '(' Expr ParamListOptional . ')'
+   55 ParamListOptional: ParamListOptional . ',' Expr
 
-    BEG      shift, and go to state 21
+    ')'  shift, and go to state 113
+    ','  shift, and go to state 114
+
+
+State 104
+
+   31 Stat: IF Expr THEN Stat ELSE . Stat
+
+    START    shift, and go to state 21
     IF       shift, and go to state 29
     REPEAT   shift, and go to state 30
     VAL      shift, and go to state 31
@@ -1230,70 +1243,70 @@ State 103
     WRITELN  shift, and go to state 33
     ID       shift, and go to state 34
 
-    $default  reduce using rule 36 (Stat)
+    $default  reduce using rule 37 (Stat)
 
     StatPart  go to state 35
-    Stat      go to state 114
-
-
-State 104
-
-   33 Stat: VAL '(' PARAMSTR '(' Expr . ')' ',' ID ')'
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-
-    OP2  shift, and go to state 71
-    OP3  shift, and go to state 72
-    OP4  shift, and go to state 73
-    ')'  shift, and go to state 115
+    Stat      go to state 115
 
 
 State 105
 
-   38 WriteInPList: '(' STRING WriteInPListOptional ')' .
+   34 Stat: VAL '(' PARAMSTR '(' Expr . ')' ',' ID ')'
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
-    $default  reduce using rule 38 (WriteInPList)
+    OP2  shift, and go to state 71
+    OP3  shift, and go to state 72
+    OP4  shift, and go to state 73
+    ')'  shift, and go to state 116
 
 
 State 106
 
-   40 WriteInPListOptional: WriteInPListOptional ',' . Expr
-   41                     | WriteInPListOptional ',' . STRING
+   39 WriteInPList: '(' STRING WriteInPListOptional ')' .
+
+    $default  reduce using rule 39 (WriteInPList)
+
+
+State 107
+
+   41 WriteInPListOptional: WriteInPListOptional ',' . Expr
+   42                     | WriteInPListOptional ',' . STRING
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
     NOT      shift, and go to state 45
     OP3      shift, and go to state 46
     ID       shift, and go to state 47
-    STRING   shift, and go to state 116
+    STRING   shift, and go to state 117
     '('      shift, and go to state 48
 
-    Expr  go to state 117
-
-
-State 107
-
-   37 WriteInPList: '(' Expr WriteInPListOptional ')' .
-
-    $default  reduce using rule 37 (WriteInPList)
+    Expr  go to state 118
 
 
 State 108
 
-   22 FormalParams: VAR IDList ':' . ID
+   38 WriteInPList: '(' Expr WriteInPListOptional ')' .
 
-    ID  shift, and go to state 118
+    $default  reduce using rule 38 (WriteInPList)
 
 
 State 109
+
+   22 FormalParams: VAR IDList ':' . ID
+
+    ID  shift, and go to state 119
+
+
+State 110
 
    23 FormalParams: IDList ':' ID .
 
     $default  reduce using rule 23 (FormalParams)
 
 
-State 110
+State 111
 
    20 FormalParamListRepeat: FormalParamListRepeat ';' . FormalParams
 
@@ -1301,26 +1314,26 @@ State 110
     ID   shift, and go to state 12
 
     IDList        go to state 83
-    FormalParams  go to state 119
+    FormalParams  go to state 120
 
 
-State 111
+State 112
 
    18 FormalParamList: '(' FormalParams FormalParamListRepeat ')' .
 
     $default  reduce using rule 18 (FormalParamList)
 
 
-State 112
-
-   52 ParamList: '(' Expr ParamListOptional ')' .
-
-    $default  reduce using rule 52 (ParamList)
-
-
 State 113
 
-   54 ParamListOptional: ParamListOptional ',' . Expr
+   53 ParamList: '(' Expr ParamListOptional ')' .
+
+    $default  reduce using rule 53 (ParamList)
+
+
+State 114
+
+   55 ParamListOptional: ParamListOptional ',' . Expr
 
     REAL     shift, and go to state 43
     INTEGER  shift, and go to state 44
@@ -1329,88 +1342,88 @@ State 113
     ID       shift, and go to state 47
     '('      shift, and go to state 48
 
-    Expr  go to state 120
-
-
-State 114
-
-   30 Stat: IF Expr THEN Stat ELSE Stat .
-
-    $default  reduce using rule 30 (Stat)
+    Expr  go to state 121
 
 
 State 115
 
-   33 Stat: VAL '(' PARAMSTR '(' Expr ')' . ',' ID ')'
+   31 Stat: IF Expr THEN Stat ELSE Stat .
 
-    ','  shift, and go to state 121
+    $default  reduce using rule 31 (Stat)
 
 
 State 116
 
-   41 WriteInPListOptional: WriteInPListOptional ',' STRING .
+   34 Stat: VAL '(' PARAMSTR '(' Expr ')' . ',' ID ')'
 
-    $default  reduce using rule 41 (WriteInPListOptional)
+    ','  shift, and go to state 122
 
 
 State 117
 
-   40 WriteInPListOptional: WriteInPListOptional ',' Expr .
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
+   42 WriteInPListOptional: WriteInPListOptional ',' STRING .
+
+    $default  reduce using rule 42 (WriteInPListOptional)
+
+
+State 118
+
+   41 WriteInPListOptional: WriteInPListOptional ',' Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 40 (WriteInPListOptional)
+    $default  reduce using rule 41 (WriteInPListOptional)
 
 
-State 118
+State 119
 
    22 FormalParams: VAR IDList ':' ID .
 
     $default  reduce using rule 22 (FormalParams)
 
 
-State 119
+State 120
 
    20 FormalParamListRepeat: FormalParamListRepeat ';' FormalParams .
 
     $default  reduce using rule 20 (FormalParamListRepeat)
 
 
-State 120
+State 121
 
-   43 Expr: Expr . OP2 Expr
-   44     | Expr . OP3 Expr
-   45     | Expr . OP4 Expr
-   54 ParamListOptional: ParamListOptional ',' Expr .
+   44 Expr: Expr . OP2 Expr
+   45     | Expr . OP3 Expr
+   46     | Expr . OP4 Expr
+   55 ParamListOptional: ParamListOptional ',' Expr .
 
     OP2  shift, and go to state 71
     OP3  shift, and go to state 72
     OP4  shift, and go to state 73
 
-    $default  reduce using rule 54 (ParamListOptional)
-
-
-State 121
-
-   33 Stat: VAL '(' PARAMSTR '(' Expr ')' ',' . ID ')'
-
-    ID  shift, and go to state 122
+    $default  reduce using rule 55 (ParamListOptional)
 
 
 State 122
 
-   33 Stat: VAL '(' PARAMSTR '(' Expr ')' ',' ID . ')'
+   34 Stat: VAL '(' PARAMSTR '(' Expr ')' ',' . ID ')'
 
-    ')'  shift, and go to state 123
+    ID  shift, and go to state 123
 
 
 State 123
 
-   33 Stat: VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' .
+   34 Stat: VAL '(' PARAMSTR '(' Expr ')' ',' ID . ')'
 
-    $default  reduce using rule 33 (Stat)
+    ')'  shift, and go to state 124
+
+
+State 124
+
+   34 Stat: VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' .
+
+    $default  reduce using rule 34 (Stat)

@@ -1,9 +1,12 @@
 #ifndef _STRUCTURES_
 #define _STRUCTURES_
 
-typedef enum Terminais{
+typedef enum Terminals{
 	Id,
 	IntLit, 
 	RealLit, 
 	String,
-}Terminais;
+}Terminals;
+
+
+#endif _STRUCTURES_
