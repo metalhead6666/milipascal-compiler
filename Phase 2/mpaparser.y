@@ -1,7 +1,6 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
-	#include "structures.h"
 	#include "functions.h"
 
 	void yyerror(char *s);
@@ -11,6 +10,20 @@
 %}
 
 %union{
+	struct _Program* program;
+	struct _VarPart* varPart;
+	struct _VarDecl* varDecl;
+	struct _IdStruct* ids;
+	struct _FuncPart* funcPart;
+	struct _FuncDecl* funcDecl;
+	struct _FuncDef* funcDef;
+	struct _FuncDef2* funcDef2;
+	struct _FuncParams* funcParams;
+	struct _Params* params;
+	struct _VarParams* varParams;
+	Terminals type;
+	Operators ops;
+
 	char *string;
 	int value;
 }
@@ -51,18 +64,20 @@
 %nonassoc IFX
 %nonassoc ELSE
 
+%type <program> Prog;
+
 %%
 
-Prog: ProgHeading ';' ProgBlock '.' 
+Prog: ProgHeading ';' ProgBlock '.'         {}//program=makeNode($1,$3);}
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'
 		   ;
 
-ProgBlock: VarPart FuncPart StatPart
+ProgBlock: varPart funcPart StatPart
 		 ;
 
-VarPart: VAR VarDeclaration ';' VarDeclarationRepeat
+varPart: VAR VarDeclaration ';' VarDeclarationRepeat
 	   |
 	   ;
 
@@ -80,7 +95,7 @@ IDListRepeat: IDListRepeat ',' ID
 			|
 			;
 
-FuncPart: FuncPart FuncDeclaration ';'
+funcPart: funcPart FuncDeclaration ';'
 		|		
 		;
 
@@ -104,7 +119,7 @@ FormalParams: VAR IDList ':' ID
 			| IDList ':' ID
 			;
 
-FuncBlock: VarPart StatPart
+FuncBlock: varPart StatPart
 		 ;
 
 StatPart: BEG StatList END
