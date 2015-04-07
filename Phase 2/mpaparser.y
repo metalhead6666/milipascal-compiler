@@ -1,6 +1,8 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
+	#include "structures.h"
+	#include "functions.h"
 
 	void yyerror(char *s);
 
@@ -8,10 +10,15 @@
 	extern int count_line, count_column;	
 %}
 
+%union{
+	char *string;
+	int value;
+}
+
 %token RESERVED
-%token REAL
-%token INTEGER
-%token START
+%token <string> REAL
+%token <value> INTEGER
+%token BEG
 %token DO
 %token IF
 %token THEN
@@ -33,8 +40,8 @@
 %token OP2
 %token OP3
 %token OP4
-%token ID
-%token STRING
+%token <string> ID
+%token <string> STRING
 
 %left NOT
 %left OP2
@@ -46,7 +53,7 @@
 
 %%
 
-Prog: ProgHeading ';' ProgBlock '.'
+Prog: ProgHeading ';' ProgBlock '.' 
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'
@@ -100,15 +107,12 @@ FormalParams: VAR IDList ':' ID
 FuncBlock: VarPart StatPart
 		 ;
 
-StatPart: START StatList END
+StatPart: BEG StatList END
 		;
 
-StatList: Stat StatListRepeat
+StatList: StatList ';' Stat
+		| Stat
 		;
-
-StatListRepeat: StatListRepeat ";" Stat
-			  |
-			  ;
 
 Stat: StatPart
 	| IF Expr THEN Stat %prec IFX
@@ -154,7 +158,7 @@ ParamListOptional: ParamListOptional ',' Expr
 int main(int argc, char *argv[]){
 	if(argc > 0){
 		if(strcmp(argv[0], "-t") == 0){
-			//print tree here
+			print_tree();
 		}
 	}
 
