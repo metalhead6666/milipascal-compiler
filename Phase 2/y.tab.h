@@ -48,7 +48,7 @@ extern int yydebug;
     RESERVED = 258,
     REAL = 259,
     INTEGER = 260,
-    START = 261,
+    BEG = 261,
     DO = 262,
     IF = 263,
     THEN = 264,
@@ -79,7 +79,7 @@ extern int yydebug;
 #define RESERVED 258
 #define REAL 259
 #define INTEGER 260
-#define START 261
+#define BEG 261
 #define DO 262
 #define IF 263
 #define THEN 264
@@ -107,7 +107,16 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE YYSTYPE;
+union YYSTYPE
+{
+#line 13 "mpaparser.y" /* yacc.c:1909  */
+
+	char *string;
+	int value;
+
+#line 119 "y.tab.h" /* yacc.c:1909  */
+};
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
