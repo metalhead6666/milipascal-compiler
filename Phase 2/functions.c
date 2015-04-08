@@ -20,9 +20,16 @@ ProgBlock* addProgBlock(VarPart* varPart, FuncPart* funcPart){
 
 void print_tree(Program* program){
 	printf("Program\n");
+
 	counter+=2;
 	print_dots(counter);
-	printf("Id(%s)\n", program->id);
+
+	print_id(program->id);
+
+}
+
+void print_id(char *id){
+	printf("Id(%s)\n", id);
 }
 
 void print_dots(int counter){

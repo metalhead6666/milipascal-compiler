@@ -11,5 +11,6 @@ ProgBlock* addProgBlock(VarPart* varPart, FuncPart* funcPart);
 
 void print_tree(Program* program);
 void print_dots(int counter);
+void print_id(char *id);
 
 #endif
