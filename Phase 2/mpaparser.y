@@ -1,36 +1,13 @@
 %{
-	#include <stdio.h>
-	#include <string.h>
+	#include "structures.h"
 	#include "functions.h"
 
 	void yyerror(char *s);
 
 	extern char *yytext;
-	extern int count_line, count_column;	
+	extern int count_line, count_column;
 %}
 
-%union{
-	struct _Program* program;
-	struct _VarPart* varPart;
-	struct _VarDecl* varDecl;
-	struct _IdStruct* ids;
-	struct _FuncPart* funcPart;
-	struct _FuncDecl* funcDecl;
-	struct _FuncDef* funcDef;
-	struct _FuncDef2* funcDef2;
-	struct _FuncParams* funcParams;
-	struct _Params* params;
-	struct _VarParams* varParams;
-	Terminals type;
-	Operators ops;
-
-	char *string;
-	int value;
-}
-
-%token <string> RESERVED
-%token <string> REAL
-%token <value> INTEGER
 %token BEG
 %token DO
 %token IF
@@ -55,6 +32,9 @@
 %token <string> OP4
 %token <string> ID
 %token <string> STRING
+%token <string> INTEGER
+%token <string> REAL
+%token <string> RESERVED
 
 %left NOT
 %left OP2
@@ -65,16 +45,22 @@
 %nonassoc ELSE
 
 %type <program> Prog;
+%type <string> ProgHeading;
+
+%union{
+	struct Program* program;
+
+	char *string;
+};
 
 %%
-
-Prog: ProgHeading ';' ProgBlock '.'         {}//program=makeNode($1,$3);}
+Prog: ProgHeading ';' ProgBlock '.'         					{$$ = makeNode($1);}
 	;
 
-ProgHeading: PROGRAM ID '(' OUTPUT ')'
+ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 		   ;
 
-ProgBlock: varPart funcPart StatPart
+ProgBlock: varPart funcPart StatPart							{}//$$ = addProgBlock($1, $2);}
 		 ;
 
 varPart: VAR VarDeclaration ';' VarDeclarationRepeat
@@ -153,7 +139,7 @@ WriteInPListOptional: WriteInPListOptional ',' Expr
 Expr: Expr OP2 Expr
 	| Expr OP3 Expr
 	| Expr OP4 Expr
-	| OP3 Expr
+	| OP3 Expr %prec NOT
 	| NOT Expr	
 	| '(' Expr ')'
 	| INTEGER
@@ -170,16 +156,18 @@ ParamListOptional: ParamListOptional ',' Expr
 				 ;		 
 
 %%
-int main(int argc, char *argv[]){
+int main(int argc, char **argv){
+	yyparse();
+
 	if(argc > 0){
 		if(strcmp(argv[0], "-t") == 0){
-			print_tree();
+			print_tree(program);
 		}
 	}
 
-	return yyparse();
+	return 0;
 }
 
 void yyerror(char *s){
-	printf ("Line %d, col %d: %s: %s\n", count_line, count_column, s, yytext);
+	printf("Line %d, col %d: %s: %s\n", count_line, count_column, s, yytext);
 }
