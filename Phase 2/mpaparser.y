@@ -6,6 +6,8 @@
 
 	extern char *yytext;
 	extern int count_line, count_column;
+
+	Program* program;
 %}
 
 %token BEG
@@ -46,15 +48,17 @@
 
 %type <program> Prog;
 %type <string> ProgHeading;
+%type <progBlock> ProgBlock;
 
 %union{
 	struct Program* program;
+	struct ProgBlock* progBlock;
 
 	char *string;
 };
 
 %%
-Prog: ProgHeading ';' ProgBlock '.'         					{$$ = makeNode($1);}
+Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode($1, $3);}
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
@@ -159,8 +163,8 @@ ParamListOptional: ParamListOptional ',' Expr
 int main(int argc, char **argv){
 	yyparse();
 
-	if(argc > 0){
-		if(strcmp(argv[0], "-t") == 0){
+	if(argc > 1){
+		if(strcmp(argv[1], "-t") == 0){
 			print_tree(program);
 		}
 	}
