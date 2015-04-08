@@ -1,6 +1,5 @@
 %{
-	#include <stdio.h>
-	#include <stdlib.h>	
+	#include "structures.h"
 	#include "y.tab.h"
 	
 	int start_line = 1, start_column = 1, count_line = 1, count_column = 1;
@@ -12,7 +11,6 @@
 reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|file|for|get|goto|in|input|label|ln|maxint|new|nil|odd|of|ord|pack|packed|page|pred|procedure|put|read|readln|record|reset|rewrite|round|set|sin|sqr|sqrt|succ|text|to|trunc|type|unpack|with|write)
 
 %%
-
 "(*"|"{" {BEGIN STATE; start_line = count_line; start_column = count_column; count_column += yyleng;}
 <STATE>"*)"|"}" {BEGIN 0; count_column += yyleng;}
 <STATE><<EOF>> {printf("Line %d, col %d: unterminated comment\n", start_line, start_column); return *yytext;}
@@ -21,7 +19,7 @@ reserved (abs|arctan|array|case|char|chr|const|cos|dispose|downto|eof|eoln|exp|f
 
 {reserved} {count_column += yyleng; yylval.string = (char*)strdup(yytext); return RESERVED;}
 [0-9]+((e("+"|"-")?[0-9]+)|("."[0-9]+((e("+"|"-")?)?[0-9]+)?)) {count_column += yyleng; yylval.string = (char*)strdup(yytext); return REAL;}
-[0-9]+ {count_column += yyleng; yylval.value = atoi((char*)strdup(yytext)); return INTEGER;}
+[0-9]+ {count_column += yyleng; yylval.string = (char*)strdup(yytext); return INTEGER;}
 begin {count_column += yyleng; return BEG;}
 do {count_column += yyleng; return DO;}
 if {count_column += yyleng; return IF;}
@@ -55,7 +53,6 @@ and|"*"|"/"|mod|div {count_column += yyleng; yylval.string = (char*)strdup(yytex
 . {printf("Line %d, col %d: illegal character ('%s')\n", count_line, count_column, yytext); count_column += yyleng; return *yytext;}
 
 %%
-
 int yywrap(){
 	return 1;
 }	
