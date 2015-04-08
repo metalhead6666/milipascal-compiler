@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "structures.h"
 
 Program* makeNode(char* id, ProgBlock* progBlock);
