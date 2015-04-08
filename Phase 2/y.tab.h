@@ -45,64 +45,64 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    RESERVED = 258,
-    REAL = 259,
-    INTEGER = 260,
-    BEG = 261,
-    DO = 262,
-    IF = 263,
-    THEN = 264,
-    ELSE = 265,
-    END = 266,
-    FORWARD = 267,
-    FUNCTION = 268,
-    OUTPUT = 269,
-    PARAMSTR = 270,
-    REPEAT = 271,
-    UNTIL = 272,
-    VAR = 273,
-    VAL = 274,
-    WHILE = 275,
-    WRITELN = 276,
-    PROGRAM = 277,
-    ASSIGN = 278,
-    NOT = 279,
-    OP2 = 280,
-    OP3 = 281,
-    OP4 = 282,
-    ID = 283,
-    STRING = 284,
+    BEG = 258,
+    DO = 259,
+    IF = 260,
+    THEN = 261,
+    ELSE = 262,
+    END = 263,
+    FORWARD = 264,
+    FUNCTION = 265,
+    OUTPUT = 266,
+    PARAMSTR = 267,
+    REPEAT = 268,
+    UNTIL = 269,
+    VAR = 270,
+    VAL = 271,
+    WHILE = 272,
+    WRITELN = 273,
+    PROGRAM = 274,
+    ASSIGN = 275,
+    NOT = 276,
+    OP2 = 277,
+    OP3 = 278,
+    OP4 = 279,
+    ID = 280,
+    STRING = 281,
+    INTEGER = 282,
+    REAL = 283,
+    RESERVED = 284,
     IFX = 285
   };
 #endif
 /* Tokens.  */
-#define RESERVED 258
-#define REAL 259
-#define INTEGER 260
-#define BEG 261
-#define DO 262
-#define IF 263
-#define THEN 264
-#define ELSE 265
-#define END 266
-#define FORWARD 267
-#define FUNCTION 268
-#define OUTPUT 269
-#define PARAMSTR 270
-#define REPEAT 271
-#define UNTIL 272
-#define VAR 273
-#define VAL 274
-#define WHILE 275
-#define WRITELN 276
-#define PROGRAM 277
-#define ASSIGN 278
-#define NOT 279
-#define OP2 280
-#define OP3 281
-#define OP4 282
-#define ID 283
-#define STRING 284
+#define BEG 258
+#define DO 259
+#define IF 260
+#define THEN 261
+#define ELSE 262
+#define END 263
+#define FORWARD 264
+#define FUNCTION 265
+#define OUTPUT 266
+#define PARAMSTR 267
+#define REPEAT 268
+#define UNTIL 269
+#define VAR 270
+#define VAL 271
+#define WHILE 272
+#define WRITELN 273
+#define PROGRAM 274
+#define ASSIGN 275
+#define NOT 276
+#define OP2 277
+#define OP3 278
+#define OP4 279
+#define ID 280
+#define STRING 281
+#define INTEGER 282
+#define REAL 283
+#define RESERVED 284
 #define IFX 285
 
 /* Value type.  */
@@ -110,26 +110,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 12 "mpaparser.y" /* yacc.c:1909  */
+#line 50 "mpaparser.y" /* yacc.c:1909  */
 
-	struct _Program* program;
-	struct _VarPart* varPart;
-	struct _VarDecl* varDecl;
-	struct _IdStruct* ids;
-	struct _FuncPart* funcPart;
-	struct _FuncDecl* funcDecl;
-	struct _FuncDef* funcDef;
-	struct _FuncDef2* funcDef2;
-	struct _FuncParams* funcParams;
-	struct _Params* params;
-	struct _VarParams* varParams;
-	Terminals type;
-	Operators ops;
+	struct Program* program;
 
 	char *string;
-	int value;
 
-#line 133 "y.tab.h" /* yacc.c:1909  */
+#line 120 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
