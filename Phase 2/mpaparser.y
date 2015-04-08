@@ -147,7 +147,8 @@ WriteInPListOptional: WriteInPListOptional ',' Expr
 Expr: Expr OP2 Expr
 	| Expr OP3 Expr
 	| Expr OP4 Expr
-	| OP3 Expr %prec NOT
+	| '+' Expr %prec NOT
+	| '-' Expr %prec NOT
 	| NOT Expr	
 	| '(' Expr ')'
 	| INTEGER
