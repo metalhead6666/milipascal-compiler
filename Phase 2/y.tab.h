@@ -110,14 +110,16 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 52 "mpaparser.y" /* yacc.c:1909  */
+#line 55 "mpaparser.y" /* yacc.c:1909  */
 
 	struct Program* program;
 	struct ProgBlock* progBlock;
+	struct VarPart* varPart;
+	struct FuncPart* funcPart;
 
 	char *string;
 
-#line 121 "y.tab.h" /* yacc.c:1909  */
+#line 123 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

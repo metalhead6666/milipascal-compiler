@@ -65,6 +65,7 @@
 #line 1 "mpaparser.y" /* yacc.c:339  */
 
 	#include "functions.h"
+	#include "print.h"
 
 	void yyerror(char *s);
 
@@ -73,7 +74,7 @@
 
 	Program* program;
 
-#line 77 "y.tab.c" /* yacc.c:339  */
+#line 78 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -173,14 +174,16 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 52 "mpaparser.y" /* yacc.c:355  */
+#line 55 "mpaparser.y" /* yacc.c:355  */
 
 	struct Program* program;
 	struct ProgBlock* progBlock;
+	struct VarPart* varPart;
+	struct FuncPart* funcPart;
 
 	char *string;
 
-#line 184 "y.tab.c" /* yacc.c:355  */
+#line 187 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -195,7 +198,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 199 "y.tab.c" /* yacc.c:358  */
+#line 202 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -495,12 +498,12 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    60,    60,    63,    66,    69,    70,    73,    74,    77,
-      80,    83,    84,    87,    88,    91,    92,    93,    96,    99,
-     100,   103,   104,   107,   108,   111,   114,   117,   118,   121,
-     122,   123,   124,   125,   126,   127,   128,   129,   132,   133,
-     134,   137,   138,   139,   142,   143,   144,   145,   146,   147,
-     148,   149,   150,   153,   154,   157,   158
+       0,    65,    65,    68,    71,    74,    75,    78,    79,    82,
+      85,    88,    89,    92,    93,    96,    97,    98,   101,   104,
+     105,   108,   109,   112,   113,   116,   119,   122,   123,   126,
+     127,   128,   129,   130,   131,   132,   133,   134,   137,   138,
+     139,   142,   143,   144,   147,   148,   149,   150,   151,   152,
+     153,   154,   155,   158,   159,   162,   163
 };
 #endif
 
@@ -1353,25 +1356,43 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 60 "mpaparser.y" /* yacc.c:1646  */
+#line 65 "mpaparser.y" /* yacc.c:1646  */
     {program = makeNode((yyvsp[-3].string), (yyvsp[-1].progBlock));}
-#line 1359 "y.tab.c" /* yacc.c:1646  */
+#line 1362 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 63 "mpaparser.y" /* yacc.c:1646  */
+#line 68 "mpaparser.y" /* yacc.c:1646  */
     {(yyval.string) = (yyvsp[-3].string);}
-#line 1365 "y.tab.c" /* yacc.c:1646  */
+#line 1368 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 66 "mpaparser.y" /* yacc.c:1646  */
-    {}
-#line 1371 "y.tab.c" /* yacc.c:1646  */
+#line 71 "mpaparser.y" /* yacc.c:1646  */
+    {(yyval.progBlock) = addProgBlock((yyvsp[-2].varPart), (yyvsp[-1].funcPart));}
+#line 1374 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 5:
+#line 74 "mpaparser.y" /* yacc.c:1646  */
+    {(yyval.varPart) = NULL;}
+#line 1380 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 6:
+#line 75 "mpaparser.y" /* yacc.c:1646  */
+    {(yyval.varPart) = NULL;}
+#line 1386 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 14:
+#line 93 "mpaparser.y" /* yacc.c:1646  */
+    {(yyval.funcPart) = NULL;}
+#line 1392 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1375 "y.tab.c" /* yacc.c:1646  */
+#line 1396 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1599,7 +1620,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 161 "mpaparser.y" /* yacc.c:1906  */
+#line 166 "mpaparser.y" /* yacc.c:1906  */
 
 int main(int argc, char **argv){
 	yyparse();
