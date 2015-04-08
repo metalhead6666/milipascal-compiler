@@ -47,10 +47,10 @@ and|"*"|"/"|mod|div {count_column += yyleng; yylval.string = (char*)strdup(yytex
 
 [a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ID;}
 "'"("''"|[^'\n])*"'" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return STRING;}
-"'"([^'\n]*("''")*)* {printf("Line %d, col %d: unterminated string\n", count_line, count_column); count_column += yyleng; return *yytext;}
+"'"([^'\n]*("''")*)* {printf("Line %d, col %d: unterminated string\n", count_line, count_column); count_column += yyleng;}
 "\t"|" " {count_column += yyleng;}
 "\n" {++count_line; count_column = 1;}
-. {printf("Line %d, col %d: illegal character ('%s')\n", count_line, count_column, yytext); count_column += yyleng; return *yytext;}
+. {printf("Line %d, col %d: illegal character ('%s')\n", count_line, count_column, yytext); count_column += yyleng;}
 
 %%
 int yywrap(){
