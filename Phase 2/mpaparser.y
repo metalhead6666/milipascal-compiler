@@ -119,12 +119,9 @@ FuncBlock: varPart StatPart
 StatPart: BEG StatList END
 		;
 
-StatList: Stat StatListRepeat
+StatList: StatList ';' Stat
+		| Stat
 		;
-
-StatListRepeat: StatListRepeat ',' Stat
-			  |
-			  ;
 
 Stat: StatPart
 	| IF Expr THEN Stat %prec IFX
