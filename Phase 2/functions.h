@@ -9,6 +9,8 @@
 Program* makeNode(char* id, ProgBlock* progBlock);
 ProgBlock* addProgBlock(VarPart* varPart, FuncPart* funcPart);
 
+
 void print_tree(Program* program);
+void print_dots(int counter);
 
 #endif

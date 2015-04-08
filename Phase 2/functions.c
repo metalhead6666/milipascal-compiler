@@ -1,5 +1,7 @@
 #include "functions.h"
 
+int counter=0;
+
 Program* makeNode(char* id, ProgBlock* progBlock){
 	Program* prog = (Program *)malloc(sizeof(Program));
 	prog->progBlock = progBlock;
@@ -17,5 +19,15 @@ ProgBlock* addProgBlock(VarPart* varPart, FuncPart* funcPart){
 }
 
 void print_tree(Program* program){
-	printf("%s\n", program->id);
+	printf("Program\n");
+	counter+=2;
+	print_dots(counter);
+	printf("Id(%s)\n", program->id);
+}
+
+void print_dots(int counter){
+	int i;
+	for(i=0;i<counter;i++){
+		printf(".");
+	}
 }
