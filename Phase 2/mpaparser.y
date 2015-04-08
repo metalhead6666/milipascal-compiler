@@ -38,10 +38,10 @@
 %token <string> REAL
 %token <string> RESERVED
 
-%left NOT
-%left OP2
-%left OP3
 %left OP4
+%left OP3
+%left OP2
+%left NOT
 
 %nonassoc IFX
 %nonassoc ELSE
@@ -119,9 +119,12 @@ FuncBlock: varPart StatPart
 StatPart: BEG StatList END
 		;
 
-StatList: StatList ';' Stat
-		| Stat
+StatList: Stat StatListRepeat
 		;
+
+StatListRepeat: StatListRepeat ',' Stat
+			  |
+			  ;
 
 Stat: StatPart
 	| IF Expr THEN Stat %prec IFX
@@ -134,15 +137,17 @@ Stat: StatPart
 	|
 	;
 
-WriteInPList: '(' Expr WriteInPListOptional ')'
-			| '(' STRING WriteInPListOptional ')'
+WriteInPList: '(' Optional WriteInPListOptional ')'
 			|
 			;
 
-WriteInPListOptional: WriteInPListOptional ',' Expr
-					| WriteInPListOptional ',' STRING
+WriteInPListOptional: WriteInPListOptional ',' Optional
 					|
 					;
+
+Optional: Expr
+		| STRING
+		;					
 
 Expr: Expr OP2 Expr
 	| Expr OP3 Expr
