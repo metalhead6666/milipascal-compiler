@@ -1,5 +1,4 @@
 %{
-	#include "structures.h"
 	#include "functions.h"
 
 	void yyerror(char *s);
