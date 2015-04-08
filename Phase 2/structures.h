@@ -1,14 +1,14 @@
 #ifndef _STRUCTURES_
 #define _STRUCTURES_
 
-typedef enum{
+typedef enum Terminals{
 	Id,
 	IntLit, 
 	RealLit, 
 	String
 }Terminals;
 
-typedef enum{
+typedef enum Operators{
 	Add,
 	And,
 	Call,
@@ -29,7 +29,7 @@ typedef enum{
 	Sub
 }Operators;
 
-typedef enum{
+typedef enum Statements{
 	Assign,
 	IfElse,
 	Repeat,
@@ -39,45 +39,74 @@ typedef enum{
 	WriteLn
 }Statements;
 
-typedef struct _Program Program;
-typedef struct _VarPart VarPart;
-typedef struct _VarDecl VarDecl;
-typedef struct _IdStruct IdStruct;
-typedef struct _FuncPart FuncPart;
-typedef struct _FuncDecl FuncDecl;
-typedef struct _FuncDef FuncDef;
-typedef struct _FuncDef2 FuncDef2;
-typedef struct _FuncParams FuncParams;
-typedef struct _Params Params;
-typedef struct _VarParams VarParams;
-
-//Program
-struct _Program{
-	char* id;
-	VarPart* varPart;
-	FuncPart* funcPart;
-	Statements stat;
-};
-
-struct _VarPart{
-	VarPart* next;
-	VarDecl* varDecl;
-};
-
-struct _VarDecl{
-	char* first_id;
-	char* last_id;
-	IdStruct* id;
-};
-
-struct _IdStruct{
+typedef struct IdStruct IdStruct;
+struct IdStruct{
 	IdStruct* next;
 	char* id;
 };
 
-struct _FuncPart{
+typedef struct VarParams{
+	char* first_id;
+	char* last_id;
+	IdStruct* id;
+}VarParams;
+
+typedef struct Params{
+	char* first_id;
+	char* last_id;
+	IdStruct* id;
+}Params;
+
+typedef struct VarDecl{
+	char* first_id;
+	char* last_id;
+	IdStruct* id;
+}VarDecl;
+
+typedef struct VarPart VarPart;
+struct VarPart{
+	VarPart* next;
+	VarDecl* varDecl;
+};
+
+typedef struct ProgBlock ProgBlock;
+/* Program */
+typedef struct Program{
+	char* id;
+	ProgBlock* progBlock;
+}Program;
+
+typedef struct FuncParams{
+	union{
+		Params* params;
+		VarParams* varParams;
+	}OptionalParams;
+}FuncParams;
+
+/* Function Declaration */
+typedef struct FuncDecl{
+	char* first_id;
+	FuncParams* funcParams;
+	char* last_id;
+}FuncDecl;
+
+typedef struct FuncDef{
+	FuncDecl* funcDecl;
+	VarPart* varPart;
+	Statements stat;
+}FuncDef;
+
+typedef struct FuncDef2{
+	char* id;
+	VarPart* varPart;
+	Statements stat;
+}FuncDef2;
+
+typedef struct FuncPart FuncPart;
+struct FuncPart{
 	FuncPart* next;
 
+	/* everything is optional */
 	union{
 		FuncDecl* funcDecl;
 		FuncDef* funcDef;
@@ -85,42 +114,10 @@ struct _FuncPart{
 	}funcPart;
 };
 
-//Function Declaration
-struct _FuncDecl{
-	char* first_id;
-	FuncParams* funcParams;
-	char* last_id;
-};
-
-struct _FuncDef{
-	FuncDecl* funcDecl;
+struct ProgBlock{
 	VarPart* varPart;
+	FuncPart* funcPart;
 	Statements stat;
-};
-
-struct _FuncDef2{
-	char* id;
-	VarPart* varPart;
-	Statements stat;
-};
-
-struct _FuncParams{
-	union{
-		Params* params;
-		VarParams* varParams;
-	}OptionalParams;
-};
-
-struct _Params{
-	char* first_id;
-	char* last_id;
-	IdStruct* id;
-};
-
-struct _VarParams{
-	char* first_id;
-	char* last_id;
-	IdStruct* id;
 };
 
 #endif
