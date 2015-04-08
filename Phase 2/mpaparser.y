@@ -1,5 +1,6 @@
 %{
 	#include "functions.h"
+	#include "print.h"
 
 	void yyerror(char *s);
 
@@ -48,10 +49,14 @@
 %type <program> Prog;
 %type <string> ProgHeading;
 %type <progBlock> ProgBlock;
+%type <varPart> varPart;
+%type <funcPart> funcPart;
 
 %union{
 	struct Program* program;
 	struct ProgBlock* progBlock;
+	struct VarPart* varPart;
+	struct FuncPart* funcPart;
 
 	char *string;
 };
@@ -63,15 +68,15 @@ Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode($1, $3);}
 ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 		   ;
 
-ProgBlock: varPart funcPart StatPart							{}//$$ = addProgBlock($1, $2);}
+ProgBlock: varPart funcPart StatPart							{$$ = addProgBlock($1, $2);}
 		 ;
 
-varPart: VAR VarDeclaration ';' VarDeclarationRepeat
-	   |
+varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = NULL;}
+	   |														{$$ = NULL;}
 	   ;
 
 VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ';'
-					|
+					|											
 					;		   
 
 VarDeclaration: IDList ':' ID
@@ -81,11 +86,11 @@ IDList: ID IDListRepeat
 	  ;			 
 
 IDListRepeat: IDListRepeat ',' ID
-			|
+			|		
 			;
 
 funcPart: funcPart FuncDeclaration ';'
-		|		
+		|														{$$ = NULL;}	
 		;
 
 FuncDeclaration: FuncHeading ';' FORWARD
