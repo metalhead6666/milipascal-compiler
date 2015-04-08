@@ -6,7 +6,7 @@
 #include <string.h>
 #include "structures.h"
 
-Program* makeNode(char* id);
+Program* makeNode(char* id, ProgBlock* progBlock);
 ProgBlock* addProgBlock(VarPart* varPart, FuncPart* funcPart);
 
 void print_tree(Program* program);
