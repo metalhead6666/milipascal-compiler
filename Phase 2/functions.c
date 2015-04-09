@@ -2,6 +2,7 @@
 
 /*
 *	IdStruct
+*	connectIds
 *	VarParams
 *	Params
 *	VarDecl
@@ -28,6 +29,7 @@ Program *makeNode(char* id, ProgBlock* progBlock){
 	return prog;
 }
 
+//Declarations
 IdStruct *addIdStruct(IdStruct* next, char *id){
 	IdStruct *idStruct = (IdStruct *)malloc(sizeof(IdStruct));
 	idStruct->next = next;
@@ -35,6 +37,12 @@ IdStruct *addIdStruct(IdStruct* next, char *id){
 
 	return idStruct;
 }
+
+IdStruct *connectIds(IdStruct *id1, IdStruct *id2){
+	id1->next = id2;
+	return id1;
+}
+
 
 VarParams *addVarParams(char *first_id, char *last_id, IdStruct *id){
 	VarParams *varParams = (VarParams *)malloc(sizeof(VarParams));
