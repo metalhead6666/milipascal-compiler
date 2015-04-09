@@ -2,7 +2,7 @@
 
 void print_tree(Program* program){
 	int counter = 0;
-	
+
 	printf("Program\n");
 
 	counter += 2;
