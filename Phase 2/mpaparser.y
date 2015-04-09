@@ -97,38 +97,35 @@ IDList: ',' ID IDList 											{$$ = addIdStruct($3, $2);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: funcPart FuncDeclaration ';'
+funcPart: funcPart FuncDeclaration ';' 							{$$ = addFuncPart_FuncDecl($1, $2);}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD
-			   | FUNCTION ID ';' FuncBlock
-			   | FuncHeading ';' FuncBlock
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = $1;}
+			   | FUNCTION ID ';' varPart StatPart				//
+			   | FuncHeading ';' varPart StatPart 				//
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncDecl($2, $3, $5)}
 		   ;		   
 
-FormalParamList: '(' FormalParams FormalParamListRepeat ')'
-			   |
+FormalParamList: '(' FormalParams FormalParamListRepeat ')'		//
+			   |												{$$ = NULL;}
 			   ;
 
-FormalParamListRepeat: ';' FormalParams FormalParamListRepeat
-					 |
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	//
+					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: VAR ID IDList ':' ID
-			| ID IDList ':' ID
+FormalParams: VAR ID IDList ':' ID 								//
+			| ID IDList ':' ID 									//
 			;
 
-FuncBlock: varPart StatPart
-		 ;
-
-StatPart: BEG StatList END
+StatPart: BEG StatList END 										{$$ = $2;}
 		;
 
-StatList: StatList ';' Stat
-		| Stat
+StatList: StatList ';' Stat 									//
+		| Stat 													{$$ = $1;}
 		;
 
 Stat: StatPart

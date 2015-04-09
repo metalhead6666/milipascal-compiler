@@ -76,32 +76,6 @@ typedef struct Program{
 	ProgBlock* progBlock;
 }Program;
 
-typedef struct FuncParams{
-	union{
-		Params* params;
-		VarParams* varParams;
-	}OptionalParams;
-}FuncParams;
-
-/* Function Declaration */
-typedef struct FuncDecl{
-	char* first_id;
-	FuncParams* funcParams;
-	char* last_id;
-}FuncDecl;
-
-typedef struct FuncDef{
-	FuncDecl* funcDecl;
-	VarPart* varPart;
-	Statements stat;
-}FuncDef;
-
-typedef struct FuncDef2{
-	char* id;
-	VarPart* varPart;
-	Statements stat;
-}FuncDef2;
-
 typedef struct FuncPart FuncPart;
 struct FuncPart{
 	FuncPart* next;
