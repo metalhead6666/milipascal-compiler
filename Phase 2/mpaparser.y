@@ -5,10 +5,14 @@
 
 	void yyerror(char *s);
 
+	/* values received from lex */
 	extern char *yytext;
 	extern int count_line, count_column;
 
+	/* node root to print in the tree */
 	Program* program;
+
+	/* in case some syntax error appears, doesn't print the AST */
 	int hasErrors = 0;
 %}
 
@@ -48,7 +52,6 @@
 %nonassoc IFX
 %nonassoc ELSE
 
-%type <program> Prog;
 %type <string> ProgHeading;
 %type <progBlock> ProgBlock;
 %type <varPart> varPart;
