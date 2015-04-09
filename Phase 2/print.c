@@ -20,23 +20,23 @@ void print_tree(Program* program){
 
 	while(root != NULL){		
 		print_dots(counter);
-		printf("Id(%s)\n", root->varDecl->first_id);
+		print_id(root->varDecl->first_id);
 
 		while(root->varDecl->id != NULL){
 			print_dots(counter);
-			printf("Id(%s)\n", root->varDecl->id->id);
+			print_id(root->varDecl->id->id);
 
 			root->varDecl->id = root->varDecl->id->next;
 		}
 
 		print_dots(counter);
-		printf("Id(%s)\n", root->varDecl->last_id);
+		print_id(root->varDecl->last_id);
 
 		root = root->next;
 	}
 
 	counter -= 4;
-	print_dots(counter);
+	//print_dots(counter);
 }
 
 void print_id(char *id){
