@@ -1,4 +1,5 @@
 %{
+	#include <string.h>
 	#include "functions.h"
 	#include "print.h"
 
@@ -8,6 +9,7 @@
 	extern int count_line, count_column;
 
 	Program* program;
+	int hasErrors = 0;
 %}
 
 %token BEG
@@ -171,7 +173,7 @@ int main(int argc, char **argv){
 	yyparse();
 
 	if(argc > 1){
-		if(strcmp(argv[1], "-t") == 0){
+		if(strcmp(argv[1], "-t") == 0 && !hasErrors){
 			print_tree(program);
 		}
 	}
@@ -180,5 +182,6 @@ int main(int argc, char **argv){
 }
 
 void yyerror(char *s){
-	printf("Line %d, col %d: %s: %s\n", count_line, count_column, s, yytext);
+	hasErrors = 1;
+	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
