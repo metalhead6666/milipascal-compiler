@@ -1,28 +1,42 @@
 #include "print.h"
 
-int counter = 0;
-
 void print_tree(Program* program){
+	int counter = 0;
+	
 	printf("Program\n");
 
 	counter += 2;
 	print_dots(counter);
-
 	print_id(program->id);
 
-	ProgBlock *raiz = program->progBlock;
+	VarPart *root = program->progBlock->varPart;
 
-	while(raiz->varPart->next!=NULL){
+	print_dots(counter);
+	printf("VarPart\n");
+	counter += 2;
+	print_dots(counter);
+	printf("VarDecl\n");
+	counter += 2;
+
+	while(root != NULL){		
 		print_dots(counter);
-		printf("VarPart\n");
+		printf("Id(%s)\n", root->varDecl->first_id);
 
-		VarPart *var = raiz->varPart;
+		while(root->varDecl->id != NULL){
+			print_dots(counter);
+			printf("Id(%s)\n", root->varDecl->id->id);
 
-		while(var->next!=NULL){
-			printf("Merda");
-			*(var->next)++;
+			root->varDecl->id = root->varDecl->id->next;
 		}
+
+		print_dots(counter);
+		printf("Id(%s)\n", root->varDecl->last_id);
+
+		root = root->next;
 	}
+
+	counter -= 4;
+	print_dots(counter);
 }
 
 void print_id(char *id){
