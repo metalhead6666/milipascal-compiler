@@ -81,15 +81,12 @@ VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ';'
 					|											
 					;		   
 
-VarDeclaration: IDList ':' ID
-			  ;
+VarDeclaration: ID IDList ':' ID
+			  ;		 
 
-IDList: ID IDListRepeat
-	  ;			 
-
-IDListRepeat: IDListRepeat ',' ID
-			|		
-			;
+IDList: IDList ',' ID
+	  |	
+	  ;
 
 funcPart: funcPart FuncDeclaration ';'
 		|														{$$ = NULL;}	
@@ -111,8 +108,8 @@ FormalParamListRepeat: FormalParamListRepeat ';' FormalParams
 					 |
 					 ;
 
-FormalParams: VAR IDList ':' ID
-			| IDList ':' ID
+FormalParams: VAR ID IDList ':' ID
+			| ID IDList ':' ID
 			;
 
 FuncBlock: varPart StatPart
