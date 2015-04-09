@@ -81,14 +81,14 @@ VarDecl *addVarDecl(char *first_id, char *last_id, IdStruct *id){
 
 FuncParams *addFuncParams_Params(Params *params){
 	FuncParams *funcParams = (FuncParams *)malloc(sizeof(FuncParams));
-	funcParams->OptionalParams.params=params;
+	funcParams->OptionalParams.params = params;
 
 	return funcParams;
 }
 
 FuncParams *addFuncParams_VarParams(VarParams *varParams){
 	FuncParams *funcParams = (FuncParams *)malloc(sizeof(FuncParams));
-	funcParams->OptionalParams.varParams=varParams;
+	funcParams->OptionalParams.varParams = varParams;
 
 	return funcParams;
 }
@@ -143,6 +143,3 @@ FuncPart *addFuncPart_FuncDef2(FuncPart *next, FuncDef2 *funcDef2){
 
 	return funcPart;
 }
-
-
-
