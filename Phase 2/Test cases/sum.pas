@@ -8,5 +8,5 @@ begin
 x:=10;
 y:=5;
 z := x+y;
-write(z) 
+writeln(z) 
 end.
