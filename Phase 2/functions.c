@@ -2,7 +2,6 @@
 
 /*
 *	IdStruct
-*	connectIds
 *	VarParams
 *	Params
 *	VarDecl
@@ -36,11 +35,6 @@ IdStruct *addIdStruct(IdStruct* next, char *id){
 	idStruct->id = id;
 
 	return idStruct;
-}
-
-IdStruct *connectIds(IdStruct *id1, IdStruct *id2){
-	id1->next = id2;
-	return id1;
 }
 
 
@@ -77,6 +71,7 @@ VarPart *addVarPart(VarPart *varPart, VarDecl *varDecl){
 
 	return new_varPart;
 }
+
 
 VarDecl *addVarDecl(char *first_id, char *last_id, IdStruct *id){
 	VarDecl *varDecl = (VarDecl *)malloc(sizeof(VarDecl));

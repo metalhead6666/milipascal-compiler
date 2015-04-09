@@ -19,6 +19,5 @@ FuncDef2 *addFuncDef2(char *id, VarPart *varPart, Statements stat);
 FuncPart *addFuncPart_FuncDecl(FuncPart *next, FuncDecl *funcDecl);
 FuncPart *addFuncPart_FuncDef(FuncPart *next, FuncDef *funcDef);
 FuncPart *addFuncPart_FuncDef2(FuncPart *next, FuncDef2 *funcDef2);
-IdStruct *connectIds(IdStruct *id1, IdStruct *id2);
 
 #endif

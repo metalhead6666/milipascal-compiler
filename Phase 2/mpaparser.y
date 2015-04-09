@@ -52,13 +52,19 @@
 %type <string> ProgHeading;
 %type <progBlock> ProgBlock;
 %type <varPart> varPart;
+%type <varPart> VarDeclarationRepeat;
 %type <funcPart> funcPart;
+%type <idStruct> IDList;
+%type <varDecl> VarDeclaration;
+
 
 %union{
 	struct Program* program;
 	struct ProgBlock* progBlock;
 	struct VarPart* varPart;
 	struct FuncPart* funcPart;
+	struct IdStruct* idStruct;
+	struct VarDecl* varDecl;
 
 	char *string;
 };
@@ -73,19 +79,19 @@ ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 ProgBlock: varPart funcPart StatPart							{$$ = addProgBlock($1, $2);}
 		 ;
 
-varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = NULL;}
+varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = addVarPart($4, $2);}
 	   |														{$$ = NULL;}
 	   ;
 
-VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ';'
-					|											
+VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ';'	{$$ = addVarPart($1, $2);}
+					|											{$$ = NULL;}
 					;		   
 
-VarDeclaration: ID IDList ':' ID
+VarDeclaration: ID IDList ':' ID 								{$$ = addVarDecl($1,$4,$2);}
 			  ;		 
 
-IDList: IDList ',' ID
-	  |	
+IDList: IDList ',' ID 											{$$ = addIdStruct($1,$3);}
+	  |															{$$ = NULL;}
 	  ;
 
 funcPart: funcPart FuncDeclaration ';'
