@@ -83,14 +83,14 @@ varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = addVarPart($4, $2);
 	   |														{$$ = NULL;}
 	   ;
 
-VarDeclarationRepeat: VarDeclarationRepeat VarDeclaration ';'	{$$ = addVarPart($1, $2);}
+VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = addVarPart($3, $1);}
 					|											{$$ = NULL;}
 					;		   
 
-VarDeclaration: ID IDList ':' ID 								{$$ = addVarDecl($1,$4,$2);}
+VarDeclaration: ID IDList ':' ID 								{$$ = addVarDecl($1, $4, $2);}
 			  ;		 
 
-IDList: IDList ',' ID 											{$$ = addIdStruct($1,$3);}
+IDList: ',' ID IDList 											{$$ = addIdStruct($3, $2);}
 	  |															{$$ = NULL;}
 	  ;
 
@@ -110,7 +110,7 @@ FormalParamList: '(' FormalParams FormalParamListRepeat ')'
 			   |
 			   ;
 
-FormalParamListRepeat: FormalParamListRepeat ';' FormalParams
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat
 					 |
 					 ;
 
@@ -143,7 +143,7 @@ WriteInPList: '(' Optional WriteInPListOptional ')'
 			|
 			;
 
-WriteInPListOptional: WriteInPListOptional ',' Optional
+WriteInPListOptional: ',' Optional WriteInPListOptional
 					|
 					;
 
@@ -167,7 +167,7 @@ ParamList: '(' Expr ParamListOptional ')'
 		 |
 		 ;	
 
-ParamListOptional: ParamListOptional ',' Expr
+ParamListOptional: ',' Expr ParamListOptional
 				 |
 				 ;		 
 
