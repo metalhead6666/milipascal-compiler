@@ -184,6 +184,8 @@ int main(int argc, char **argv){
 		}
 	}
 
+	clean_memory(program);
+
 	return 0;
 }
 
