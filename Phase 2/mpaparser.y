@@ -60,7 +60,6 @@
 %type <idStruct> IDList;
 %type <varDecl> VarDeclaration;
 
-
 %union{
 	struct Program* program;
 	struct ProgBlock* progBlock;
@@ -97,35 +96,35 @@ IDList: ',' ID IDList 											{$$ = addIdStruct($3, $2);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: funcPart FuncDeclaration ';' 							{$$ = addFuncPart_FuncDecl($1, $2);}
+funcPart: funcPart FuncDeclaration ';' 							{/*$$ = addFuncPart_FuncDecl($1, $2);*/}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = $1;}
+FuncDeclaration: FuncHeading ';' FORWARD						{/*$$ = $1;*/}
 			   | FUNCTION ID ';' varPart StatPart				//
 			   | FuncHeading ';' varPart StatPart 				//
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncDecl($2, $3, $5)}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{/*$$ = addFuncDecl($2, $3, $5);*/}
 		   ;		   
 
 FormalParamList: '(' FormalParams FormalParamListRepeat ')'		//
-			   |												{$$ = NULL;}
+			   |												{/*$$ = NULL;*/}
 			   ;
 
 FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	//
-					 |											{$$ = NULL;}
+					 |											{/*$$ = NULL;*/}
 					 ;
 
 FormalParams: VAR ID IDList ':' ID 								//
 			| ID IDList ':' ID 									//
 			;
 
-StatPart: BEG StatList END 										{$$ = $2;}
+StatPart: BEG StatList END 										{/*$$ = $2;*/}
 		;
 
 StatList: StatList ';' Stat 									//
-		| Stat 													{$$ = $1;}
+		| Stat 													{/*$$ = $1;*/}
 		;
 
 Stat: StatPart
