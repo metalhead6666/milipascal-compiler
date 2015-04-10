@@ -61,9 +61,6 @@ IdStruct *addIdStruct(IdStruct* next, char *id){
 	return idStruct;
 }
 
-
-
-
 VarParams *addVarParams(char *first_id, char *last_id, IdStruct *id){
 	VarParams *varParams = (VarParams *)malloc(sizeof(VarParams));
 	varParams->first_id = first_id;
@@ -81,21 +78,3 @@ Params *addParams(char *first_id, char *last_id, IdStruct *id){
 
 	return params;
 }
-
-FuncPart *addFuncPart_FuncDecl(FuncPart *next, FuncDecl *funcDecl){
-	FuncPart *funcPart = (FuncPart *)malloc(sizeof(FuncPart));
-	funcPart->next = next;
-	funcPart->funcPart.funcDecl = funcDecl;
-
-	return funcPart;
-}
-
-FuncDecl *addFuncDecl(char *first_id, char *last_id, FuncParams *funcParams){
-	FuncDecl *funcDecl = (FuncDecl *)malloc(sizeof(FuncDecl));
-	funcDecl->first_id = first_id;
-	funcDecl->last_id = last_id;
-	funcDecl-> funcParams = funcParams;
-
-	return funcDecl;
-}
-
