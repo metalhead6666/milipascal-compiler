@@ -81,11 +81,6 @@ struct FuncPart{
 	FuncPart* next;
 
 	/* everything is optional */
-	union{
-		FuncDecl* funcDecl;
-		FuncDef* funcDef;
-		FuncDef2* funcDef2;
-	}funcPart;
 };
 
 struct ProgBlock{
