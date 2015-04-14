@@ -59,15 +59,22 @@
 %type <funcPart> funcPart;
 %type <idStruct> IDList;
 %type <varDecl> VarDeclaration;
+%type <funcDeclaration> FuncDeclaration;
+%type <funcHeading> FuncHeading;
+%type <formalParamList> FormalParamList;
+%type <formalParamList> FormalParamListRepeat;
+%type <formalParams> FormalParams;
 
 %union{
-	struct Program* program;
 	struct ProgBlock* progBlock;
 	struct VarPart* varPart;
 	struct FuncPart* funcPart;
 	struct IdStruct* idStruct;
 	struct VarDecl* varDecl;
-
+	struct FuncDeclaration* funcDeclaration;
+	struct FuncHeading *funcHeading;
+	struct FormalParamList *formalParamList;
+	struct FormalParams *formalParams;
 	char *string;
 };
 
@@ -96,28 +103,28 @@ IDList: ',' ID IDList 											{$$ = addIdStruct($3, $2);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: funcPart FuncDeclaration ';' 							{/*$$ = addFuncPart_FuncDecl($1, $2);*/}
+funcPart: funcPart FuncDeclaration ';' 							{$$ = addFuncPart($1, $2);}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{/*$$ = $1;*/}
-			   | FUNCTION ID ';' varPart StatPart				//
-			   | FuncHeading ';' varPart StatPart 				//
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1);}
+			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL);}
+			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1);}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{/*$$ = addFuncDecl($2, $3, $5);*/}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncHeading($2, $3, $5);}
 		   ;		   
 
-FormalParamList: '(' FormalParams FormalParamListRepeat ')'		//
-			   |												{/*$$ = NULL;*/}
+FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = addFormalParamList($2,$3);}
+			   |												{$$ = NULL;}
 			   ;
 
-FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	//
-					 |											{/*$$ = NULL;*/}
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = addFormalParamList($2,$3);}
+					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: VAR ID IDList ':' ID 								//
-			| ID IDList ':' ID 									//
+FormalParams: VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5);}
+			| ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4);}
 			;
 
 StatPart: BEG StatList END 										{/*$$ = $2;*/}

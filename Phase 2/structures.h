@@ -65,10 +65,37 @@ typedef struct Program{
 }Program;
 
 typedef struct FuncPart FuncPart;
+
+typedef struct FormalParams{
+	char* first_id;
+	IdStruct* idStruct;
+	char* last_id;
+}FormalParams;
+
+typedef struct FormalParamList FormalParamList;
+struct FormalParamList{
+	FormalParams* formalParams;
+	FormalParamList* next;
+};
+
+typedef struct FuncHeading{
+	char* first_id;
+	FormalParamList* next;
+	char* last_id;
+}FuncHeading;
+
+typedef struct FuncDeclaration{
+	Statements stat;
+	VarPart* varPart;
+	union{
+		char *id;
+		FuncHeading* funcHeading;
+	}funcDeclarationUnion;
+}FuncDeclaration;
+
 struct FuncPart{
 	FuncPart* next;
-
-	/* everything is optional */
+	FuncDeclaration *funcDeclaration;
 };
 
 struct ProgBlock{
@@ -76,5 +103,9 @@ struct ProgBlock{
 	FuncPart* funcPart;
 	Statements stat;
 };
+
+
+
+
 
 #endif

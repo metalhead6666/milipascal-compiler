@@ -1,25 +1,5 @@
 #include "functions.h"
 
-/*
-*	IdStruct
-*	VarParams
-*	Params
-*	VarDecl
-*	VarPart
-*	ProgBlock
-*	Program
-*	FuncParams
-*		|FuncParams_Params
-*		|FuncParams_VarParams
-*	FuncDecl
-*	FuncDef
-* 	FuncDef2
-*	FuncPart
-*		|FuncPart_FuncDecl
-*		|FuncPart_FuncDef
-*		|FuncPart_FuncDef2
-*/
-
 Program *makeNode(char* id, ProgBlock* progBlock){
 	Program* prog = (Program *)malloc(sizeof(Program));
 	prog->progBlock = progBlock;
@@ -59,4 +39,47 @@ IdStruct *addIdStruct(IdStruct* next, char *id){
 	idStruct->id = id;
 
 	return idStruct;
+}
+
+FuncPart *addFuncPart(FuncPart* next, FuncDeclaration *funcDeclaration){
+	FuncPart *new_funcPart = (FuncPart *)malloc(sizeof(FuncPart));
+	new_funcPart->next = next;
+	new_funcPart->funcDeclaration = funcDeclaration;
+
+	return new_funcPart;
+}
+
+FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading){
+	FuncDeclaration *funcDeclaration = (FuncDeclaration *)malloc(sizeof(FuncDeclaration));
+	funcDeclaration->varPart=varPart;
+	funcDeclaration->funcDeclarationUnion.id=id;
+	funcDeclaration->funcDeclarationUnion.funcHeading=funcHeading;
+
+	return funcDeclaration;
+}
+
+FuncHeading *addFuncHeading(char* first_id, FormalParamList *next, char* last_id){
+	FuncHeading *funcHeading = (FuncHeading *)malloc(sizeof(FuncHeading));
+	funcHeading->first_id = first_id;
+	funcHeading->next = next;
+	funcHeading->last_id = last_id;
+
+	return funcHeading;
+}
+
+FormalParamList *addFormalParamList(FormalParams *formalParams, FormalParamList *next){
+	FormalParamList *formalParamList = (FormalParamList *)malloc(sizeof(FormalParamList));
+	formalParamList->formalParams = formalParams;
+	formalParamList->next = next;
+
+	return formalParamList;
+}
+
+FormalParams *addFormalParams(char* first_id, IdStruct *idStruct, char* last_id){
+	FormalParams *formalParams = (FormalParams *)malloc(sizeof(FormalParams));
+	formalParams->first_id = first_id;
+	formalParams->idStruct = idStruct;
+	formalParams->last_id = last_id;
+
+	return formalParams;
 }
