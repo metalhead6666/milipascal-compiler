@@ -60,21 +60,3 @@ IdStruct *addIdStruct(IdStruct* next, char *id){
 
 	return idStruct;
 }
-
-VarParams *addVarParams(char *first_id, char *last_id, IdStruct *id){
-	VarParams *varParams = (VarParams *)malloc(sizeof(VarParams));
-	varParams->first_id = first_id;
-	varParams->last_id = last_id;
-	varParams-> id = id;
-
-	return varParams;
-}
-
-Params *addParams(char *first_id, char *last_id, IdStruct *id){
-	Params *params = (Params *)malloc(sizeof(Params));
-	params->first_id = first_id;
-	params->last_id = last_id;
-	params-> id = id;
-
-	return params;
-}
