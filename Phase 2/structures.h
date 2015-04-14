@@ -45,18 +45,6 @@ struct IdStruct{
 	char* id;
 };
 
-typedef struct VarParams{
-	char* first_id;
-	char* last_id;
-	IdStruct* id;
-}VarParams;
-
-typedef struct Params{
-	char* first_id;
-	char* last_id;
-	IdStruct* id;
-}Params;
-
 typedef struct VarDecl{
 	char* first_id;
 	char* last_id;
