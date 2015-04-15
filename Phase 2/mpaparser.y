@@ -48,8 +48,9 @@
 %left OP3
 %left OP2
 %left NOT
+%right UMINUS UPLUS
 
-%nonassoc IFX
+%nonassoc THEN
 %nonassoc ELSE
 
 %type <string> ProgHeading;
@@ -103,7 +104,7 @@ IDList: ',' ID IDList 											{$$ = addIdStruct($3, $2);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: funcPart FuncDeclaration ';' 							{$$ = addFuncPart($1, $2);}
+funcPart: FuncDeclaration ';' funcPart  						{$$ = addFuncPart($3, $1);}
 		|														{$$ = NULL;}	
 		;
 
@@ -123,19 +124,19 @@ FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = addFormalPar
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5);}
-			| ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4);}
+FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4);}
+			| VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5);}
 			;
 
-StatPart: BEG StatList END 										{/*$$ = $2;*/}
+StatPart: BEG StatList END 										
 		;
 
-StatList: StatList ';' Stat 									//
-		| Stat 													{/*$$ = $1;*/}
+StatList: StatList ';' Stat
+		| Stat 													
 		;
 
 Stat: StatPart
-	| IF Expr THEN Stat %prec IFX
+	| IF Expr THEN Stat
 	| IF Expr THEN Stat ELSE Stat
 	| WHILE Expr DO Stat
 	| REPEAT StatList UNTIL Expr
@@ -160,8 +161,8 @@ Optional: Expr
 Expr: Expr OP2 Expr
 	| Expr OP3 Expr
 	| Expr OP4 Expr
-	| '+' Expr %prec NOT
-	| '-' Expr %prec NOT
+	| '+' Expr %prec UPLUS
+	| '-' Expr %prec UMINUS
 	| NOT Expr	
 	| '(' Expr ')'
 	| INTEGER
@@ -194,3 +195,4 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
+
