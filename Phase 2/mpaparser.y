@@ -44,12 +44,12 @@
 %token <string> REAL
 %token <string> RESERVED
 
-%left OP4
 %left OP3
 %left OP2
 %left NOT
 %right UMINUS UPLUS
 
+%nonassoc OP4
 %nonassoc THEN
 %nonassoc ELSE
 
