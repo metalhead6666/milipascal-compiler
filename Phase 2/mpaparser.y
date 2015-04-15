@@ -44,7 +44,7 @@
 %token <string> REAL
 %token <string> RESERVED
 
-%left ADDOP
+%left ADDOP OR
 %left MULTOP
 %left NOT
 
@@ -164,14 +164,14 @@ Expr: SimpleExpr
 	| SimpleExpr RELATIONALOP SimpleExpr
 	;
 
-SimpleExpr: '+' Term ADDOP Term
-		  | '-' Term ADDOP Term
-		  | Term ADDOP Term
+SimpleExpr: ADDOP Term
+		  | SimpleExpr ADDOP Term
+		  | SimpleExpr OR Term
 		  | Term
 		  ;
 
 Term: Factor
-	| Factor MULTOP Factor
+	| Term MULTOP Factor
 	;
 
 Factor: '(' Expr ')'

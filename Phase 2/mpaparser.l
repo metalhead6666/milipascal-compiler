@@ -38,11 +38,12 @@ while {count_column += yyleng; return WHILE;}
 writeln {count_column += yyleng; return WRITELN;}
 program {count_column += yyleng; return PROGRAM;}
 ":=" {count_column += yyleng; return ASSIGN;}
+or {count_column += yyleng; return OR;}
 ":"|","|"."|"("|")"|";" {count_column += yyleng; return yytext[0];}
 
 not {count_column += yyleng; return NOT;}
 and|"*"|"/"|mod|div {count_column += yyleng; yylval.string = (char*)strdup(yytext); return MULTOP;}
-"+"|"-"|or {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ADDOP;}
+"+"|"-" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ADDOP;}
 "<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return RELATIONALOP;}
 
 [a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ID;}
