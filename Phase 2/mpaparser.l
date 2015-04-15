@@ -41,9 +41,9 @@ program {count_column += yyleng; return PROGRAM;}
 ":"|","|"."|"("|")"|";" {count_column += yyleng; return yytext[0];}
 
 not {count_column += yyleng; return NOT;}
-and|"*"|"/"|mod|div {count_column += yyleng; yylval.string = (char*)strdup(yytext); return OP2;}
-"+"|"-"|or {count_column += yyleng; yylval.string = (char*)strdup(yytext); return OP3;}
-"<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return OP4;}
+and|"*"|"/"|mod|div {count_column += yyleng; yylval.string = (char*)strdup(yytext); return MULTOP;}
+"+"|"-"|or {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ADDOP;}
+"<"|">"|"="|"<>"|"<="|">=" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return RELATIONALOP;}
 
 [a-zA-Z][a-zA-Z0-9]* {count_column += yyleng; yylval.string = (char*)strdup(yytext); return ID;}
 "'"("''"|[^'\n])*"'" {count_column += yyleng; yylval.string = (char*)strdup(yytext); return STRING;}
