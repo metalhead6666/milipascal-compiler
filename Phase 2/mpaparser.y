@@ -35,21 +35,20 @@
 %token PROGRAM
 %token ASSIGN
 %token NOT
-%token <string> OP2
-%token <string> OP3
-%token <string> OP4
+%token <string> MULTOP
+%token <string> ADDOP
+%token <string> RELATIONALOP
 %token <string> ID
 %token <string> STRING
 %token <string> INTEGER
 %token <string> REAL
 %token <string> RESERVED
 
-%left OP3
-%left OP2
+%left ADDOP
+%left MULTOP
 %left NOT
-%right UMINUS UPLUS
 
-%nonassoc OP4
+%nonassoc RELATIONALOP
 %nonassoc THEN
 %nonassoc ELSE
 
@@ -131,9 +130,12 @@ FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4);}
 StatPart: BEG StatList END 										
 		;
 
-StatList: StatList ';' Stat
-		| Stat 													
+StatList: Stat StatListRepeat												
 		;
+
+StatListRepeat: ';' Stat StatListRepeat
+			  |
+			  ;
 
 Stat: StatPart
 	| IF Expr THEN Stat
@@ -156,19 +158,34 @@ WriteInPListOptional: ',' Optional WriteInPListOptional
 
 Optional: Expr
 		| STRING
-		;					
+		;
 
-Expr: Expr OP2 Expr
-	| Expr OP3 Expr
-	| Expr OP4 Expr
-	| '+' Expr %prec UPLUS
-	| '-' Expr %prec UMINUS
-	| NOT Expr	
-	| '(' Expr ')'
-	| INTEGER
-	| REAL
-	| ID ParamList
+Expr: SimpleExpr
+	| SimpleExpr RELATIONALOP SimpleExpr
 	;
+
+SimpleExpr: '+' Term SimpleExprRepeat
+		  | '-' Term SimpleExprRepeat
+		  | Term SimpleExprRepeat
+		  ;
+
+SimpleExprRepeat: ADDOP Term SimpleExprRepeat
+				|
+				;
+
+Term: Factor TermRepeat	
+	;
+
+TermRepeat: MULTOP Factor TermRepeat
+		  |
+		  ;
+
+Factor: '(' Expr ')'
+	  | NOT Factor
+  	  | INTEGER
+  	  | REAL
+  	  | ID ParamList
+  	  ;
 
 ParamList: '(' Expr ParamListOptional ')'
 		 |
@@ -195,4 +212,3 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
-
