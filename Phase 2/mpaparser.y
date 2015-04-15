@@ -164,31 +164,25 @@ Expr: SimpleExpr
 	| SimpleExpr RELATIONALOP SimpleExpr
 	;
 
-SimpleExpr: '+' Term SimpleExprRepeat
-		  | '-' Term SimpleExprRepeat
-		  | Term SimpleExprRepeat
+SimpleExpr: '+' Term ADDOP Term
+		  | '-' Term ADDOP Term
+		  | Term ADDOP Term
+		  | Term
 		  ;
 
-SimpleExprRepeat: ADDOP Term SimpleExprRepeat
-				|
-				;
-
-Term: Factor TermRepeat	
+Term: Factor
+	| Factor MULTOP Factor
 	;
-
-TermRepeat: MULTOP Factor TermRepeat
-		  |
-		  ;
 
 Factor: '(' Expr ')'
 	  | NOT Factor
   	  | INTEGER
   	  | REAL
+  	  | ID
   	  | ID ParamList
   	  ;
 
 ParamList: '(' Expr ParamListOptional ')'
-		 |
 		 ;	
 
 ParamListOptional: ',' Expr ParamListOptional
@@ -212,3 +206,4 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
+
