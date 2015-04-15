@@ -1,16 +1,20 @@
 #include "print.h"
 
-void print_tree(Program* program){
-	int counter = 0;
+int counter = 0;
 
+void print_tree(Program* program){
 	printf("Program\n");
 
 	counter += 2;
 	print_dots(counter);
 	print_id(program->id);
 
-	VarPart *root = program->progBlock->varPart;
+	print_varPart(program->progBlock->varPart);
+	counter -= 4;
+	print_funcPart(program->progBlock->funcPart);
+}
 
+void print_varPart(VarPart* root){
 	print_dots(counter);
 	printf("VarPart\n");
 	counter += 2;
@@ -34,9 +38,24 @@ void print_tree(Program* program){
 
 		root = root->next;
 	}
+}
 
-	counter -= 4;
-	//print_dots(counter);
+void print_funcPart(FuncPart* funcPart){
+	print_dots(counter);
+	printf("FuncPart\n");
+
+	if(funcPart != NULL){
+		counter += 2;
+		print_dots(counter);
+		printf("FuncDecl\n");
+
+		counter += 2;
+		
+		while(funcPart->next != NULL){
+			print_dots(counter);
+			print_id(funcPart->funcDeclaration->funcDeclarationUnion.id);
+		}
+	}
 }
 
 void print_id(char *id){

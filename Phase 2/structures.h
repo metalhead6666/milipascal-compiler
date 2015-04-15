@@ -65,7 +65,6 @@ typedef struct Program{
 }Program;
 
 typedef struct FuncPart FuncPart;
-
 typedef struct FormalParams{
 	char* first_id;
 	IdStruct* idStruct;
@@ -87,6 +86,7 @@ typedef struct FuncHeading{
 typedef struct FuncDeclaration{
 	Statements stat;
 	VarPart* varPart;
+	
 	union{
 		char *id;
 		FuncHeading* funcHeading;
@@ -103,9 +103,5 @@ struct ProgBlock{
 	FuncPart* funcPart;
 	Statements stat;
 };
-
-
-
-
 
 #endif
