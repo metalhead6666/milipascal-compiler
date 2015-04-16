@@ -10,33 +10,38 @@ void print_tree(Program* program){
 	print_id(program->id);
 
 	print_varPart(program->progBlock->varPart);
-	counter -= 4;
+	counter -= 2;
 	print_funcPart(program->progBlock->funcPart);
+	//counter -= 2;
+	print_statList(program->progBlock->stat);
 }
 
-void print_varPart(VarPart* root){
+void print_varPart(VarPart* varPart){
 	print_dots(counter);
 	printf("VarPart\n");
-	counter += 2;
-	print_dots(counter);
-	printf("VarDecl\n");
-	counter += 2;
+	counter += 2;	
 
-	while(root != NULL){		
+	while(varPart != NULL){
 		print_dots(counter);
-		print_id(root->varDecl->first_id);
+		printf("VarDecl\n");
+		counter += 2;
+		
+		print_dots(counter);
+		print_id(varPart->varDecl->first_id);
 
-		while(root->varDecl->id != NULL){
+		while(varPart->varDecl->id != NULL){
 			print_dots(counter);
-			print_id(root->varDecl->id->id);
+			print_id(varPart->varDecl->id->id);
 
-			root->varDecl->id = root->varDecl->id->next;
+			varPart->varDecl->id = varPart->varDecl->id->next;
 		}
 
 		print_dots(counter);
-		print_id(root->varDecl->last_id);
+		print_id(varPart->varDecl->last_id);
 
-		root = root->next;
+		varPart = varPart->next;
+		
+		counter -= 2;	
 	}
 }
 
@@ -47,14 +52,26 @@ void print_funcPart(FuncPart* funcPart){
 	if(funcPart != NULL){
 		counter += 2;
 		print_dots(counter);
-		printf("FuncDecl\n");
-
-		counter += 2;
+		printf("FuncDecl\n");		
 		
-		while(funcPart->next != NULL){
+		while(funcPart != NULL){
+			counter += 2;
 			print_dots(counter);
 			print_id(funcPart->funcDeclaration->funcDeclarationUnion.id);
+
+			counter -= 2;
+			print_varPart(funcPart->funcDeclaration->varPart);
+			funcPart = funcPart->next;
 		}
+	}
+}
+
+void print_statList(Stat *stat){
+	print_dots(counter);
+	printf("StatList\n");
+
+	while(stat != NULL){
+
 	}
 }
 
