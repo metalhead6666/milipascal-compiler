@@ -49,11 +49,18 @@ FuncPart *addFuncPart(FuncPart* next, FuncDeclaration *funcDeclaration){
 	return new_funcPart;
 }
 
-FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading){
+FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading, int type){
 	FuncDeclaration *funcDeclaration = (FuncDeclaration *)malloc(sizeof(FuncDeclaration));
 	funcDeclaration->varPart=varPart;
-	funcDeclaration->funcDeclarationUnion.id=id;
-	funcDeclaration->funcDeclarationUnion.funcHeading=funcHeading;
+	funcDeclaration->type = type;
+
+	if(type == 1){			
+		funcDeclaration->funcDeclarationUnion.funcHeading=funcHeading;
+	}
+
+	else{
+		funcDeclaration->funcDeclarationUnion.id=id;
+	}
 
 	return funcDeclaration;
 }
@@ -92,13 +99,19 @@ StatList *addStatList(Stat *stat, StatList *next){
 	return statList;
 }
 
-Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList){
+Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList, int type){
 	Stat *stat = (Stat *)malloc(sizeof(Stat));
 	stat->expr = expr;
 	stat->next = next;
 	stat->writeInPList = writeInPList;
-	stat->StatUnion.id = id;
-	stat->StatUnion.statList = statList;
+	stat->type = type;
+
+	if(type==1){
+		stat->StatUnion.id = id;
+	}
+	else if(type==2){
+		stat->StatUnion.statList = statList;
+	}
 
 	return stat;
 }
@@ -111,10 +124,61 @@ WriteInPList *addWriteInPList(Optional *optional, WriteInPList *next){
 	return writeInPList;
 }
 
-Optional *addOptional(Expr *expr, char *string){
+Optional *addOptional(Expr *expr, char *string, int type){
 	Optional *optional = (Optional *)malloc(sizeof(Optional));
-	optional->OptionalUnion.expr = expr;
-	optional->OptionalUnion.string = string;
+	optional->type = type;
+
+	if(type==1){
+		optional->OptionalUnion.expr = expr;
+	}
+	else{
+		optional->OptionalUnion.string = string;
+	}
 
 	return optional;
+}
+
+Expr *addExpr(SimpleExpr *first_simpleExpr, SimpleExpr *last_simpleExpr, char* relationalOp){
+	Expr *expr = (Expr *)malloc(sizeof(Expr));
+	expr->first_simpleExpr = first_simpleExpr;
+	expr->last_simpleExpr = last_simpleExpr;
+	expr->relationalOp = relationalOp;
+
+	return expr;
+}
+
+SimpleExpr *addSimpleExpr(Term *term, char* addOp, SimpleExpr *next){
+	SimpleExpr *simpleExpr = (SimpleExpr *)malloc(sizeof(SimpleExpr));
+	simpleExpr->term = term;
+	simpleExpr->addOp = addOp;
+	simpleExpr->next = next;
+
+	return simpleExpr;
+}
+
+Term *addTerm(Factor *factor, Term *next, char* multOp){
+	Term *term = (Term *)malloc(sizeof(Term));
+	term->factor = factor;
+	term->next = next;
+	term->multOp = multOp;
+
+	return term;
+}
+
+Factor *addFactor(Expr *expr, char *tokenOp, ParamList *paramList, Factor *next){
+	Factor *factor = (Factor *)malloc(sizeof(Factor));
+	factor->expr = expr;
+	factor->tokenOp = tokenOp;
+	factor->paramList = paramList;
+	factor->next = next;
+
+	return factor;
+}
+
+ParamList *addParamList(Expr *expr, ParamList *next){
+	ParamList *paramList = (ParamList *)malloc(sizeof(ParamList));
+	paramList->expr = expr;
+	paramList->next = next;
+
+	return paramList;
 }

@@ -2,6 +2,7 @@
 #define _STRUCTURES_
 
 typedef struct Stat Stat;
+typedef struct Expr Expr;
 typedef struct IdStruct IdStruct;
 struct IdStruct{
 	IdStruct* next;
@@ -54,6 +55,8 @@ typedef struct FuncDeclaration{
 		char *id;
 		FuncHeading* funcHeading;
 	}funcDeclarationUnion;
+
+	int type;
 }FuncDeclaration;
 
 struct FuncPart{
@@ -73,15 +76,47 @@ struct StatList{
 	StatList *next;
 };
 
-typedef struct Expr{
-	
-}Expr;
+typedef struct ParamList ParamList;
+struct ParamList{
+	Expr *expr;
+	ParamList *next;
+};	
+
+typedef struct Factor Factor;
+struct Factor{
+	Expr *expr;
+	char *tokenOp;
+	ParamList *paramList;
+	Factor *next;
+};
+
+typedef struct Term Term;
+struct Term{
+	Factor *factor;
+	Term *next;
+	char *multOp;
+};
+
+typedef struct SimpleExpr SimpleExpr;
+struct SimpleExpr{
+	Term *term;
+	char* addOp;
+	SimpleExpr *next;
+};
+
+struct Expr{
+	SimpleExpr *first_simpleExpr;
+	SimpleExpr *last_simpleExpr;
+	char *relationalOp;
+};
 
 typedef struct Optional{
 	union{
 		Expr *expr;
 		char *string;
 	}OptionalUnion;
+
+	int type;
 }Optional;
 
 typedef struct WriteInPList WriteInPList;
@@ -98,6 +133,8 @@ struct Stat{
 		char *id;
 		StatList *statList;
 	}StatUnion;
+	
+	int type;
 };
 
 #endif

@@ -72,6 +72,11 @@
 %type <writeInPList> WriteInPList;
 %type <writeInPList> WriteInPListOptional;
 %type <optional> Optional;
+%type <term> Term;
+%type <simpleExpr> SimpleExpr;
+%type <factor> Factor;
+%type <paramList> ParamList;
+%type <paramList> ParamListOptional;
 
 %union{
 	struct ProgBlock* progBlock;
@@ -88,6 +93,10 @@
 	struct Expr *expr;
 	struct WriteInPList *writeInPList;
 	struct Optional *optional;
+	struct Term *term;
+	struct SimpleExpr *simpleExpr;
+	struct Factor *factor;
+	struct ParamList *paramList;
 	char *string;
 };
 
@@ -120,9 +129,9 @@ funcPart: FuncDeclaration ';' funcPart  						{$$ = addFuncPart($3, $1);}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1);}
-			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL);}
-			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1);}
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1, 1);}
+			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL, 2);}
+			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1, 1);}
 			   ;
 
 FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncHeading($2, $3, $5);}
@@ -150,14 +159,14 @@ StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3);}
 			  |													{$$ = NULL;}
 			  ;
 
-Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1);}
-	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL);}
-	| IF Expr THEN Stat ELSE Stat 								{$$ = $4->next = $6; addStat($2,$4,NULL,NULL,NULL);}
-	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL);}
-	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2);}	
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL);}
-	| ID ASSIGN Expr 											{$$ = addStat($3,NULL,NULL,$1,NULL);}
-	| WRITELN WriteInPList 										{$$ = addStat(NULL,NULL,$2,NULL,NULL);}
+Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1,3);}
+	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3);}
+	| IF Expr THEN Stat ELSE Stat 								{$$ = $4->next = $6; addStat($2,$4,NULL,NULL,NULL,3);}
+	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3);}
+	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2,2);}	
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL,1);}
+	| ID ASSIGN Expr 											{$$ = addStat($3,NULL,NULL,$1,NULL,1);}
+	| WRITELN WriteInPList 										{$$ = addStat(NULL,NULL,$2,NULL,NULL,3);}
 	| 															{$$ = NULL;}
 	;
 
@@ -169,37 +178,37 @@ WriteInPListOptional: ',' Optional WriteInPListOptional 		{$$ = addWriteInPList(
 					| 											{$$ = NULL;}
 					;
 
-Optional: Expr 													{$$ = addOptional($1,NULL);}
-		| STRING 												{$$ = addOptional(NULL,$1);}
+Optional: Expr 													{$$ = addOptional($1,NULL,1);}
+		| STRING 												{$$ = addOptional(NULL,$1,2);}
 		;
 
-Expr: SimpleExpr												{}
-	| SimpleExpr RELATIONALOP SimpleExpr						{}
+Expr: SimpleExpr												{$$ = addExpr($1,NULL,NULL);}
+	| SimpleExpr RELATIONALOP SimpleExpr						{$$ = addExpr($1,$3,$2);}
 	;
 
-SimpleExpr: ADDOP Term
-		  | SimpleExpr ADDOP Term
-		  | SimpleExpr OR Term
-		  | Term
+SimpleExpr: ADDOP Term											{$$ = addSimpleExpr($2,$1,NULL);}
+		  | SimpleExpr ADDOP Term 								{$$ = addSimpleExpr($3,$2,$1);}
+		  | SimpleExpr OR Term 									{$$ = addSimpleExpr($3,NULL,$1);}
+		  | Term 												{$$ = addSimpleExpr($1,NULL,NULL);}
 		  ;
 
-Term: Factor
-	| Term MULTOP Factor
+Term: Factor	 												{$$ = addTerm($1, NULL, NULL);}
+	| Term MULTOP Factor 										{$$ = addTerm($3, $1, $2);}
 	;
 
-Factor: '(' Expr ')'
-	  | NOT Factor
-  	  | INTEGER
-  	  | REAL
-  	  | ID
-  	  | ID ParamList
+Factor: '(' Expr ')'											{$$ = addFactor($2, NULL, NULL, NULL);}
+	  | NOT Factor  											{$$ = addFactor(NULL, NULL, NULL, $2);}
+  	  | INTEGER													{$$ = addFactor(NULL, $1, NULL, NULL);}
+  	  | REAL 													{$$ = addFactor(NULL, $1, NULL, NULL);}
+  	  | ID 														{$$ = addFactor(NULL, $1, NULL, NULL);}
+  	  | ID ParamList 											{$$ = addFactor(NULL, $1, $2, NULL);}
   	  ;
 
-ParamList: '(' Expr ParamListOptional ')'
+ParamList: '(' Expr ParamListOptional ')' 						{$$ = addParamList($2,$3);}
 		 ;	
 
-ParamListOptional: ',' Expr ParamListOptional
-				 |
+ParamListOptional: ',' Expr ParamListOptional 					{$$ = addParamList($2,$3);}
+				 | 												{$$ = NULL;}
 				 ;		 
 
 %%
