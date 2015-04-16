@@ -83,3 +83,22 @@ FormalParams *addFormalParams(char* first_id, IdStruct *idStruct, char* last_id)
 
 	return formalParams;
 }
+
+StatList *addStatList(Stat *stat, StatList *next){
+	StatList *statList = (StatList *)malloc(sizeof(StatList));
+	statList->stat = stat;
+	statList->next = next;
+
+	return statList;
+}
+
+Stat *addStat(Expr *expr, Stat *next, WriteInPList*writeInPList, char *id, StatList * statList){
+	Stat *stat = (Stat *)malloc(sizeof(Stat));
+	stat->expr = expr;
+	stat->next = next;
+	stat->writeInPList = writeInPList;
+	stat->StatUnion.id = id;
+	stat->StatUnion.statList = statList;
+
+	return stat;
+}

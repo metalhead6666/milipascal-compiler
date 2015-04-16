@@ -14,5 +14,7 @@ FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *fun
 FuncHeading *addFuncHeading(char* first_id, FormalParamList *next, char* last_id);
 FormalParamList *addFormalParamList(FormalParams *formalParams, FormalParamList *next);
 FormalParams *addFormalParams(char* first_id, IdStruct *idStruct, char* last_id);
+StatList *addStatList(Stat *stat, StatList *next);
+Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList);
 
 #endif

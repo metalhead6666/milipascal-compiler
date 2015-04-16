@@ -1,44 +1,7 @@
 #ifndef _STRUCTURES_
 #define _STRUCTURES_
 
-typedef enum Terminals{
-	Id,
-	IntLit, 
-	RealLit, 
-	String
-}Terminals;
-
-typedef enum Operators{
-	Add,
-	And,
-	Call,
-	Div,
-	Eq,
-	Geq,
-	Gt,
-	Leq,
-	Lt,
-	Minus,
-	Mod,
-	Mul,
-	Neq,
-	Not,
-	Or,
-	Plus,
-	RealDiv,
-	Sub
-}Operators;
-
-typedef enum Statements{
-	Assign,
-	IfElse,
-	Repeat,
-	StatList,
-	ValParam,
-	While,
-	WriteLn
-}Statements;
-
+typedef struct Stat Stat;
 typedef struct IdStruct IdStruct;
 struct IdStruct{
 	IdStruct* next;
@@ -84,7 +47,7 @@ typedef struct FuncHeading{
 }FuncHeading;
 
 typedef struct FuncDeclaration{
-	Statements stat;
+	Stat* stat;
 	VarPart* varPart;
 	
 	union{
@@ -101,7 +64,31 @@ struct FuncPart{
 struct ProgBlock{
 	VarPart* varPart;
 	FuncPart* funcPart;
-	Statements stat;
+	Stat* stat;
+};
+
+typedef struct StatList StatList;
+struct StatList{
+	Stat *stat;
+	StatList *next;
+};
+
+typedef struct Expr{
+	
+}Expr;
+
+typedef struct WriteInPList{
+	
+}WriteInPList;
+
+struct Stat{
+	Expr *expr;
+	Stat *next;
+	WriteInPList * writeInPList;
+	union{
+		char *id;
+		StatList *statList;
+	}StatUnion;
 };
 
 #endif

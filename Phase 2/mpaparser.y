@@ -64,6 +64,14 @@
 %type <formalParamList> FormalParamList;
 %type <formalParamList> FormalParamListRepeat;
 %type <formalParams> FormalParams;
+%type <statList> StatList;
+%type <statList> StatListRepeat;
+%type <statList> StatPart;
+%type <stat> Stat;
+%type <expr> Expr;
+%type <writeInPList> WriteInPList;
+
+
 
 %union{
 	struct ProgBlock* progBlock;
@@ -75,6 +83,10 @@
 	struct FuncHeading *funcHeading;
 	struct FormalParamList *formalParamList;
 	struct FormalParams *formalParams;
+	struct StatList *statList;
+	struct Stat *stat;
+	struct Expr *expr;
+	struct WriteInPList *writeInPList;
 	char *string;
 };
 
@@ -127,29 +139,29 @@ FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4);}
 			| VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5);}
 			;
 
-StatPart: BEG StatList END 										
+StatPart: BEG StatList END 										{$$ = $2;}
 		;
 
-StatList: Stat StatListRepeat												
+StatList: Stat StatListRepeat									{$$ = addStatList($1,$2);}				
 		;
 
-StatListRepeat: ';' Stat StatListRepeat
-			  |
+StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3);}	
+			  |													{$$ = NULL;}
 			  ;
 
-Stat: StatPart
-	| IF Expr THEN Stat
-	| IF Expr THEN Stat ELSE Stat
-	| WHILE Expr DO Stat
-	| REPEAT StatList UNTIL Expr
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')'
-	| ID ASSIGN Expr
-	| WRITELN WriteInPList
-	|
+Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1);}
+	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL);}
+	| IF Expr THEN Stat ELSE Stat 								{$$ = $4->next = $6; addStat($2,$4,NULL,NULL,NULL);}
+	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL);}
+	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2);}	
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL);}
+	| ID ASSIGN Expr 											{$$ = addStat($3,NULL,NULL,$1,NULL);}
+	| WRITELN WriteInPList 										{$$ = addStat(NULL,NULL,$2,NULL,NULL);}
+	| 															{$$ = NULL;}
 	;
 
-WriteInPList: '(' Optional WriteInPListOptional ')'
-			|
+WriteInPList: '(' Optional WriteInPListOptional ')'				{}
+			|													{$$ = NULL;}
 			;
 
 WriteInPListOptional: ',' Optional WriteInPListOptional
@@ -160,8 +172,8 @@ Optional: Expr
 		| STRING
 		;
 
-Expr: SimpleExpr
-	| SimpleExpr RELATIONALOP SimpleExpr
+Expr: SimpleExpr												{}
+	| SimpleExpr RELATIONALOP SimpleExpr						{}
 	;
 
 SimpleExpr: ADDOP Term
