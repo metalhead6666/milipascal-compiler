@@ -73,8 +73,6 @@
 %type <writeInPList> WriteInPListOptional;
 %type <optional> Optional;
 
-
-
 %union{
 	struct ProgBlock* progBlock;
 	struct VarPart* varPart;
