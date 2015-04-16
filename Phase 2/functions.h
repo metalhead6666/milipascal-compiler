@@ -16,7 +16,7 @@ FormalParamList *addFormalParamList(FormalParams *formalParams, FormalParamList 
 FormalParams *addFormalParams(char* first_id, IdStruct *idStruct, char* last_id);
 StatList *addStatList(Stat *stat, StatList *next);
 Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList);
-WriteInPList *addWriteInPList(Expr *expr, WriteInPList *next);
+WriteInPList *addWriteInPList(Optional *optional, WriteInPList *next);
 Optional *addOptional(Expr *expr, char *string);
 
 #endif
