@@ -77,9 +77,18 @@ typedef struct Expr{
 	
 }Expr;
 
-typedef struct WriteInPList{
-	
-}WriteInPList;
+typedef struct Optional{
+	union{
+		Expr *expr;
+		char *string;
+	}OptionalUnion;
+}Optional;
+
+typedef struct WriteInPList WriteInPList;
+struct WriteInPList{
+	Optional *optional;
+	WriteInPList *next;
+};
 
 struct Stat{
 	Expr *expr;

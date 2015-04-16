@@ -70,6 +70,8 @@
 %type <stat> Stat;
 %type <expr> Expr;
 %type <writeInPList> WriteInPList;
+%type <writeInPList> WriteInPListOptional;
+%type <optional> Optional;
 
 
 
@@ -87,6 +89,7 @@
 	struct Stat *stat;
 	struct Expr *expr;
 	struct WriteInPList *writeInPList;
+	struct Optional *optional;
 	char *string;
 };
 
@@ -160,16 +163,16 @@ Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1);}
 	| 															{$$ = NULL;}
 	;
 
-WriteInPList: '(' Optional WriteInPListOptional ')'				{}
+WriteInPList: '(' Optional WriteInPListOptional ')'				{$$ = addWriteInPList($2,$3);}
 			|													{$$ = NULL;}
 			;
 
-WriteInPListOptional: ',' Optional WriteInPListOptional
-					|
+WriteInPListOptional: ',' Optional WriteInPListOptional 		{$$ = addWriteInPList($2,$3);}
+					| 											{$$ = NULL;}
 					;
 
-Optional: Expr
-		| STRING
+Optional: Expr 													{$$ = addOptional($1,NULL);}
+		| STRING 												{$$ = addOptional(NULL,$1);}
 		;
 
 Expr: SimpleExpr												{}

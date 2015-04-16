@@ -92,7 +92,7 @@ StatList *addStatList(Stat *stat, StatList *next){
 	return statList;
 }
 
-Stat *addStat(Expr *expr, Stat *next, WriteInPList*writeInPList, char *id, StatList * statList){
+Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList){
 	Stat *stat = (Stat *)malloc(sizeof(Stat));
 	stat->expr = expr;
 	stat->next = next;
@@ -101,4 +101,20 @@ Stat *addStat(Expr *expr, Stat *next, WriteInPList*writeInPList, char *id, StatL
 	stat->StatUnion.statList = statList;
 
 	return stat;
+}
+
+WriteInPList *addWriteInPList(Optional *optional, WriteInPList *next){
+	WriteInPList *writeInPList = (WriteInPList *)malloc(sizeof(WriteInPList));
+	writeInPList->optional = optional;
+	writeInPList->next = next;
+
+	return writeInPList;
+}
+
+Optional *addOptional(Expr *expr, char *string){
+	Optional *optional = (Optional *)malloc(sizeof(Optional));
+	optional->OptionalUnion.expr = expr;
+	optional->OptionalUnion.string = string;
+
+	return optional;
 }
