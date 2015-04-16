@@ -107,7 +107,7 @@ Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode($1, $3);}
 ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 		   ;
 
-ProgBlock: varPart funcPart StatPart							{$$ = addProgBlock($1, $2);}
+ProgBlock: varPart funcPart StatPart							{$$ = addProgBlock($1, $2, $3);}
 		 ;
 
 varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = addVarPart($4, $2);}
@@ -129,9 +129,9 @@ funcPart: FuncDeclaration ';' funcPart  						{$$ = addFuncPart($3, $1);}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1, 1);}
-			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL, 2);}
-			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1, 1);}
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1, 1, NULL);}
+			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL, 2, $5);}
+			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1, 1, $4);}
 			   ;
 
 FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncHeading($2, $3, $5);}

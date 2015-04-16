@@ -8,10 +8,11 @@ Program *makeNode(char* id, ProgBlock* progBlock){
 	return prog;
 }
 
-ProgBlock *addProgBlock(VarPart* varPart, FuncPart* funcPart){
+ProgBlock *addProgBlock(VarPart* varPart, FuncPart* funcPart, StatList *stat){
 	ProgBlock* progBlock = (ProgBlock *)malloc(sizeof(ProgBlock));
 	progBlock->varPart = varPart;
 	progBlock->funcPart = funcPart;
+	progBlock->stat = stat;
 
 	return progBlock;
 }
@@ -49,10 +50,11 @@ FuncPart *addFuncPart(FuncPart* next, FuncDeclaration *funcDeclaration){
 	return new_funcPart;
 }
 
-FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading, int type){
+FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading, int type, StatList *stat){
 	FuncDeclaration *funcDeclaration = (FuncDeclaration *)malloc(sizeof(FuncDeclaration));
 	funcDeclaration->varPart=varPart;
 	funcDeclaration->type = type;
+	funcDeclaration->stat = stat;
 
 	if(type == 1){			
 		funcDeclaration->funcDeclarationUnion.funcHeading=funcHeading;

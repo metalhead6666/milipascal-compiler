@@ -98,7 +98,7 @@ void print_funcPart(FuncPart* funcPart){
 	}
 }
 
-void print_statList(Stat *stat){
+void print_statList(StatList *stat){
 	print_dots(counter);
 	printf("StatList\n");
 

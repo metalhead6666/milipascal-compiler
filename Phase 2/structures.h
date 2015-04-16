@@ -3,6 +3,7 @@
 
 typedef struct Stat Stat;
 typedef struct Expr Expr;
+typedef struct StatList StatList;
 typedef struct IdStruct IdStruct;
 struct IdStruct{
 	IdStruct* next;
@@ -48,7 +49,7 @@ typedef struct FuncHeading{
 }FuncHeading;
 
 typedef struct FuncDeclaration{
-	Stat* stat;
+	StatList* stat;
 	VarPart* varPart;
 	
 	union{
@@ -67,10 +68,9 @@ struct FuncPart{
 struct ProgBlock{
 	VarPart* varPart;
 	FuncPart* funcPart;
-	Stat* stat;
+	StatList* stat;
 };
 
-typedef struct StatList StatList;
 struct StatList{
 	Stat *stat;
 	StatList *next;
@@ -133,7 +133,7 @@ struct Stat{
 		char *id;
 		StatList *statList;
 	}StatUnion;
-	
+
 	int type;
 };
 
