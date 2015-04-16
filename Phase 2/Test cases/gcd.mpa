@@ -1,6 +1,19 @@
 program gcd(output);
 var a, b: integer;
 x,t : integer;
+
+function max(num1, num2: integer): integer;
+var
+   (* local variable declaration *)
+   result: integer;
+begin
+   if (num1 > num2) then
+      result := num1
+   else
+      result := num2;
+   max := result;
+end;
+
 begin
 	val(paramstr(1), a);
 	val(paramstr(2), b);	
