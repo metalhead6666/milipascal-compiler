@@ -8,16 +8,9 @@
 	extern char *yytext;
 	extern int count_line, count_column;
 
-	typedef struct Program{
-		char* type;
-		int level;
-		Program *son;
-		Program *brother;
-		char* value;
-	}Program;
-
 	/* node root to print in the tree */
 	Program* program;
+	Program *aux;
 
 	/* in case some syntax error appears, doesn't print the AST */
 	int hasErrors = 0;
@@ -61,149 +54,151 @@
 %nonassoc ELSE
 
 %type <string> ProgHeading;
-%type ProgBlock;
-%type varPart;
-%type VarDeclarationRepeat;
-%type funcPart;
-%type IDList;
-%type VarDeclaration;
-%type FuncDeclaration;
-%type FuncHeading;
-%type FormalParamList;
-%type FormalParamListRepeat;
-%type FormalParams;
-%type StatList;
-%type StatListRepeat;
-%type StatPart;
-%type Stat;
-%type Expr;
-%type WriteInPList;
-%type WriteInPListOptional;
-%type Optional;
-%type Term;
-%type TermRepeat;
-%type SimpleExpr;
-%type Factor;
-%type ParamList;
-%type ParamListOptional;
+%type <program> ProgBlock;
+%type <program> varPart;
+%type <program> VarDeclarationRepeat;
+%type <program> funcPart;
+%type <program> IDList;
+%type <program> VarDeclaration;
+%type <program> FuncDeclaration;
+%type <program> FuncHeading;
+%type <program> FormalParamList;
+%type <program> FormalParamListRepeat;
+%type <program> FormalParams;
+%type <program> StatList;
+%type <program> StatListRepeat;
+%type <program> StatPart;
+%type <program> Stat;
+%type <program> Expr;
+%type <program> WriteInPList;
+%type <program> WriteInPListOptional;
+%type <program> Optional;
+%type <program> Term;
+%type <program> TermRepeat;
+%type <program> SimpleExpr;
+%type <program> Factor;
+%type <program> ParamList;
+%type <program> ParamListOptional;
 
 %union{
+	struct Program* program;
 	char *string;
 };
 
 %%
-Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode($1, $3);}
+Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode("Id", $1, $3, NULL);}
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 		   ;
 
-ProgBlock: varPart funcPart StatPart							{$$ = addProgBlock($1, $2, $3);}
+ProgBlock: varPart funcPart StatPart							{$$ = $1;}
 		 ;
 
-varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = addVarPart($4, $2);}
+varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = makeNode("VarPart", "", $2, $4);}
 	   |														{$$ = NULL;}
 	   ;
 
-VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = addVarPart($3, $1);}
+VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = makeNode("VarPart", "", $1, $3);}
 					|											{$$ = NULL;}
 					;		   
 
-VarDeclaration: ID IDList ':' ID 								{$$ = addVarDecl($1, $4, $2);}
+VarDeclaration: ID IDList ':' ID 								{aux = $2; while(aux->brother != NULL) aux = aux->brother; aux->brother = makeNode("Id", $4, NULL, NULL); $$->brother = $2; $$ = makeNode("Id", $1, NULL, $2);}
 			  ;		 
 
-IDList: ',' ID IDList 											{$$ = addIdStruct($3, $2);}
+IDList: ',' ID IDList 											{$$ = makeNode("Id", $2, NULL, $3);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: FuncDeclaration ';' funcPart  						{$$ = addFuncPart($3, $1);}
+funcPart: FuncDeclaration ';' funcPart  						{$$ = NULL;}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1, 1, NULL, 1);}
-			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL, 2, $5, 2);}
-			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1, 1, $4, 2);}
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = NULL;}
+			   | FUNCTION ID ';' varPart StatPart				{$$ = NULL;}
+			   | FuncHeading ';' varPart StatPart 				{$$ = NULL;}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncHeading($2, $3, $5);}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = NULL;}
 		   ;		   
 
-FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = addFormalParamList($2,$3);}
+FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = NULL;}
 			   |												{$$ = NULL;}
 			   ;
 
-FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = addFormalParamList($2,$3);}
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = NULL;}
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4, 0);}
-			| VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5, 1);}
+FormalParams: ID IDList ':' ID 									{$$ = NULL;}
+			| VAR ID IDList ':' ID 								{$$ = NULL;}
 			;
 
 StatPart: BEG StatList END 										{$$ = $2;}
 		;
 
-StatList: Stat StatListRepeat									{$$ = addStatList($1,$2); printf("cona\n");}				
+StatList: Stat StatListRepeat									{$$ = NULL;}
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3); printf("cona2\n");}	
-			  |													{$$ = NULL;printf("cona42\n");}
+StatListRepeat: ';' Stat StatListRepeat							{$$ = NULL;}
+			  |													{$$ = NULL;}
 			  ;
 
-Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1,2, StatList1);}
-	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
-	| IF Expr THEN Stat ELSE Stat 								{if($4 != NULL) $4->next = $6; else $4 = $6; $$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
-	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3, While);}
-	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2,2, Repeat);}	
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL,1, ValParam);}
-	| ID ASSIGN Expr 											{$$ = addStat($3,NULL,NULL,$1,NULL,1, Assign);}
-	| WRITELN WriteInPList 										{$$ = addStat(NULL,NULL,$2,NULL,NULL,3, WriteLn);}
+Stat: StatPart													{$$ = NULL;}
+	| IF Expr THEN Stat 										{$$ = NULL;}
+	| IF Expr THEN Stat ELSE Stat 								{$$ = NULL;}
+	| WHILE Expr DO Stat 										{$$ = NULL;}
+	| REPEAT StatList UNTIL Expr 								{$$ = NULL;}
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = NULL;}
+	| ID ASSIGN Expr 											{$$ = NULL;}
+	| WRITELN WriteInPList 										{$$ = NULL;}
 	| 															{$$ = NULL;}
 	;
 
-WriteInPList: '(' Optional WriteInPListOptional ')'				{$$ = addWriteInPList($2,$3);}
+WriteInPList: '(' Optional WriteInPListOptional ')'				{$$ = NULL;}
 			|													{$$ = NULL;}
 			;
 
-WriteInPListOptional: ',' Optional WriteInPListOptional 		{$$ = addWriteInPList($2,$3);}
+WriteInPListOptional: ',' Optional WriteInPListOptional 		{$$ = NULL;}
 					| 											{$$ = NULL;}
 					;
 
-Optional: Expr 													{$$ = addOptional($1,NULL,1);}
-		| STRING 												{$$ = addOptional(NULL,$1,2);}
+Optional: Expr 													{$$ = NULL;}
+		| STRING 												{$$ = NULL;}
 		;
 
-Expr: SimpleExpr												{$$ = addExpr($1,NULL,NULL);}
-	| SimpleExpr RELATIONALOP SimpleExpr						{$$ = addExpr($1,$3,$2);}
+Expr: SimpleExpr												{$$ = NULL;}
+	| SimpleExpr RELATIONALOP SimpleExpr						{$$ = NULL;}
 	;
 
-SimpleExpr: ADDOP Term											{$$ = addSimpleExpr($2,$1,NULL, 1);}
-		  | Term ADDOP SimpleExpr 								{$$ = addSimpleExpr($1,$2,$3, 2);}
-		  | Term OR SimpleExpr 									{$$ = addSimpleExpr($1,$2,$3, 2);}
-		  | Term 												{$$ = addSimpleExpr($1,NULL,NULL, 0);}
+SimpleExpr: ADDOP Term											{$$ = NULL;}
+		  | Term ADDOP SimpleExpr 								{$$ = NULL;}
+		  | Term OR SimpleExpr 									{$$ = NULL;}
+		  | Term 												{$$ = NULL;}
 		  ;
 
-Term: Factor TermRepeat	 										{$$ = addTerm($1, $2, NULL);}
+Term: Factor TermRepeat	 										{$$ = NULL;}
 	;
 
-TermRepeat: MULTOP Factor TermRepeat							{$$ = addTerm($2, $3, $1);}
+TermRepeat: MULTOP Factor TermRepeat							{$$ = NULL;}
 		  |														{$$ = NULL;}
 		  ;
 
-Factor: '(' Expr ')'											{$$ = addFactor($2, NULL, NULL, NULL, Nothing);}
-	  | NOT Factor  											{$$ = addFactor(NULL, NULL, NULL, $2, Not);}
-  	  | INTEGER													{$$ = addFactor(NULL, $1, NULL, NULL, IntLit);}
-  	  | REAL 													{$$ = addFactor(NULL, $1, NULL, NULL, RealLit);}
-  	  | ID 														{$$ = addFactor(NULL, $1, NULL, NULL, Id);}
-  	  | ID ParamList 											{$$ = addFactor(NULL, $1, $2, NULL, Id);}
+Factor: '(' Expr ')'											{$$ = NULL;}
+	  | NOT Factor  											{$$ = NULL;}
+  	  | INTEGER													{$$ = NULL;}
+  	  | REAL 													{$$ = NULL;}
+  	  | ID 														{$$ = NULL;}
+  	  | ID ParamList 											{$$ = NULL;}
   	  ;
 
-ParamList: '(' Expr ParamListOptional ')' 						{$$ = addParamList($2,$3);}
+ParamList: '(' Expr ParamListOptional ')' 						{$$ = NULL;}
 		 ;	
 
-ParamListOptional: ',' Expr ParamListOptional 					{$$ = addParamList($2,$3);}
+ParamListOptional: ',' Expr ParamListOptional 					{$$ = NULL;}
 				 | 												{$$ = NULL;}
 				 ;		 
+
 
 %%
 int main(int argc, char **argv){
@@ -211,7 +206,8 @@ int main(int argc, char **argv){
 
 	if(argc > 1){
 		if(strcmp(argv[1], "-t") == 0 && !hasErrors){
-			print_tree(program);
+			printf("Program\n");
+			print_tree(program, 2);
 		}
 	}
 

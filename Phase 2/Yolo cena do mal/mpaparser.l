@@ -1,5 +1,4 @@
 %{
-	#include "structures.h"
 	#include "y.tab.h"
 	
 	int start_line = 1, start_column = 1, count_line = 1, count_column = 1;
