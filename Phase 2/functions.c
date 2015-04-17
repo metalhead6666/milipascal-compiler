@@ -84,11 +84,12 @@ FormalParamList *addFormalParamList(FormalParams *formalParams, FormalParamList 
 	return formalParamList;
 }
 
-FormalParams *addFormalParams(char* first_id, IdStruct *idStruct, char* last_id){
+FormalParams *addFormalParams(char* first_id, IdStruct *idStruct, char* last_id, int type){
 	FormalParams *formalParams = (FormalParams *)malloc(sizeof(FormalParams));
 	formalParams->first_id = first_id;
 	formalParams->idStruct = idStruct;
 	formalParams->last_id = last_id;
+	formalParams->type = type;
 
 	return formalParams;
 }
