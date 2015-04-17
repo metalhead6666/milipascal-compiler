@@ -1,5 +1,7 @@
 #include "print.h"
-int aux_counter=0;
+
+int aux_counter = 0;
+
 void print_tree(Program* program){
 	int counter = 2;
 	printf("Program\n");
@@ -9,7 +11,11 @@ void print_tree(Program* program){
 
 	print_varPart(program->progBlock->varPart, counter);
 	print_funcPart(program->progBlock->funcPart, counter);
-	print_statList(program->progBlock->stat, 1, counter);
+
+	print_dots(counter);
+	printf("StatList\n");
+
+	print_statList(program->progBlock->stat, counter);
 }
 
 void print_varPart(VarPart* varPart, int counter){
@@ -89,73 +95,67 @@ void print_funcPart(FuncPart* funcPart, int counter){
 		}
 		
 		print_varPart(funcPart->funcDeclaration->varPart, counter + 2);
-		print_statList(funcPart->funcDeclaration->stat, 1, counter + 2);
+		print_statList(funcPart->funcDeclaration->stat, counter + 2);
 		funcPart = funcPart->next;
 
 		counter -= 2;		
 	}
 }
 
-void print_statList(StatList *statList, int verbose, int counter){
-	if(verbose == 1){
-		print_dots(counter);
-		printf("StatList\n");
-	}
-
-	aux_counter = counter + 2;
+void print_statList(StatList *statList, int counter){
 	while(statList != NULL){
-		while(statList->stat != NULL){	
-		//printf("Cona\n");		
-			printStatements(statList->stat->statement, aux_counter);
-		//printf("Cona2\n");	
-			print_Expr(statList->stat->expr, counter + 4);
-			print_WriteInPList(statList->stat->writeInPList, counter + 4);
-
-			if(statList->stat->type == 1){
-				print_dots(counter + 4);
-				print_id(statList->stat->StatUnion.id);
-			}
-
-			else if(statList->stat->type == 2){			
-				print_statList(statList->stat->StatUnion.statList, 0, counter+4);				
-			}
-
+		while(statList->stat != NULL){
+			printStatements(statList->stat, counter + 2 + aux_counter);
 			statList->stat = statList->stat->next;
 		}		
+
 		statList = statList->next;
 	}
 }
 
-void printStatements(Statements statement, int counter){
+void printStatements(Stat *stat, int counter){
 	print_dots(counter);
 
-	switch(statement){
+	switch(stat->statement){
 	case Assign:				
 		printf("Assign\n");
+		print_dots(counter + 2);
+		print_id(stat->StatUnion.id);
+		print_Expr(stat->expr, counter + 2);
 		break;
 
 	case IfElse:
-		printf("IfElse\n");		
+		printf("IfElse\n");
+		print_Expr(stat->expr, counter + 2);
 		break;
 
 	case Repeat:
 		printf("Repeat\n");
+		print_Expr(stat->expr, counter + 2);
+		print_statList(stat->StatUnion.statList, counter + 2);
 		break;
 
 	case StatList1:
 		printf("StatList\n");
+		aux_counter -= 4;
+		print_statList(stat->StatUnion.statList, counter + 2);		
 		break;
 
 	case ValParam:
 		printf("ValParam\n");
+		print_Expr(stat->expr, counter + 2);
+		print_dots(counter + 2);
+		print_id(stat->StatUnion.id);
 		break;
 
 	case While:
 		printf("While\n");
+		print_Expr(stat->expr, counter + 2);
 		break;
 
 	case WriteLn:
 		printf("WriteLn\n");
+		print_WriteInPList(stat->writeInPList, counter + 2);
 		break;
 	}
 }
@@ -163,7 +163,7 @@ void printStatements(Statements statement, int counter){
 void print_Expr(Expr *expr, int counter){
 	if(expr != NULL){
 		if(expr->relationalOp != NULL){
-			aux_counter+=2;
+			aux_counter += 2;
 			print_dots(counter);
 
 			if(strcmp(expr->relationalOp, "<") == 0){
@@ -199,9 +199,7 @@ void print_Expr(Expr *expr, int counter){
 }
 
 void print_SimpleExpr(SimpleExpr *simpleExpr, int counter){
-	while(simpleExpr != NULL){
-		print_term(simpleExpr->term, counter);
-		
+	while(simpleExpr != NULL){		
 		if(simpleExpr->type == 1){
 			print_dots(counter);			
 			
@@ -213,7 +211,8 @@ void print_SimpleExpr(SimpleExpr *simpleExpr, int counter){
 				printf("Minus\n");
 			}
 
-			counter += 2;			
+			counter += 2;
+			aux_counter -= 2;
 		}
 
 		else if(simpleExpr->type == 2){
@@ -232,8 +231,10 @@ void print_SimpleExpr(SimpleExpr *simpleExpr, int counter){
 			}
 
 			counter += 2;
+			aux_counter -= 2;
 		}
 		
+		print_term(simpleExpr->term, counter);
 		simpleExpr = simpleExpr->next;
 	}
 }
@@ -311,7 +312,7 @@ void print_factor(Factor *factor, int counter){
 void print_WriteInPList(WriteInPList *writeInPList, int counter){
 	while(writeInPList != NULL){
 		if(writeInPList->optional->type == 1){
-			print_Expr(writeInPList->optional->OptionalUnion.expr, counter + 2);
+			print_Expr(writeInPList->optional->OptionalUnion.expr, counter);
 		}
 
 		else{			
