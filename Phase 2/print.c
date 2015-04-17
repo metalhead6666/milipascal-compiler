@@ -4,25 +4,25 @@ void print_tree(Program* program){
 	int counter = 0;
 	printf("Program\n");
 
-	counter += 2;
 	print_dots(counter);
 	print_id(program->id);
 
-	print_varPart(program->progBlock->varPart, counter);
-	print_funcPart(program->progBlock->funcPart, counter);
-	print_statList(program->progBlock->stat, 1, counter);
+	print_varPart(program->progBlock->varPart, counter + 2);
+	print_funcPart(program->progBlock->funcPart, counter + 2);
+	print_statList(program->progBlock->stat, 1, counter + 2);
 }
 
 void print_varPart(VarPart* varPart, int counter){
 	print_dots(counter);
 	printf("VarPart\n");
-	counter += 2;	
 
+	counter += 2;
+		
 	while(varPart != NULL){
 		print_dots(counter);
 		printf("VarDecl\n");
-		counter += 2;
 		
+		counter += 2;
 		print_dots(counter);
 		print_id(varPart->varDecl->first_id);
 
@@ -32,11 +32,8 @@ void print_varPart(VarPart* varPart, int counter){
 		print_id(varPart->varDecl->last_id);
 
 		varPart = varPart->next;
-		
-		counter -= 2;	
+		counter -= 2;
 	}
-
-	counter -= 2;
 }
 
 void print_IdStruct(IdStruct* id, int counter){
@@ -54,8 +51,9 @@ void print_funcPart(FuncPart* funcPart, int counter){
 	print_dots(counter);
 	printf("FuncPart\n");
 
+	counter += 2;
+
 	while(funcPart != NULL){
-		counter += 2;
 		print_dots(counter);
 		printf("FuncDecl\n");		
 		
@@ -66,7 +64,7 @@ void print_funcPart(FuncPart* funcPart, int counter){
 			funcHeading = funcPart->funcDeclaration->funcDeclarationUnion.funcHeading;
 			
 			print_id(funcHeading->first_id);
-			counter += 2;			
+			counter += 2;
 
 			while(funcHeading->next != NULL && funcHeading->next->formalParams != NULL){
 				print_dots(counter);
@@ -81,6 +79,7 @@ void print_funcPart(FuncPart* funcPart, int counter){
 			}
 
 			counter -= 2;
+			
 			print_dots(counter);
 			print_id(funcHeading->last_id);
 		}
@@ -88,12 +87,12 @@ void print_funcPart(FuncPart* funcPart, int counter){
 		else{
 			print_id(funcPart->funcDeclaration->funcDeclarationUnion.id);
 		}
-
-		counter -= 2;
-		print_varPart(funcPart->funcDeclaration->varPart, counter);
-		print_statList(funcPart->funcDeclaration->stat, 1, counter);
+		
+		print_varPart(funcPart->funcDeclaration->varPart, counter + 2);
+		print_statList(funcPart->funcDeclaration->stat, 1, counter + 2);
 		funcPart = funcPart->next;
-		counter -= 2;
+
+		counter -= 2;		
 	}
 }
 
@@ -103,36 +102,27 @@ void print_statList(StatList *statList, int verbose, int counter){
 		printf("StatList\n");
 	}
 
-	counter += 2;
-
 	while(statList != NULL){
 		while(statList->stat != NULL){			
-			printStatements(statList->stat->statement, counter);
-			counter += 2;
+			printStatements(statList->stat->statement, counter + 2);
+			
+			print_Expr(statList->stat->expr, counter + 4);
+			print_WriteInPList(statList->stat->writeInPList, counter + 4);
 
 			if(statList->stat->type == 1){
-				print_dots(counter);
+				print_dots(counter + 4);
 				print_id(statList->stat->StatUnion.id);
 			}
 
-			else if(statList->stat->type == 2){
-				counter -= 2;
-				print_statList(statList->stat->StatUnion.statList, 0, counter);
-				counter += 2;
+			else if(statList->stat->type == 2){				
+				print_statList(statList->stat->StatUnion.statList, 0, counter);				
 			}
-
-			print_Expr(statList->stat->expr, counter);
-			print_WriteInPList(statList->stat->writeInPList, counter);
-
-			counter -= 2;
 
 			statList->stat = statList->stat->next;
 		}		
 
 		statList = statList->next;
 	}
-
-	counter -= 2;
 }
 
 void printStatements(Statements statement, int counter){
@@ -198,7 +188,7 @@ void print_Expr(Expr *expr, int counter){
 				printf("Geq\n");
 			}
 
-			counter += 2;		
+			counter += 2;
 		}
 		
 		print_SimpleExpr(expr->first_simpleExpr, counter);
@@ -207,7 +197,9 @@ void print_Expr(Expr *expr, int counter){
 }
 
 void print_SimpleExpr(SimpleExpr *simpleExpr, int counter){
-	while(simpleExpr != NULL){		
+	while(simpleExpr != NULL){
+		print_term(simpleExpr->term, counter);
+		
 		if(simpleExpr->type == 1){
 			print_dots(counter);			
 			
@@ -219,7 +211,7 @@ void print_SimpleExpr(SimpleExpr *simpleExpr, int counter){
 				printf("Minus\n");
 			}
 
-			counter += 2;
+			counter += 2;			
 		}
 
 		else if(simpleExpr->type == 2){
@@ -240,7 +232,6 @@ void print_SimpleExpr(SimpleExpr *simpleExpr, int counter){
 			counter += 2;
 		}
 		
-		print_term(simpleExpr->term, counter);
 		simpleExpr = simpleExpr->next;
 	}
 }
@@ -280,18 +271,14 @@ void print_term(Term *term, int counter){
 
 void print_factor(Factor *factor, int counter){
 	if(factor->expr != NULL){
-		counter += 2;
-		print_Expr(factor->expr, counter);
-		counter -= 2;
+		print_Expr(factor->expr, counter + 2);
 	}
 	
 	switch(factor->terminal){
 	case Not:
 		print_dots(counter);
 		printf("Not\n");
-		counter += 2;
-		print_factor(factor->next, counter);
-		counter -= 2;
+		print_factor(factor->next, counter + 2);
 		break;
 
 	case IntLit:
@@ -309,10 +296,9 @@ void print_factor(Factor *factor, int counter){
 		print_id(factor->tokenOp);	
 		
 		while(factor->paramList != NULL){
-			printf("Call\n");
-			counter += 2;
-			print_Expr(factor->paramList->expr, counter);
-			counter -= 2;
+			print_dots(counter + 2);
+			printf("Call\n");			
+			print_Expr(factor->paramList->expr, counter + 2);			
 			factor->paramList = factor->paramList->next;
 		}
 
@@ -323,14 +309,13 @@ void print_factor(Factor *factor, int counter){
 void print_WriteInPList(WriteInPList *writeInPList, int counter){
 	while(writeInPList != NULL){
 		if(writeInPList->optional->type == 1){
-			print_Expr(writeInPList->optional->OptionalUnion.expr, counter);
+			print_Expr(writeInPList->optional->OptionalUnion.expr, counter + 2);
 		}
 
-		else{
-			counter += 2;
+		else{			
 			print_dots(counter);
 			printf("String(%s)\n", writeInPList->optional->OptionalUnion.string);
-			counter -= 2;
+			
 		}
 
 		writeInPList = writeInPList->next;
