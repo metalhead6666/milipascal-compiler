@@ -9,7 +9,7 @@ void print_varPart(VarPart* varPart, int counter);
 void print_IdStruct(IdStruct* id, int counter);
 void print_funcPart(FuncPart* funcPart, int counter);
 void print_statList(StatList *statList, int counter);
-void printStatements(Stat *stat, int counter);
+void print_statements(Stat *stat, int counter);
 void print_Expr(Expr *expr, int counter);
 void print_SimpleExpr(SimpleExpr *simpleExpr, int counter);
 void print_term(Term *term, int counter);

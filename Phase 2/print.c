@@ -19,10 +19,14 @@ void print_tree(Program* program){
 
 	print_funcPart(program->progBlock->funcPart, counter);
 
-	print_dots(counter);
-	printf("StatList\n");
+	//if(program->progBlock->stat == NULL){
+		print_dots(counter);
+		printf("StatList\n");
+	//}
 
-	print_statList(program->progBlock->stat, counter);
+	//else{
+		print_statList(program->progBlock->stat, counter);
+	//}
 }
 
 void print_varPart(VarPart* varPart, int counter){
@@ -154,67 +158,87 @@ void print_funcPart(FuncPart* funcPart, int counter){
 
 void print_statList(StatList *statList, int counter){
 	while(statList != NULL){
-		while(statList->stat != NULL){
-			printStatements(statList->stat, counter + aux_counter);
-			statList->stat = statList->stat->next;
-		}
-
+		print_statements(statList->stat, counter + 2);
 		statList = statList->next;
-	}
+	}	
 }
 
-void printStatements(Stat *stat, int counter){
-	print_dots(counter);
+void print_statements(Stat *stat, int counter){
+	if(stat == NULL){
+		return;
+	}
 
 	switch(stat->statement){
-	case Assign:				
+	case Assign:
+		print_dots(counter);			
 		printf("Assign\n");
 		print_dots(counter + 2);
 		print_id(stat->StatUnion.id);
 		print_Expr(stat->expr, counter + 2);
+		print_statements(stat->next, counter);
 		break;
 
 	case IfElse:
-		printf("IfElse\n");		
+		print_dots(counter);
+		printf("IfElse\n");
 		print_Expr(stat->expr, counter + 2);
-		
-		if(stat->next != NULL){
-			aux_counter += 2;
+
+		if(stat->next == NULL || stat->next->next == NULL){
+			print_dots(counter);
+			printf("StatList\n");
 		}
 
-		else{
-			aux_counter -= 2;
-		}
-
+		print_statements(stat->next, counter + 2);
 		break;
 
 	case Repeat:
+		print_dots(counter);
 		printf("Repeat\n");
 		print_statList(stat->StatUnion.statList, counter);
-		print_Expr(stat->expr, counter + 2);		
+		print_Expr(stat->expr, counter + 2);
+
+		if(stat->next == NULL || stat->next->next == NULL){
+			print_dots(counter);
+			printf("StatList\n");
+		}
+
+		print_statements(stat->next, counter);	
 		break;
 
 	case StatList1:
+		print_dots(counter);
 		printf("StatList\n");
-		print_statList(stat->StatUnion.statList, counter-aux_counter);		
+		print_statList(stat->StatUnion.statList, counter);
+		print_statements(stat->next, counter);
 		break;
 
 	case ValParam:
+		print_dots(counter);
 		printf("ValParam\n");
 		print_Expr(stat->expr, counter + 2);
 		print_dots(counter + 2);
 		print_id(stat->StatUnion.id);
+		print_statements(stat->next, counter);	
 		break;
 
 	case While:
+		print_dots(counter);
 		printf("While\n");		
 		print_Expr(stat->expr, counter + 2);
-		//printStatements(stat->next, counter + 2);
+
+		if(stat->next == NULL || stat->next->next == NULL){
+			print_dots(counter);
+			printf("StatList\n");
+		}
+
+		print_statements(stat->next, counter + 2);
 		break;
 
 	case WriteLn:
+		print_dots(counter);
 		printf("WriteLn\n");
 		print_WriteInPList(stat->writeInPList, counter + 2);
+		print_statements(stat->next, counter);	
 		break;
 	}
 }
@@ -354,9 +378,13 @@ void print_factor(Factor *factor, int counter){
 		if(factor->paramList != NULL){
 			print_dots(counter);		
 			printf("Call\n");
+			print_dots(counter + 2);			
 		}
 
-		print_dots(counter);
+		else{
+			print_dots(counter);
+		}
+		
 		print_id(factor->tokenOp);
 		
 		while(factor->paramList != NULL){
