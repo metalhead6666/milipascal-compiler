@@ -108,9 +108,9 @@ void print_statList(StatList *statList, int counter){
 			printStatements(statList->stat, counter + 2 + aux_counter);
 			statList->stat = statList->stat->next;
 		}		
-
 		statList = statList->next;
 	}
+	aux_counter=0;
 }
 
 void printStatements(Stat *stat, int counter){
@@ -122,6 +122,10 @@ void printStatements(Stat *stat, int counter){
 		print_dots(counter + 2);
 		print_id(stat->StatUnion.id);
 		print_Expr(stat->expr, counter + 2);
+		if(stat->next!=NULL)
+			aux_counter+=2;
+		else
+			aux_counter-=2;
 		break;
 
 	case IfElse:
