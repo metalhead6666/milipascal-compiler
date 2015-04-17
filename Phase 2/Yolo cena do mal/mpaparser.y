@@ -1,13 +1,20 @@
 %{
 	#include <string.h>
 	#include "functions.h"
-	#include "print.h"
 
 	void yyerror(char *s);
 
 	/* values received from lex */
 	extern char *yytext;
 	extern int count_line, count_column;
+
+	typedef struct Program{
+		char* type;
+		int level;
+		Program *son;
+		Program *brother;
+		char* value;
+	}Program;
 
 	/* node root to print in the tree */
 	Program* program;
