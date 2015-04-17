@@ -147,8 +147,8 @@ FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = addFormalPar
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4);}
-			| VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5);}
+FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4, 0);}
+			| VAR ID IDList ':' ID 								{$$ = addFormalParams($2,$3,$5, 1);}
 			;
 
 StatPart: BEG StatList END 										{$$ = $2;}
