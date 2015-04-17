@@ -2,34 +2,47 @@
 
 int aux_counter = 2;
 
+int count_nodes(StatList *statList){
+	int i = 0;
+
+	while(statList != NULL){
+		++i;
+		statList = statList->next;
+	}
+
+	return i;
+}
+
 void print_tree(Program* program){
 	int counter = 2;
+
 	printf("Program\n");
 
 	print_dots(counter);
 	print_id(program->id);
-
-	print_dots(counter);
-	printf("VarPart\n");
-
+	
 	print_varPart(program->progBlock->varPart, counter);
 
 	print_dots(counter);
     printf("FuncPart\n");
 
 	print_funcPart(program->progBlock->funcPart, counter);
-
-	//if(program->progBlock->stat == NULL){
+	
+	if(count_nodes(program->progBlock->stat) == 3 || count_nodes(program->progBlock->stat) > 5){
 		print_dots(counter);
 		printf("StatList\n");
-	//}
+	}
 
-	//else{
-		print_statList(program->progBlock->stat, counter);
-	//}
+	else{
+		counter -= 2;
+	}
+
+	print_statList(program->progBlock->stat, counter);
 }
 
 void print_varPart(VarPart* varPart, int counter){
+	print_dots(counter);
+	printf("VarPart\n");
 	counter += 2;
 		
 	while(varPart != NULL){
@@ -61,24 +74,19 @@ void print_IdStruct(IdStruct* id, int counter){
 
 void print_funcPart(FuncPart* funcPart, int counter){
     FuncHeading *funcHeading;
-    int temp;
 
     counter += 2;
 
     while(funcPart != NULL){
-    	temp = 0;
-
         if(funcPart->funcDeclaration->type == 1){
             funcHeading = funcPart->funcDeclaration->funcDeclarationUnion.funcHeading;
             print_dots(counter);
 
-            if(funcPart->funcDeclaration->varPart == NULL && funcPart->funcDeclaration->stat == NULL){
-            	temp = 0;
+            if(funcPart->funcDeclaration->chosen == 1){            	
                 printf("FuncDecl\n");
             }
 
-            else{
-            	temp = 1;
+            else{            	
                 printf("FuncDef\n");
             }
            
@@ -118,19 +126,20 @@ void print_funcPart(FuncPart* funcPart, int counter){
             print_dots(counter);
             print_id(funcHeading->last_id);
 
-            if(temp == 1){
-                print_dots(counter);
-                printf("VarPart\n");
+            if(funcPart->funcDeclaration->chosen == 2){
+            	print_varPart(funcPart->funcDeclaration->varPart, counter);
+
+            	if(funcPart->funcDeclaration->stat == NULL || count_nodes(funcPart->funcDeclaration->stat) > 2){
+					print_dots(counter);
+					printf("StatList\n");
+					print_statList(funcPart->funcDeclaration->stat, counter);
+				}
+
+				else{
+					print_statList(funcPart->funcDeclaration->stat, counter - 2);
+				}            	
             }
-
-            print_varPart(funcPart->funcDeclaration->varPart, counter);
-
-            if(temp == 1){
-                print_dots(counter);
-                printf("StatList\n");
-            }
-
-            print_statList(funcPart->funcDeclaration->stat, counter);
+            
             counter -= 2;
         }
 
@@ -141,14 +150,7 @@ void print_funcPart(FuncPart* funcPart, int counter){
             print_dots(counter + 2);
             print_id(funcPart->funcDeclaration->funcDeclarationUnion.id);
 
-            print_dots(counter + 2);
-            printf("VarPart\n");
-
-            print_varPart(funcPart->funcDeclaration->varPart, counter + 2);
-           
-            print_dots(counter + 2);
-            printf("StatList\n");
-           
+            print_varPart(funcPart->funcDeclaration->varPart, counter + 2);           
             print_statList(funcPart->funcDeclaration->stat, counter + 2);
         }
                        
@@ -160,7 +162,7 @@ void print_statList(StatList *statList, int counter){
 	while(statList != NULL){
 		print_statements(statList->stat, counter + 2);
 		statList = statList->next;
-	}	
+	}
 }
 
 void print_statements(Stat *stat, int counter){
@@ -182,12 +184,6 @@ void print_statements(Stat *stat, int counter){
 		print_dots(counter);
 		printf("IfElse\n");
 		print_Expr(stat->expr, counter + 2);
-
-		if(stat->next == NULL || stat->next->next == NULL){
-			print_dots(counter);
-			printf("StatList\n");
-		}
-
 		print_statements(stat->next, counter + 2);
 		break;
 
@@ -196,18 +192,15 @@ void print_statements(Stat *stat, int counter){
 		printf("Repeat\n");
 		print_statList(stat->StatUnion.statList, counter);
 		print_Expr(stat->expr, counter + 2);
-
-		if(stat->next == NULL || stat->next->next == NULL){
-			print_dots(counter);
-			printf("StatList\n");
-		}
-
 		print_statements(stat->next, counter);	
 		break;
 
 	case StatList1:
-		print_dots(counter);
-		printf("StatList\n");
+		if(stat->next == NULL){
+			print_dots(counter);
+			printf("StatList\n");
+		}
+
 		print_statList(stat->StatUnion.statList, counter);
 		print_statements(stat->next, counter);
 		break;
@@ -225,12 +218,6 @@ void print_statements(Stat *stat, int counter){
 		print_dots(counter);
 		printf("While\n");		
 		print_Expr(stat->expr, counter + 2);
-
-		if(stat->next == NULL || stat->next->next == NULL){
-			print_dots(counter);
-			printf("StatList\n");
-		}
-
 		print_statements(stat->next, counter + 2);
 		break;
 
@@ -242,6 +229,7 @@ void print_statements(Stat *stat, int counter){
 		break;
 	}
 }
+
 
 void print_Expr(Expr *expr, int counter){
 	if(expr != NULL){
@@ -388,7 +376,7 @@ void print_factor(Factor *factor, int counter){
 		print_id(factor->tokenOp);
 		
 		while(factor->paramList != NULL){
-			print_Expr(factor->paramList->expr, counter + 2);			
+			print_Expr(factor->paramList->expr, counter + 2);
 			factor->paramList = factor->paramList->next;
 		}
 

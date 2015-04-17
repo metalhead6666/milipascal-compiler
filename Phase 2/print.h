@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "structures.h"
 
+int count_nodes(StatList *statList);
 void print_tree(Program* program);
 void print_varPart(VarPart* varPart, int counter);
 void print_IdStruct(IdStruct* id, int counter);

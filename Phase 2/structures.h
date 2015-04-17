@@ -78,6 +78,7 @@ typedef struct FuncDeclaration{
 	}funcDeclarationUnion;
 
 	int type;
+	int chosen;
 }FuncDeclaration;
 
 struct FuncPart{

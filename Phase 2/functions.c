@@ -50,11 +50,12 @@ FuncPart *addFuncPart(FuncPart* next, FuncDeclaration *funcDeclaration){
 	return new_funcPart;
 }
 
-FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading, int type, StatList *stat){
+FuncDeclaration *addFuncDeclaration(VarPart *varPart, char* id, FuncHeading *funcHeading, int type, StatList *stat, int chosen){
 	FuncDeclaration *funcDeclaration = (FuncDeclaration *)malloc(sizeof(FuncDeclaration));
 	funcDeclaration->varPart=varPart;
 	funcDeclaration->type = type;
 	funcDeclaration->stat = stat;
+	funcDeclaration->chosen = chosen;
 
 	if(type == 1){			
 		funcDeclaration->funcDeclarationUnion.funcHeading=funcHeading;
