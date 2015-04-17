@@ -2,6 +2,7 @@
 
 int aux_counter = 0;
 
+
 void print_tree(Program* program){
 	int counter = 2;
 	printf("Program\n");
@@ -9,7 +10,11 @@ void print_tree(Program* program){
 	print_dots(counter);
 	print_id(program->id);
 
-	print_varPart(program->progBlock->varPart, counter);
+	print_dots(counter);
+	printf("VarPart\n");
+
+	print_varPart(program->progBlock->varPart, counter);	
+
 	print_funcPart(program->progBlock->funcPart, counter);
 
 	print_dots(counter);
@@ -18,13 +23,9 @@ void print_tree(Program* program){
 	print_statList(program->progBlock->stat, counter);
 }
 
-void print_varPart(VarPart* varPart, int counter){
-	print_dots(counter);
-	printf("VarPart\n");
-
-	counter += 2;
-		
+void print_varPart(VarPart* varPart, int counter){		
 	while(varPart != NULL){
+		counter += 2;
 		print_dots(counter);
 		printf("VarDecl\n");
 		
@@ -38,7 +39,7 @@ void print_varPart(VarPart* varPart, int counter){
 		print_id(varPart->varDecl->last_id);
 
 		varPart = varPart->next;
-		counter -= 2;
+		counter -= 4;
 	}
 }
 
@@ -52,97 +53,103 @@ void print_IdStruct(IdStruct* id, int counter){
 }
 
 void print_funcPart(FuncPart* funcPart, int counter){
-        FuncHeading *funcHeading;
- 
-        print_dots(counter);
-        printf("FuncPart\n");
- 
-        counter += 2;
- 
-        while(funcPart != NULL){               
-                if(funcPart->funcDeclaration->type == 1){
-                        funcHeading = funcPart->funcDeclaration->funcDeclarationUnion.funcHeading;
-                        print_dots(counter);
- 
-                        if(funcPart->funcDeclaration->varPart == NULL && funcPart->funcDeclaration->stat == NULL){
-                                printf("FuncDecl\n");
-                        }
- 
-                        else{
-                                printf("FuncDef\n");
-                        }
-                       
-                        counter += 2;
-                        print_dots(counter);
-                        print_id(funcHeading->first_id);
- 
-                        print_dots(counter);
-                        printf("FuncParams\n");
-                        counter += 2;
- 
-                        while(funcHeading->next != NULL && funcHeading->next->formalParams != NULL){
-                                print_dots(counter);
- 
-                                if(funcHeading->next->formalParams->type == 1){                                
-                                        printf("VarParams\n");
-                                }
- 
-                                else{                                  
-                                        printf("Params\n");
-                                }
- 
-                                counter += 2;
-                                print_dots(counter);
-                                print_id(funcHeading->next->formalParams->first_id);
- 
-                                print_IdStruct(funcHeading->next->formalParams->idStruct, counter);
-                               
-                                print_dots(counter);                   
-                                print_id(funcHeading->next->formalParams->last_id);
-                               
-                                funcHeading->next = funcHeading->next->next;
-                                counter -= 2;
-                        }
- 
-                        counter -= 2;                  
-                        print_dots(counter);
-                        print_id(funcHeading->last_id);
- 
-                        if(funcPart->funcDeclaration->varPart != NULL){
-                                print_dots(counter);
-                                printf("VarPart\n");
-                        }
- 
-                        print_varPart(funcPart->funcDeclaration->varPart, counter);
- 
-                        if(funcPart->funcDeclaration->stat != NULL){
-                                print_dots(counter);
-                                printf("StatList\n");
-                        }
- 
-                        print_statList(funcPart->funcDeclaration->stat, counter);
+    FuncHeading *funcHeading;
+    int temp;
+
+    print_dots(counter);
+    printf("FuncPart\n");
+
+    counter += 2;
+
+    while(funcPart != NULL){
+    	temp = 0;
+
+        if(funcPart->funcDeclaration->type == 1){
+            funcHeading = funcPart->funcDeclaration->funcDeclarationUnion.funcHeading;
+            print_dots(counter);
+
+            if(funcPart->funcDeclaration->varPart == NULL && funcPart->funcDeclaration->stat == NULL){
+            	temp = 0;
+                printf("FuncDecl\n");
+            }
+
+            else{
+            	temp = 1;
+                printf("FuncDef\n");
+            }
+           
+            counter += 2;
+            print_dots(counter);
+            print_id(funcHeading->first_id);
+
+            print_dots(counter);
+            printf("FuncParams\n");
+            counter += 2;
+
+            while(funcHeading->next != NULL && funcHeading->next->formalParams != NULL){
+                print_dots(counter);
+
+                if(funcHeading->next->formalParams->type == 1){                                
+                    printf("VarParams\n");
                 }
- 
-                else{
-                        print_dots(counter);
-                        printf("FuncDef2\n");
- 
-                        print_dots(counter + 2);
-                        print_id(funcPart->funcDeclaration->funcDeclarationUnion.id);
- 
-                        print_dots(counter + 2);
-                        printf("VarPart\n");
- 
-                        print_varPart(funcPart->funcDeclaration->varPart, counter + 2);
-                       
-                        print_dots(counter + 2);
-                        printf("StatList\n");
-                       
-                        print_statList(funcPart->funcDeclaration->stat, counter);
+
+                else{                                  
+                    printf("Params\n");
                 }
-                               
-                funcPart = funcPart->next;     
+
+                counter += 2;
+                print_dots(counter);
+                print_id(funcHeading->next->formalParams->first_id);
+
+                print_IdStruct(funcHeading->next->formalParams->idStruct, counter);
+               
+                print_dots(counter);                   
+                print_id(funcHeading->next->formalParams->last_id);
+               
+                funcHeading->next = funcHeading->next->next;
+                counter -= 2;
+            }
+
+            counter -= 2;                  
+            print_dots(counter);
+            print_id(funcHeading->last_id);
+
+            if(temp == 1){
+                print_dots(counter);
+                printf("VarPart\n");
+            }
+
+            print_varPart(funcPart->funcDeclaration->varPart, counter);
+
+            if(temp == 1){
+                print_dots(counter);
+                printf("StatList\n");
+            }
+
+            print_statList(funcPart->funcDeclaration->stat, counter);
+            counter -= 2;
         }
+
+        else{
+            print_dots(counter);
+            printf("FuncDef2\n");
+
+            print_dots(counter + 2);
+            print_id(funcPart->funcDeclaration->funcDeclarationUnion.id);
+
+            print_dots(counter + 2);
+            printf("VarPart\n");
+
+            print_varPart(funcPart->funcDeclaration->varPart, counter + 2);
+           
+            print_dots(counter + 2);
+            printf("StatList\n");
+           
+            print_statList(funcPart->funcDeclaration->stat, counter);
+        }
+                       
+        funcPart = funcPart->next;     
+    }	
 }
 
 void print_statList(StatList *statList, int counter){
@@ -177,9 +184,9 @@ void printStatements(Stat *stat, int counter){
 		break;
 
 	case Repeat:
-		printf("Repeat\n");
-		print_Expr(stat->expr, counter + 2);
+		printf("Repeat\n");		
 		print_statList(stat->StatUnion.statList, counter + 2);
+		print_Expr(stat->expr, counter + 2);
 		break;
 
 	case StatList1:
@@ -342,13 +349,16 @@ void print_factor(Factor *factor, int counter){
 		break;
 
 	case Id:
-		print_dots(counter);
-		print_id(factor->tokenOp);	
+		if(factor->paramList != NULL){
+			print_dots(counter);
+			printf("Call\n");
+		}
+
+		print_dots(counter + 2);
+		print_id(factor->tokenOp);
 		
 		while(factor->paramList != NULL){
-			print_dots(counter + 2);
-			printf("Call\n");			
-			print_Expr(factor->paramList->expr, counter + 2);			
+			print_Expr(factor->paramList->expr, counter);			
 			factor->paramList = factor->paramList->next;
 		}
 
