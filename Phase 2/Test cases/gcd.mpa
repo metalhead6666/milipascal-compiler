@@ -4,8 +4,6 @@ begin
 	val(paramstr(1), a);
 	val(paramstr(2), b);
 
-	if true then else writeln;
-
 	if a = 0 then
 		writeln(b)
 	else

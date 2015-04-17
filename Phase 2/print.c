@@ -1,15 +1,15 @@
 #include "print.h"
-
+int aux_counter=0;
 void print_tree(Program* program){
-	int counter = 0;
+	int counter = 2;
 	printf("Program\n");
 
 	print_dots(counter);
 	print_id(program->id);
 
-	print_varPart(program->progBlock->varPart, counter + 2);
-	print_funcPart(program->progBlock->funcPart, counter + 2);
-	print_statList(program->progBlock->stat, 1, counter + 2);
+	print_varPart(program->progBlock->varPart, counter);
+	print_funcPart(program->progBlock->funcPart, counter);
+	print_statList(program->progBlock->stat, 1, counter);
 }
 
 void print_varPart(VarPart* varPart, int counter){
@@ -102,10 +102,12 @@ void print_statList(StatList *statList, int verbose, int counter){
 		printf("StatList\n");
 	}
 
+	aux_counter = counter + 2;
 	while(statList != NULL){
-		while(statList->stat != NULL){			
-			printStatements(statList->stat->statement, counter + 2);
-			
+		while(statList->stat != NULL){	
+		//printf("Cona\n");		
+			printStatements(statList->stat->statement, aux_counter);
+		//printf("Cona2\n");	
 			print_Expr(statList->stat->expr, counter + 4);
 			print_WriteInPList(statList->stat->writeInPList, counter + 4);
 
@@ -114,13 +116,12 @@ void print_statList(StatList *statList, int verbose, int counter){
 				print_id(statList->stat->StatUnion.id);
 			}
 
-			else if(statList->stat->type == 2){				
-				print_statList(statList->stat->StatUnion.statList, 0, counter);				
+			else if(statList->stat->type == 2){			
+				print_statList(statList->stat->StatUnion.statList, 0, counter+4);				
 			}
 
 			statList->stat = statList->stat->next;
 		}		
-
 		statList = statList->next;
 	}
 }
@@ -162,6 +163,7 @@ void printStatements(Statements statement, int counter){
 void print_Expr(Expr *expr, int counter){
 	if(expr != NULL){
 		if(expr->relationalOp != NULL){
+			aux_counter+=2;
 			print_dots(counter);
 
 			if(strcmp(expr->relationalOp, "<") == 0){
