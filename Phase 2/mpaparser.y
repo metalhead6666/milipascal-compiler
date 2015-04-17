@@ -35,6 +35,7 @@
 %token PROGRAM
 %token ASSIGN
 %token NOT
+%token <string> OR
 %token <string> MULTOP
 %token <string> ADDOP
 %token <string> RELATIONALOP
@@ -73,6 +74,7 @@
 %type <writeInPList> WriteInPListOptional;
 %type <optional> Optional;
 %type <term> Term;
+%type <term> TermRepeat;
 %type <simpleExpr> SimpleExpr;
 %type <factor> Factor;
 %type <paramList> ParamList;
@@ -159,14 +161,14 @@ StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3);}
 			  |													{$$ = NULL;}
 			  ;
 
-Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1,3);}
-	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3);}
-	| IF Expr THEN Stat ELSE Stat 								{$$ = addStat($2,$4,NULL,NULL,NULL,3); $4->next = $6;}
-	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3);}
-	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2,2);}	
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL,1);}
-	| ID ASSIGN Expr 											{$$ = addStat($3,NULL,NULL,$1,NULL,1);}
-	| WRITELN WriteInPList 										{$$ = addStat(NULL,NULL,$2,NULL,NULL,3);}
+Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1,2, StatList1);}
+	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
+	| IF Expr THEN Stat ELSE Stat 								{$4->next = $6; $$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
+	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3, While);}
+	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2,2, Repeat);}	
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL,1, ValParam);}
+	| ID ASSIGN Expr 											{$$ = addStat($3,NULL,NULL,$1,NULL,1, Assign);}
+	| WRITELN WriteInPList 										{$$ = addStat(NULL,NULL,$2,NULL,NULL,3, WriteLn);}
 	| 															{$$ = NULL;}
 	;
 
@@ -186,22 +188,25 @@ Expr: SimpleExpr												{$$ = addExpr($1,NULL,NULL);}
 	| SimpleExpr RELATIONALOP SimpleExpr						{$$ = addExpr($1,$3,$2);}
 	;
 
-SimpleExpr: ADDOP Term											{$$ = addSimpleExpr($2,$1,NULL);}
-		  | SimpleExpr ADDOP Term 								{$$ = addSimpleExpr($3,$2,$1);}
-		  | SimpleExpr OR Term 									{$$ = addSimpleExpr($3,NULL,$1);}
-		  | Term 												{$$ = addSimpleExpr($1,NULL,NULL);}
+SimpleExpr: ADDOP Term											{$$ = addSimpleExpr($2,$1,NULL, 1);}
+		  | Term ADDOP SimpleExpr 								{$$ = addSimpleExpr($1,$2,$3, 2);}
+		  | Term OR SimpleExpr 									{$$ = addSimpleExpr($1,$2,$3, 2);}
+		  | Term 												{$$ = addSimpleExpr($1,NULL,NULL, 0);}
 		  ;
 
-Term: Factor	 												{$$ = addTerm($1, NULL, NULL);}
-	| Term MULTOP Factor 										{$$ = addTerm($3, $1, $2);}
+Term: Factor TermRepeat	 										{$$ = addTerm($1, $2, NULL);}
 	;
 
-Factor: '(' Expr ')'											{$$ = addFactor($2, NULL, NULL, NULL);}
-	  | NOT Factor  											{$$ = addFactor(NULL, NULL, NULL, $2);}
-  	  | INTEGER													{$$ = addFactor(NULL, $1, NULL, NULL);}
-  	  | REAL 													{$$ = addFactor(NULL, $1, NULL, NULL);}
-  	  | ID 														{$$ = addFactor(NULL, $1, NULL, NULL);}
-  	  | ID ParamList 											{$$ = addFactor(NULL, $1, $2, NULL);}
+TermRepeat: MULTOP Factor TermRepeat							{$$ = addTerm($2, $3, $1);}
+		  |														{$$ = NULL;}
+		  ;
+
+Factor: '(' Expr ')'											{$$ = addFactor($2, NULL, NULL, NULL, Nothing);}
+	  | NOT Factor  											{$$ = addFactor(NULL, NULL, NULL, $2, Not);}
+  	  | INTEGER													{$$ = addFactor(NULL, $1, NULL, NULL, IntLit);}
+  	  | REAL 													{$$ = addFactor(NULL, $1, NULL, NULL, RealLit);}
+  	  | ID 														{$$ = addFactor(NULL, $1, NULL, NULL, Id);}
+  	  | ID ParamList 											{$$ = addFactor(NULL, $1, $2, NULL, Id);}
   	  ;
 
 ParamList: '(' Expr ParamListOptional ')' 						{$$ = addParamList($2,$3);}

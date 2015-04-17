@@ -101,12 +101,14 @@ StatList *addStatList(Stat *stat, StatList *next){
 	return statList;
 }
 
-Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList, int type){
+Stat *addStat(Expr *expr, Stat *next, WriteInPList *writeInPList, char *id, StatList * statList, int type, Statements statement){
 	Stat *stat = (Stat *)malloc(sizeof(Stat));
+
 	stat->expr = expr;
 	stat->next = next;
 	stat->writeInPList = writeInPList;
 	stat->type = type;
+	stat->statement = statement;
 
 	if(type==1){
 		stat->StatUnion.id = id;
@@ -140,7 +142,7 @@ Optional *addOptional(Expr *expr, char *string, int type){
 	return optional;
 }
 
-Expr *addExpr(SimpleExpr *first_simpleExpr, SimpleExpr *last_simpleExpr, char* relationalOp){
+Expr *addExpr(SimpleExpr *first_simpleExpr, SimpleExpr *last_simpleExpr, char *relationalOp){
 	Expr *expr = (Expr *)malloc(sizeof(Expr));
 	expr->first_simpleExpr = first_simpleExpr;
 	expr->last_simpleExpr = last_simpleExpr;
@@ -149,11 +151,12 @@ Expr *addExpr(SimpleExpr *first_simpleExpr, SimpleExpr *last_simpleExpr, char* r
 	return expr;
 }
 
-SimpleExpr *addSimpleExpr(Term *term, char* addOp, SimpleExpr *next){
+SimpleExpr *addSimpleExpr(Term *term, char* addOp, SimpleExpr *next, int type){
 	SimpleExpr *simpleExpr = (SimpleExpr *)malloc(sizeof(SimpleExpr));
 	simpleExpr->term = term;
 	simpleExpr->addOp = addOp;
 	simpleExpr->next = next;
+	simpleExpr->type = type;
 
 	return simpleExpr;
 }
@@ -167,12 +170,13 @@ Term *addTerm(Factor *factor, Term *next, char* multOp){
 	return term;
 }
 
-Factor *addFactor(Expr *expr, char *tokenOp, ParamList *paramList, Factor *next){
+Factor *addFactor(Expr *expr, char *tokenOp, ParamList *paramList, Factor *next, Terminals terminal){
 	Factor *factor = (Factor *)malloc(sizeof(Factor));
 	factor->expr = expr;
 	factor->tokenOp = tokenOp;
 	factor->paramList = paramList;
 	factor->next = next;
+	factor->terminal = terminal;
 
 	return factor;
 }

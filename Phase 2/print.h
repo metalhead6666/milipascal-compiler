@@ -5,13 +5,17 @@
 #include "structures.h"
 
 void print_tree(Program* program);
-void print_varPart(VarPart* varPart);
-void print_IdStruct(IdStruct* id);
-void print_funcPart(FuncPart* funcPart);
-void print_statList(StatList *statList);
-void print_Expr(Expr *expr);
-void print_WriteInPList(WriteInPList *writeInPList);
-void print_dots();
+void print_varPart(VarPart* varPart, int counter);
+void print_IdStruct(IdStruct* id, int counter);
+void print_funcPart(FuncPart* funcPart, int counter);
+void print_statList(StatList *statList, int verbose, int counter);
+void printStatements(Statements statement, int counter);
+void print_Expr(Expr *expr, int counter);
+void print_SimpleExpr(SimpleExpr *simpleExpr, int counter);
+void print_term(Term *term, int counter);
+void print_factor(Factor *factor, int counter);
+void print_WriteInPList(WriteInPList *writeInPList, int counter);
+void print_dots(int counter);
 void print_id(char *id);
 
 #endif 

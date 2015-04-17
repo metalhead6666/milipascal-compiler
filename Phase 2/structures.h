@@ -1,6 +1,25 @@
 #ifndef _STRUCTURES_
 #define _STRUCTURES_
 
+typedef enum{
+	Id,
+	IntLit,
+	RealLit,
+	String,
+	Not,
+	Nothing
+}Terminals;
+
+typedef enum{
+	Assign,
+	IfElse,
+	Repeat,
+	StatList1,
+	ValParam,
+	While,
+	WriteLn
+}Statements;
+
 typedef struct Stat Stat;
 typedef struct Expr Expr;
 typedef struct StatList StatList;
@@ -88,6 +107,7 @@ struct Factor{
 	char *tokenOp;
 	ParamList *paramList;
 	Factor *next;
+	Terminals terminal;
 };
 
 typedef struct Term Term;
@@ -102,6 +122,7 @@ struct SimpleExpr{
 	Term *term;
 	char* addOp;
 	SimpleExpr *next;
+	int type;
 };
 
 struct Expr{
@@ -135,6 +156,7 @@ struct Stat{
 	}StatUnion;
 
 	int type;
+	Statements statement;
 };
 
 #endif
