@@ -131,9 +131,9 @@ funcPart: FuncDeclaration ';' funcPart  						{$$ = addFuncPart($3, $1);}
 		|														{$$ = NULL;}	
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1, 1, NULL, 1);}
-			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL, 2, $5, 2);}
-			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1, 1, $4, 2);}
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = addFuncDeclaration(NULL,NULL,$1, 1, NULL);}
+			   | FUNCTION ID ';' varPart StatPart				{$$ = addFuncDeclaration($4,$2,NULL, 2, $5);}
+			   | FuncHeading ';' varPart StatPart 				{$$ = addFuncDeclaration($3,NULL,$1, 1, $4);}
 			   ;
 
 FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = addFuncHeading($2, $3, $5);}
@@ -154,11 +154,11 @@ FormalParams: ID IDList ':' ID 									{$$ = addFormalParams($1,$2,$4, 0);}
 StatPart: BEG StatList END 										{$$ = $2;}
 		;
 
-StatList: Stat StatListRepeat									{$$ = addStatList($1,$2); printf("cona\n");}				
+StatList: Stat StatListRepeat									{$$ = addStatList($1,$2);}				
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3); printf("cona2\n");}	
-			  |													{$$ = NULL;printf("cona42\n");}
+StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3);}	
+			  |													{$$ = NULL;}
 			  ;
 
 Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1,2, StatList1);}
@@ -216,6 +216,7 @@ ParamListOptional: ',' Expr ParamListOptional 					{$$ = addParamList($2,$3);}
 				 | 												{$$ = NULL;}
 				 ;		 
 
+
 %%
 int main(int argc, char **argv){
 	yyparse();
@@ -233,3 +234,5 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
+
+
