@@ -53,6 +53,7 @@ typedef struct FormalParams{
 	char* first_id;
 	IdStruct* idStruct;
 	char* last_id;
+	int type;
 }FormalParams;
 
 typedef struct FormalParamList FormalParamList;
