@@ -121,16 +121,13 @@ void print_funcPart(FuncPart* funcPart, int counter){
             if(temp == 1){
                 print_dots(counter);
                 printf("VarPart\n");
-            }
-
-            print_varPart(funcPart->funcDeclaration->varPart, counter);
-
-            if(temp == 1){
-                print_dots(counter);
+            	print_varPart(funcPart->funcDeclaration->varPart, counter);
+            
+            	print_dots(counter);
                 printf("StatList\n");
+                print_statList(funcPart->funcDeclaration->stat, counter);
             }
-
-            print_statList(funcPart->funcDeclaration->stat, counter);
+            
             counter -= 2;
         }
 
@@ -182,12 +179,6 @@ void print_statements(Stat *stat, int counter){
 		print_dots(counter);
 		printf("IfElse\n");
 		print_Expr(stat->expr, counter + 2);
-
-		if(stat->next == NULL || stat->next->next == NULL){
-			print_dots(counter);
-			printf("StatList\n");
-		}
-
 		print_statements(stat->next, counter + 2);
 		break;
 
@@ -196,12 +187,6 @@ void print_statements(Stat *stat, int counter){
 		printf("Repeat\n");
 		print_statList(stat->StatUnion.statList, counter);
 		print_Expr(stat->expr, counter + 2);
-
-		if(stat->next == NULL || stat->next->next == NULL){
-			print_dots(counter);
-			printf("StatList\n");
-		}
-
 		print_statements(stat->next, counter);	
 		break;
 
@@ -225,12 +210,6 @@ void print_statements(Stat *stat, int counter){
 		print_dots(counter);
 		printf("While\n");		
 		print_Expr(stat->expr, counter + 2);
-
-		if(stat->next == NULL || stat->next->next == NULL){
-			print_dots(counter);
-			printf("StatList\n");
-		}
-
 		print_statements(stat->next, counter + 2);
 		break;
 

@@ -8,12 +8,13 @@
 	/* values received from lex */
 	extern char *yytext;
 	extern int count_line, count_column;
+	extern int errorLex;
 
 	/* node root to print in the tree */
 	Program* program;
 
 	/* in case some syntax error appears, doesn't print the AST */
-	int hasErrors = 0;
+	int hasErrors = 0;	
 %}
 
 %token BEG
@@ -45,13 +46,14 @@
 %token <string> REAL
 %token <string> RESERVED
 
+%right ELSE THEN
 %left ADDOP OR
 %left MULTOP
-%left NOT
+%right NOT
+%left '(' ')'
+%right ASSIGN
 
 %nonassoc RELATIONALOP
-%nonassoc THEN
-%nonassoc ELSE
 
 %type <string> ProgHeading;
 %type <progBlock> ProgBlock;
@@ -234,5 +236,3 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
-
-

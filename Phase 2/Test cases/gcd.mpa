@@ -1,8 +1,18 @@
 program gcd(output);
-var a, b: integer;
-begin
-a:=0;
-begin
-end;
-b:=1;
-end.
+begin 
+	i := 4;
+	begin end;
+	begin
+	    begin
+ 	       begin
+		begin end;
+		begin end
+	       end;
+	    end;
+	end;
+	begin end;
+	begin end;
+	begin end;
+	i := 2;
+end
+.
