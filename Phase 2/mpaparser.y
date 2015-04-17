@@ -163,7 +163,7 @@ StatListRepeat: ';' Stat StatListRepeat							{$$ = addStatList($2,$3);}
 
 Stat: StatPart													{$$ = addStat(NULL,NULL,NULL,NULL,$1,2, StatList1);}
 	| IF Expr THEN Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
-	| IF Expr THEN Stat ELSE Stat 								{$4->next = $6; $$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
+	| IF Expr THEN Stat ELSE Stat 								{if($4 != NULL) $4->next = $6; $$ = addStat($2,$4,NULL,NULL,NULL,3, IfElse);}
 	| WHILE Expr DO Stat 										{$$ = addStat($2,$4,NULL,NULL,NULL,3, While);}
 	| REPEAT StatList UNTIL Expr 								{$$ = addStat($4,NULL,NULL,NULL,$2,2, Repeat);}	
 	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = addStat($5,NULL,NULL,$8,NULL,1, ValParam);}
