@@ -1,0 +1,8 @@
+program echo(output);
+var x: integer;
+begin
+	x := 1.2-1;
+	x := 'something';
+	val(paramstr(1), x);
+	writeln(x)
+end.
