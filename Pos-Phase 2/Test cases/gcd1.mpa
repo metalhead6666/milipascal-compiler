@@ -1,0 +1,11 @@
+program gcd(output);
+var a, b: integer;
+x, y: boolean;
+x, y: boolean;
+x, y: boolean;
+x, y: boolean;
+x, y: boolean;
+x, y: boolean;
+x, y: boolean;
+begin
+end.

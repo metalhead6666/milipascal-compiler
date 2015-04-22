@@ -1,0 +1,9 @@
+program gcd(output);
+{ }   
+{  olad
+  }
+
+var a, b: integer;
+x,y:boolean;
+begin
+end.
