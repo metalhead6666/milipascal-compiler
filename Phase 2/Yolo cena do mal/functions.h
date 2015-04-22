@@ -29,6 +29,31 @@ Program *makeNode(char *type, char *value, Program *son, Program *brother){
 	return program;
 }
 
+Program *insert_last_brother(Program *program){
+	Program *aux = program; 
+
+	if(program == NULL){
+		return NULL;
+	}
+
+	while(aux->brother != NULL){
+		aux = aux->brother; 
+	}
+
+	return aux;
+}
+
+int count_nodes(Program *program){
+	Program *aux = program;
+	int counter = 0;
+
+	while(aux != NULL){
+		aux = aux->brother;
+	}
+
+	return counter;
+}
+
 void print_tree(Program *program, int counter){
 	if(program != NULL){
 		print_dots(counter);

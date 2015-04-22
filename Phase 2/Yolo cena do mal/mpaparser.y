@@ -57,28 +57,16 @@
 %type <program> ProgBlock;
 %type <program> varPart;
 %type <program> VarDeclarationRepeat;
-%type <program> funcPart;
 %type <program> IDList;
+%type <program> IDListRepeat;
 %type <program> VarDeclaration;
+%type <program> funcPart;
 %type <program> FuncDeclaration;
 %type <program> FuncHeading;
 %type <program> FormalParamList;
 %type <program> FormalParamListRepeat;
 %type <program> FormalParams;
-%type <program> StatList;
-%type <program> StatListRepeat;
 %type <program> StatPart;
-%type <program> Stat;
-%type <program> Expr;
-%type <program> WriteInPList;
-%type <program> WriteInPListOptional;
-%type <program> Optional;
-%type <program> Term;
-%type <program> TermRepeat;
-%type <program> SimpleExpr;
-%type <program> Factor;
-%type <program> ParamList;
-%type <program> ParamListOptional;
 
 %union{
 	struct Program* program;
@@ -86,117 +74,117 @@
 };
 
 %%
-Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode("Id", $1, $3, NULL);}
+Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode("Id", $1, NULL, $3);}
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 		   ;
 
-ProgBlock: varPart funcPart StatPart							{$$ = $1;}
+ProgBlock: varPart funcPart StatPart							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; $$ = $1;}
 		 ;
 
 varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = makeNode("VarPart", "", $2, $4);}
-	   |														{$$ = NULL;}
+	   |														{$$ = makeNode("VarPart", "", NULL, NULL);}
 	   ;
 
 VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = makeNode("VarPart", "", $1, $3);}
 					|											{$$ = NULL;}
 					;		   
 
-VarDeclaration: ID IDList ':' ID 								{aux = $2; while(aux->brother != NULL) aux = aux->brother; aux->brother = makeNode("Id", $4, NULL, NULL); $$->brother = $2; $$ = makeNode("Id", $1, NULL, $2);}
+VarDeclaration: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL); $$ = makeNode("VarDecl", "", $1, NULL);}
 			  ;		 
 
-IDList: ',' ID IDList 											{$$ = makeNode("Id", $2, NULL, $3);}
+IDList: ID IDListRepeat											{$$ = makeNode("Id", $1, NULL, $2);}
+	  ;
+
+IDListRepeat: ',' ID IDListRepeat								{$$ = makeNode("Id", $2, NULL, $3);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: FuncDeclaration ';' funcPart  						{$$ = NULL;}
-		|														{$$ = NULL;}	
+funcPart: FuncDeclaration ';' funcPart  						{$$ =  makeNode("FuncPart", "", $1, $3);}	
+		|														{$$ =  makeNode("FuncPart", "", NULL, NULL);}
 		;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = NULL;}
-			   | FUNCTION ID ';' varPart StatPart				{$$ = NULL;}
-			   | FuncHeading ';' varPart StatPart 				{$$ = NULL;}
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL);}
+			   | FUNCTION ID ';' varPart StatPart				{$4->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4), NULL);}
+			   | FuncHeading ';' varPart StatPart 				{$3->brother = $4; $1->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL);}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{$$ = NULL;}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL); $$ = makeNode("Id", $2, NULL, $3);}
 		   ;		   
 
-FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = NULL;}
+FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3);}
 			   |												{$$ = NULL;}
 			   ;
 
-FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = NULL;}
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("FuncParams", "", $2, $3);}
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: ID IDList ':' ID 									{$$ = NULL;}
-			| VAR ID IDList ':' ID 								{$$ = NULL;}
+FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL); $$ = makeNode("Params", "", $1, NULL);}
+			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL); $$ = makeNode("VarParams", "", $2, NULL);}
 			;
 
-StatPart: BEG StatList END 										{$$ = $2;}
+StatPart: BEG StatList END 										{$$ = makeNode("StatList", "", NULL, NULL);}						
 		;
 
-StatList: Stat StatListRepeat									{$$ = NULL;}
+StatList: Stat StatListRepeat									
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{$$ = NULL;}
-			  |													{$$ = NULL;}
+StatListRepeat: ';' Stat StatListRepeat							
+			  |													
 			  ;
 
-Stat: StatPart													{$$ = NULL;}
-	| IF Expr THEN Stat 										{$$ = NULL;}
-	| IF Expr THEN Stat ELSE Stat 								{$$ = NULL;}
-	| WHILE Expr DO Stat 										{$$ = NULL;}
-	| REPEAT StatList UNTIL Expr 								{$$ = NULL;}
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{$$ = NULL;}
-	| ID ASSIGN Expr 											{$$ = NULL;}
-	| WRITELN WriteInPList 										{$$ = NULL;}
-	| 															{$$ = NULL;}
+Stat: StatPart													
+	| IF Expr THEN Stat 										
+	| IF Expr THEN Stat ELSE Stat 								
+	| WHILE Expr DO Stat 										
+	| REPEAT StatList UNTIL Expr 								
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					
+	| ID ASSIGN Expr 											
+	| WRITELN WriteInPList 										
+	| 															
 	;
 
-WriteInPList: '(' Optional WriteInPListOptional ')'				{$$ = NULL;}
-			|													{$$ = NULL;}
+WriteInPList: '(' Optional WriteInPListOptional ')'				
+			|													
 			;
 
-WriteInPListOptional: ',' Optional WriteInPListOptional 		{$$ = NULL;}
-					| 											{$$ = NULL;}
+WriteInPListOptional: ',' Optional WriteInPListOptional 		
+					| 											
 					;
 
-Optional: Expr 													{$$ = NULL;}
-		| STRING 												{$$ = NULL;}
+Optional: Expr 													
+		| STRING 												
 		;
 
-Expr: SimpleExpr												{$$ = NULL;}
-	| SimpleExpr RELATIONALOP SimpleExpr						{$$ = NULL;}
+Expr: SimpleExpr												
+	| SimpleExpr RELATIONALOP SimpleExpr						
 	;
 
-SimpleExpr: ADDOP Term											{$$ = NULL;}
-		  | Term ADDOP SimpleExpr 								{$$ = NULL;}
-		  | Term OR SimpleExpr 									{$$ = NULL;}
-		  | Term 												{$$ = NULL;}
+SimpleExpr: ADDOP Term
+		  | SimpleExpr ADDOP Term
+		  | SimpleExpr OR Term
+		  | Term
 		  ;
 
-Term: Factor TermRepeat	 										{$$ = NULL;}
+Term: Factor
+	| Term MULTOP Factor
 	;
 
-TermRepeat: MULTOP Factor TermRepeat							{$$ = NULL;}
-		  |														{$$ = NULL;}
-		  ;
-
-Factor: '(' Expr ')'											{$$ = NULL;}
-	  | NOT Factor  											{$$ = NULL;}
-  	  | INTEGER													{$$ = NULL;}
-  	  | REAL 													{$$ = NULL;}
-  	  | ID 														{$$ = NULL;}
-  	  | ID ParamList 											{$$ = NULL;}
+Factor: '(' Expr ')'											
+	  | NOT Factor  											
+  	  | INTEGER													
+  	  | REAL 													
+  	  | ID 														
+  	  | ID ParamList 											
   	  ;
 
-ParamList: '(' Expr ParamListOptional ')' 						{$$ = NULL;}
+ParamList: '(' Expr ParamListOptional ')' 						
 		 ;	
 
-ParamListOptional: ',' Expr ParamListOptional 					{$$ = NULL;}
-				 | 												{$$ = NULL;}
+ParamListOptional: ',' Expr ParamListOptional 					
+				 | 												
 				 ;		 
 
 
