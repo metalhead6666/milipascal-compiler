@@ -107,7 +107,7 @@ funcPart: FuncDeclaration ';' funcPart  						{$$ =  makeNode("FuncPart", "", $1
 
 FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL);}
 			   | FUNCTION ID ';' varPart StatPart				{$4->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4), NULL);}
-			   | FuncHeading ';' varPart StatPart 				{$3->brother = $4; $1->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL);}
+			   | FuncHeading ';' varPart StatPart 				{$3->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL);}
 			   ;
 
 FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL); $$ = makeNode("Id", $2, NULL, $3);}
