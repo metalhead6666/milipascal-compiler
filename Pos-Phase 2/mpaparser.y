@@ -62,6 +62,7 @@
 %type <program> VarDeclaration;
 %type <program> funcPart;
 %type <program> FuncDeclaration;
+%type <program> FuncDeclRepeat;
 %type <program> FuncHeading;
 %type <program> FormalParamList;
 %type <program> FormalParamListRepeat;
@@ -87,7 +88,7 @@ varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = makeNode("VarPart",
 	   |														{$$ = makeNode("VarPart", "", NULL, NULL);}
 	   ;
 
-VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = makeNode("VarPart", "", $1, $3);}
+VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = makeNode("NoPrint", "", $1, $3);}
 					|											{$$ = NULL;}
 					;		   
 
@@ -101,9 +102,13 @@ IDListRepeat: ',' ID IDListRepeat								{$$ = makeNode("Id", $2, NULL, $3);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: FuncDeclaration ';' funcPart  						{$$ =  makeNode("FuncPart", "", $1, $3);}	
+funcPart: FuncDeclaration ';' FuncDeclRepeat 					{$$ =  makeNode("FuncPart", "", $1, $3);}	
 		|														{$$ =  makeNode("FuncPart", "", NULL, NULL);}
 		;
+
+FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ =  makeNode("NoPrint", "", $1, $3);}
+			  |													{$$=NULL;}
+			  ;
 
 FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL);}
 			   | FUNCTION ID ';' varPart StatPart				{$4->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4), NULL);}

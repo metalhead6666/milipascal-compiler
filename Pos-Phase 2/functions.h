@@ -56,6 +56,12 @@ int count_nodes(Program *program){
 
 void print_tree(Program *program, int counter){
 	if(program != NULL){
+		if(strcmp(program->type,"NoPrint")==0){
+			print_tree(program->son, counter + 2);
+			print_tree(program->brother, counter);
+			return;
+		}
+
 		print_dots(counter);
 
 		if(verify_terminal(program->type)){
