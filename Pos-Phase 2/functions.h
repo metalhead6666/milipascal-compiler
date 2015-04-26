@@ -97,4 +97,50 @@ int verify_terminal(char *type){
 	return 0;
 }
 
+char* verify_Expr(char *expr){
+	if(strcmp(expr,"=") == 0)
+		return "Eq";
+	if(strcmp(expr,">") == 0)
+		return "Gt";
+	if(strcmp(expr,"<") == 0)
+		return "Lt";
+	if(strcmp(expr,"<>") == 0)
+		return "Neq";
+	if(strcmp(expr,"<=") == 0)
+		return "Leq";
+	if(strcmp(expr,">=") == 0)
+		return "Geq";
+}
+
+char* verify_SimpleExpr(char *expr, int type){
+
+	if(type==0){
+		if(strcmp(expr,"+") == 0)
+			return "Plus";
+		if(strcmp(expr,"-") == 0)
+			return "Minus";
+	}
+
+	if(type==1){
+		if(strcmp(expr,"+") == 0)
+			return "Add";
+		if(strcmp(expr,"-") == 0)
+			return "Sub";
+	}
+	return "Or";
+}
+
+char* verify_MultOp(char *term){
+	if(strcmp(term,"div")==0)
+		return "Div";
+	if(strcmp(term,"mod")==0)
+		return "Mod";
+	if(strcmp(term,"/")==0)
+		return "RealDiv";
+	if(strcmp(term,"*")==0)
+		return "Mul";
+	if(strcmp(term,"and")==0)
+		return "And";
+}
+
 #endif
