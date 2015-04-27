@@ -69,6 +69,7 @@
 %type <program> FormalParamListRepeat;
 %type <program> FormalParams;
 %type <program> StatPart;
+%type <program> CompStat;
 %type <program> StatList;
 %type <program> StatListRepeat;
 %type <program> Stat;
@@ -143,7 +144,10 @@ FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != N
 			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL); $$ = makeNode("VarParams", "", $2, NULL);}
 			;
 
-StatPart: BEG StatList END 										{$$ = makeNode("StatList", "", NULL, $2);}						
+StatPart: CompStat												{$$ = $1;}
+		;
+
+CompStat: BEG StatList END 										{$$ = makeNode("StatList", "", NULL, $2);}
 		;
 
 StatList: Stat StatListRepeat									{if($2 != NULL) $1->brother=$2; $$ = makeNode("NoPrint", "", NULL, $1);}
@@ -153,7 +157,7 @@ StatListRepeat: ';' Stat StatListRepeat							{if($3 != NULL) $2->brother=$3; $$
 			  |													{$$ = NULL;}
 			  ;
 
-Stat: StatPart													{$$ = $1;}
+Stat: CompStat													{$$ = $1;}
 	| IF Expr THEN Stat 										{aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("If", "", aux, NULL);}
 	| IF Expr THEN Stat ELSE Stat 								{if($4 != NULL) $4->brother = $6; aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("IfElse", "", $2, NULL);}
 	| WHILE Expr DO Stat 										{aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("While", "", aux, NULL);}
