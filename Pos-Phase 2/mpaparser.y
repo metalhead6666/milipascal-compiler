@@ -195,13 +195,13 @@ Factor: '(' Expr ')'											{$$ = $2;}
   	  | INTEGER													{$$ = makeNode("IntLit", $1, NULL, NULL);}										
   	  | REAL 													{$$ = makeNode("RealLit", $1, NULL, NULL);}
   	  | ID 														{$$ = makeNode("Id", $1, NULL, NULL);}
-  	  | ID ParamList 											{$$ = makeNode("Id", "$1", NULL, makeNode("Call", "", $2, NULL));}
+  	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2), NULL);}
   	  ;
 
-ParamList: '(' Expr ParamListOptional ')' 						{$$ = makeNode("NoPrint", "", $2, $3);}
+ParamList: '(' Expr ParamListOptional ')' 						{$2->brother = $3; $$ = makeNode("NoPrint", "", NULL, $2);}
 		 ;	
 
-ParamListOptional: ',' Expr ParamListOptional 					{$$ = makeNode("NoPrint", "", $2, $3);}
+ParamListOptional: ',' Expr ParamListOptional 					{$2->brother = $3; $$ = makeNode("NoPrint", "", NULL, $2);}
 				 | 												{$$ = NULL;}
 				 ;		 
 
