@@ -146,10 +146,10 @@ FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != N
 StatPart: BEG StatList END 										{$$ = makeNode("StatList", "", NULL, $2);}						
 		;
 
-StatList: Stat StatListRepeat									{$$ = makeNode("NoPrint", "", $1, $2);}
+StatList: Stat StatListRepeat									{if($2 != NULL) $1->brother=$2; $$ = makeNode("NoPrint", "", NULL, $1);}
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{$$ = makeNode("NoPrint", "", $2, $3);}
+StatListRepeat: ';' Stat StatListRepeat							{if($3 != NULL) $2->brother=$3; $$ = makeNode("NoPrint", "", NULL, $2);}
 			  |													{$$ = NULL;}
 			  ;
 
