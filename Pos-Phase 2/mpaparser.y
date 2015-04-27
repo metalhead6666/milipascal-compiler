@@ -147,7 +147,7 @@ FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != N
 StatPart: CompStat												{$$ = $1;}
 		;
 
-CompStat: BEG StatList END 										{$$ = makeNode("StatList", "", NULL, $2);}
+CompStat: BEG StatList END 										{$$ = makeNode("StatList", "", $2, NULL);}
 		;
 
 StatList: Stat StatListRepeat									{if($2 != NULL) $1->brother=$2; $$ = makeNode("NoPrint", "", NULL, $1);}
@@ -159,9 +159,55 @@ StatListRepeat: ';' Stat StatListRepeat							{if($3 != NULL) $2->brother=$3; $$
 
 Stat: CompStat													{$$ = $1;}
 	| IF Expr THEN Stat 										{aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("If", "", aux, NULL);}
-	| IF Expr THEN Stat ELSE Stat 								{if($4 != NULL) $4->brother = $6; aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("IfElse", "", $2, NULL);}
-	| WHILE Expr DO Stat 										{aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("While", "", aux, NULL);}
-	| REPEAT StatList UNTIL Expr 								{aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("Repeat", "", $2, NULL);}
+
+	| IF Expr THEN Stat ELSE Stat 								{
+																	if($4==NULL && $6==NULL){
+																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));
+																	}
+																	else if($4==NULL && $6!=NULL){
+																		$2->brother = makeNode("StatList", "", NULL, $6);
+																	}
+																	else if($4!=NULL && $6==NULL){
+																		$2->brother = $4;
+																		$4->brother =  makeNode("StatList", "", NULL, NULL);
+																	}
+																	else{
+																		$2->brother = $4;
+																		$4->brother = $6;
+																	}
+																	$$ = makeNode("IfElse", "", $2, NULL);
+																}
+
+
+	| WHILE Expr DO Stat 										{
+																	if($4==NULL){
+																		$2->brother = makeNode("StatList", "", NULL, NULL);
+																	}
+																	else{
+																		$2->brother = $4;
+																	}
+																	$$ = makeNode("While", "", $2, NULL);
+																}
+
+	| REPEAT StatList UNTIL Expr 								{
+																	if($2==NULL){
+																		aux = makeNode("StatList", "", NULL, NULL);
+																		$$ = makeNode("Repeat", "", aux, NULL);
+																	}
+																	else{
+																		if($2->brother!=NULL){
+																			aux = insert_last_brother($2); 
+																			aux->brother = $4; 
+																			$$ = makeNode("Repeat", "", $2, NULL);
+																		}
+																		else{
+																			aux = makeNode("StatList", "", NULL, NULL);
+																			aux->brother = $4; 
+																			$$ = makeNode("Repeat3", "", $2, NULL);
+																		}
+																	}																	
+																}
+
 	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{aux = insert_last_brother($5); aux->brother = makeNode("Id",$8,NULL,NULL); $$ = makeNode("ValParam", "", aux, NULL);}
 	| ID ASSIGN Expr 											{$$ = makeNode("Assign", "", makeNode("Id", $1, NULL, $3), NULL);}
 	| WRITELN WriteInPList 										{$$ = makeNode("WriteLn", "", $2, NULL);}
@@ -228,3 +274,11 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
+
+
+
+
+
+
+
+
