@@ -158,7 +158,18 @@ StatListRepeat: ';' Stat StatListRepeat							{if($3 != NULL) $2->brother=$3; $$
 			  ;
 
 Stat: CompStat													{$$ = $1;}
-	| IF Expr THEN Stat 										{aux = insert_last_brother($2); aux->brother = $4; $$ = makeNode("If", "", aux, NULL);}
+
+	| IF Expr THEN Stat 										{
+																	if($4!=NULL){
+																		$2->brother = $4;
+																		$4->brother = makeNode("StatList", "", NULL, NULL);
+																		$$ = makeNode("IfElse", "", $2, NULL);
+																	}
+																	else{
+																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));
+																		$$ = makeNode("IfElse", "", $2, NULL);
+																	}
+																}
 
 	| IF Expr THEN Stat ELSE Stat 								{
 																	if($4==NULL && $6==NULL){
@@ -203,7 +214,7 @@ Stat: CompStat													{$$ = $1;}
 																		else{
 																			aux = makeNode("StatList", "", NULL, NULL);
 																			aux->brother = $4; 
-																			$$ = makeNode("Repeat3", "", $2, NULL);
+																			$$ = makeNode("Repeat", "", aux, NULL);
 																		}
 																	}																	
 																}
@@ -274,11 +285,4 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
-
-
-
-
-
-
-
 
