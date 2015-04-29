@@ -206,15 +206,9 @@ Stat: CompStat													{$$ = $1;}
 																		$$ = makeNode("Repeat", "", aux, NULL);
 																	}
 																	else{
-																		if($2->brother!=NULL){
-																			aux = insert_last_brother($2); 
-																			aux->brother = $4; 
-																			$$ = makeNode("Repeat", "", $2, NULL);
-																		}
-																		else{
-																			aux = makeNode("StatList", "", NULL, $4);
-																			$$ = makeNode("Repeat", "", aux, NULL);
-																		}
+																		aux = insert_last_brother($2); 
+																		aux->brother = $4; 
+																		$$ = makeNode("Repeat", "", $2, NULL);
 																	}																	
 																}
 
