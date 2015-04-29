@@ -159,7 +159,10 @@ Program
 ........Id(max)
 ........Id(a)
 ........Id(b)
-....Assign
-......Id(i)
-......IntLit(10)
+....StatList
+......StatList
+........StatList
+..........Assign
+............Id(i)
+............IntLit(10)
 ....WriteLn
