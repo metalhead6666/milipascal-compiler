@@ -116,20 +116,20 @@ IDListRepeat: ',' ID IDListRepeat								{$$ = makeNode("Id", $2, NULL, $3);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: FuncDeclaration ';' FuncDeclRepeat 					{$$ =  makeNode("FuncPart", "", $1, $3);}	
-		|														{$$ =  makeNode("FuncPart", "", NULL, NULL);}
+funcPart: FuncDeclaration ';' FuncDeclRepeat 					{$$ = makeNode("FuncPart", "", $1, $3);}	
+		|														{$$ = makeNode("FuncPart", "", NULL, NULL);}
 		;
 
-FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ =  makeNode("NoPrint", "", $1, $3);}
+FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ = makeNode("NoPrint", "", $1, $3);}
 			  |													{$$ = NULL;}
 			  ;
 
 FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL);}
-			   | FUNCTION ID ';' varPart StatPart				{$4->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4), NULL);}
-			   | FuncHeading ';' varPart StatPart 				{$3->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL);}
+			   | FUNCTION ID ';' varPart StatPart				{aux = insert_last_brother($4); aux->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4), NULL);}
+			   | FuncHeading ';' varPart StatPart 				{aux = insert_last_brother($3); aux->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL);}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL); $$ = makeNode("Id", $2, NULL, $3);}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL); else $3 = makeNode("Id", $5, NULL, NULL); $$ = makeNode("Id", $2, NULL, $3);}
 		   ;		   
 
 FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3);}
@@ -140,20 +140,20 @@ FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("Fu
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL); $$ = makeNode("Params", "", $1, NULL);}
-			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL); $$ = makeNode("VarParams", "", $2, NULL);}
+FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL); else $1 = makeNode("Id", $3, NULL, NULL); $$ = makeNode("Params", "", $1, NULL);}
+			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL); else $2 = makeNode("Id", $4, NULL, NULL); $$ = makeNode("VarParams", "", $2, NULL);}
 			;
 
-StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) makeNode("StatList", "", NULL, NULL); else $$ = $1;}
+StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) $$ = makeNode("StatList", "", NULL, NULL); else $$ = $1;}
 		;
 
 CompStat: BEG StatList END 										{$$ = makeNode("StatList", "", $2, NULL);}
 		;
 
-StatList: Stat StatListRepeat									{if($1 != NULL) $1->brother=$2; $$ = makeNode("NoPrint", "", NULL, $1);}
+StatList: Stat StatListRepeat									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; $$ = makeNode("NoPrint", "", NULL, $1);}
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{if($2 != NULL) $2->brother=$3; $$ = makeNode("NoPrint", "", NULL, $2);}
+StatListRepeat: ';' Stat StatListRepeat							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; $$ = makeNode("NoPrint", "", NULL, $2);}
 			  |													{$$ = NULL;}
 			  ;
 
