@@ -121,7 +121,7 @@ funcPart: FuncDeclaration ';' FuncDeclRepeat 					{$$ =  makeNode("FuncPart", ""
 		;
 
 FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ =  makeNode("NoPrint", "", $1, $3);}
-			  |													{$$=NULL;}
+			  |													{$$ = NULL;}
 			  ;
 
 FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL);}
@@ -144,25 +144,25 @@ FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != N
 			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL); $$ = makeNode("VarParams", "", $2, NULL);}
 			;
 
-StatPart: CompStat												{$$ = $1;}
+StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) makeNode("StatList", "", NULL, NULL); else $$ = $1;}
 		;
 
 CompStat: BEG StatList END 										{$$ = makeNode("StatList", "", $2, NULL);}
 		;
 
-StatList: Stat StatListRepeat									{if($2 != NULL) $1->brother=$2; $$ = makeNode("NoPrint", "", NULL, $1);}
+StatList: Stat StatListRepeat									{if($1 != NULL) $1->brother=$2; $$ = makeNode("NoPrint", "", NULL, $1);}
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{if($3 != NULL) $2->brother=$3; $$ = makeNode("NoPrint", "", NULL, $2);}
+StatListRepeat: ';' Stat StatListRepeat							{if($2 != NULL) $2->brother=$3; $$ = makeNode("NoPrint", "", NULL, $2);}
 			  |													{$$ = NULL;}
 			  ;
 
 Stat: CompStat													{$$ = $1;}
 
 	| IF Expr THEN Stat 										{
-																	if($4!=NULL){
-																		$2->brother = $4;
+																	if($4!=NULL){																		
 																		$4->brother = makeNode("StatList", "", NULL, NULL);
+																		$2->brother = $4;
 																		$$ = makeNode("IfElse", "", $2, NULL);
 																	}
 																	else{
@@ -178,13 +178,13 @@ Stat: CompStat													{$$ = $1;}
 																	else if($4==NULL && $6!=NULL){
 																		$2->brother = makeNode("StatList", "", NULL, $6);
 																	}
-																	else if($4!=NULL && $6==NULL){
-																		$2->brother = $4;
+																	else if($4!=NULL && $6==NULL){																		
 																		$4->brother =  makeNode("StatList", "", NULL, NULL);
-																	}
-																	else{
 																		$2->brother = $4;
+																	}
+																	else{																		
 																		$4->brother = $6;
+																		$2->brother = $4;
 																	}
 																	$$ = makeNode("IfElse", "", $2, NULL);
 																}
