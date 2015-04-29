@@ -202,7 +202,7 @@ Stat: CompStat													{$$ = $1;}
 
 	| REPEAT StatList UNTIL Expr 								{
 																	if($2==NULL){
-																		aux = makeNode("StatList", "", NULL, NULL);
+																		aux = makeNode("StatList", "", NULL, $4);
 																		$$ = makeNode("Repeat", "", aux, NULL);
 																	}
 																	else{
@@ -212,8 +212,7 @@ Stat: CompStat													{$$ = $1;}
 																			$$ = makeNode("Repeat", "", $2, NULL);
 																		}
 																		else{
-																			aux = makeNode("StatList", "", NULL, NULL);
-																			aux->brother = $4; 
+																			aux = makeNode("StatList", "", NULL, $4);
 																			$$ = makeNode("Repeat", "", aux, NULL);
 																		}
 																	}																	
@@ -225,11 +224,11 @@ Stat: CompStat													{$$ = $1;}
 	| 															{$$ = NULL;}
 	;
 
-WriteInPList: '(' Optional WriteInPListOptional ')'				{aux = insert_last_brother($2); aux->brother = $3; $$ = makeNode("NoPrint", "", NULL, aux);}
+WriteInPList: '(' Optional WriteInPListOptional ')'				{aux = insert_last_brother($2); aux->brother = $3; $$ = aux;}
 			|													{$$ = NULL;}
 			;
 
-WriteInPListOptional: ',' Optional WriteInPListOptional 		{aux = insert_last_brother($2); aux->brother = $3; $$ = makeNode("NoPrint", "", NULL, aux);}
+WriteInPListOptional: ',' Optional WriteInPListOptional 		{aux = insert_last_brother($2); aux->brother = $3; $$ = aux;}
 					| 											{$$ = NULL;}
 					;
 
@@ -259,10 +258,10 @@ Factor: '(' Expr ')'											{$$ = $2;}
   	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2), NULL);}
   	  ;
 
-ParamList: '(' Expr ParamListOptional ')' 						{$2->brother = $3; $$ = makeNode("NoPrint", "", NULL, $2);}
+ParamList: '(' Expr ParamListOptional ')' 						{$2->brother = $3; $$ = $2;}
 		 ;	
 
-ParamListOptional: ',' Expr ParamListOptional 					{$2->brother = $3; $$ = makeNode("NoPrint", "", NULL, $2);}
+ParamListOptional: ',' Expr ParamListOptional 					{$2->brother = $3; $$ = $2;}
 				 | 												{$$ = NULL;}
 				 ;		 
 
