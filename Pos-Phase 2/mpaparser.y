@@ -147,13 +147,13 @@ FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != N
 StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) $$ = makeNode("StatList", "", NULL, NULL); else $$ = $1;}
 		;
 
-CompStat: BEG StatList END 										{$$ = makeNode("StatList", "", $2, NULL);}
+CompStat: BEG StatList END 										{if(count_nodes($2) > 1) $$ = makeNode("StatList", "", $2, NULL); else $$ = $2;}
 		;
 
-StatList: Stat StatListRepeat									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; $$ = makeNode("NoPrint", "", NULL, $1);}
+StatList: Stat StatListRepeat									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; $$ = $1;}
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; $$ = makeNode("NoPrint", "", NULL, $2);}
+StatListRepeat: ';' Stat StatListRepeat							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; $$ = $2;}
 			  |													{$$ = NULL;}
 			  ;
 

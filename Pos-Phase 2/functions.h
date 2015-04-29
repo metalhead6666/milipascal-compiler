@@ -47,9 +47,8 @@ int count_nodes(Program *program){
 	Program *aux = program;
 	int counter = 0;
 
-	while(aux != NULL){
-		aux = aux->brother;
-		++counter;
+	if(aux != NULL && aux->brother != NULL){
+		counter += 2;
 	}
 
 	return counter;
