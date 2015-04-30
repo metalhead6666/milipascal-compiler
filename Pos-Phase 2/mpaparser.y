@@ -133,7 +133,7 @@ FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($
 		   ;		   
 
 FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3);}
-			   |												{$$ = NULL;}
+			   |												{$$ = makeNode("FuncParams", "", NULL, NULL);}
 			   ;
 
 FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("NoPrint", "", $2, $3);}
