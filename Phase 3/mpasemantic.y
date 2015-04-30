@@ -4,18 +4,31 @@
 	#include "semantic.h"
 
 	void yyerror(char *s);
+	void cannotWriteValues_error(char* type);
+	void functionIdentifierExpected_error();
+	void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2);
+	void incompatibleTypeAssigment_error(char *token, char *type1, char *type2);
+	void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
+	void cannotAppliedType_error(char *token, char *type);
+	void cannotAppliedType2_error(char *token, char *type1, char *type2);
+	void variableIdentifierExpected_error();
+	void wrongNumberArguments_error(char *token, char *type1, char *type2);
 
 	/* values received from lex */
 	extern char *yytext;
 	extern int count_line, count_column;
 
 	/* node root to print in the tree */
-	Program* program;
+	Program *program;
 	Program *aux;
 	char *aux2;
 
+	/* semantic error structure declaration */
+	ErrorStruct *errorStruct;
+
 	/* in case some syntax error appears, doesn't print the AST */
 	int hasErrors = 0;
+	int hasErrorsSemantic = 0;
 %}
 
 %token BEG
@@ -281,7 +294,7 @@ int main(int argc, char **argv){
 				semantic = 1;
 			}
 			
-			*argv++;
+			argv++;
 		}
 
 		if(tree){
@@ -290,10 +303,17 @@ int main(int argc, char **argv){
 		}
 
 		if(semantic){
-			if(tree){
-				printf("\n");
+			if(hasErrorsSemantic){
+				
 			}
-			//print_semantic();
+
+			else{
+				if(tree){
+					printf("\n");
+				}
+
+				//print_semantic();
+			}
 		}
 	}
 
@@ -304,7 +324,6 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
-
 
 //Tratamento de erros
 void cannotWriteValues_error(char* type){
@@ -332,12 +351,12 @@ void incompatibleTypeStatement_error(char *statement, char *type1, char *type2){
 	printf("Incompatible type in %s statement (got %s, expected %s)\n", statement, type1, type2);
 }
 
-void cannotApliedType_error(char *token, char *type){
+void cannotAppliedType_error(char *token, char *type){
 	hasErrorsSemantic = 1;
 	printf("Operator %s cannot be applied to type %s\n", token, type);
 }
 
-void cannotApliedType2_error(char *token, char *type1, char *type2){
+void cannotAppliedType2_error(char *token, char *type1, char *type2){
 	hasErrorsSemantic = 1;
 	printf("Operator %s cannot be applied to types %s, %s\n", token, type1, type2);
 }
@@ -351,4 +370,3 @@ void wrongNumberArguments_error(char *token, char *type1, char *type2){
 	hasErrorsSemantic = 1;
 	printf("Wrong number of arguments in call to function %s (got %s, expected %s)\n", token, type1, type2);
 }
-
