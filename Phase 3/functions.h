@@ -15,9 +15,14 @@ struct Program{
 
 
 Program *makeNode(char *type, char *value, Program *son, Program *brother);
+Program *insert_last_brother(Program *program);
+int count_nodes(Program *program);
 void print_tree(Program *program, int counter);
 void print_dots(int counter);
 int verify_terminal(char *type);
+char *verify_Expr(char *expr);
+char *verify_SimpleExpr(char *expr, int type);
+char *verify_MultOp(char *term);
 
 
 Program *makeNode(char *type, char *value, Program *son, Program *brother){
@@ -29,7 +34,6 @@ Program *makeNode(char *type, char *value, Program *son, Program *brother){
 
 	return program;
 }
-
 
 Program *insert_last_brother(Program *program){
 	Program *aux = program; 
@@ -58,7 +62,7 @@ int count_nodes(Program *program){
 
 void print_tree(Program *program, int counter){
 	if(program != NULL){
-		if(strcmp(program->type,"NoPrint")==0){
+		if(strcmp(program->type, "NoPrint") == 0){
 			print_tree(program->son, counter + 2);
 			print_tree(program->brother, counter);
 			return;
@@ -99,49 +103,71 @@ int verify_terminal(char *type){
 	return 0;
 }
 
-char* verify_Expr(char *expr){
-	if(strcmp(expr,"=") == 0)
+char *verify_Expr(char *expr){
+	if(strcmp(expr, "=") == 0){
 		return "Eq";
-	if(strcmp(expr,">") == 0)
+	}
+
+	if(strcmp(expr, ">") == 0){
 		return "Gt";
-	if(strcmp(expr,"<") == 0)
+	}
+
+	if(strcmp(expr, "<") == 0){
 		return "Lt";
-	if(strcmp(expr,"<>") == 0)
+	}
+
+	if(strcmp(expr, "<>") == 0){
 		return "Neq";
-	if(strcmp(expr,"<=") == 0)
+	}
+
+	if(strcmp(expr, "<=") == 0){
 		return "Leq";
-	if(strcmp(expr,">=") == 0)
-		return "Geq";
-	return "";
+	}
+
+	return "Geq";
 }
 
-char* verify_SimpleExpr(char *expr, int type){
-
-	if(type==0){
-		if(strcmp(expr,"+") == 0)
+char *verify_SimpleExpr(char *expr, int type){
+	if(!type){
+		if(strcmp(expr, "+") == 0){
 			return "Plus";
-		if(strcmp(expr,"-") == 0)
+		}
+
+		if(strcmp(expr, "-") == 0){
 			return "Minus";
+		}
 	}
 
-	if(type==1){
-		if(strcmp(expr,"+") == 0)
+	else if(type){
+		if(strcmp(expr, "+") == 0){
 			return "Add";
-		if(strcmp(expr,"-") == 0)
+		}
+
+		if(strcmp(expr, "-") == 0){
 			return "Sub";
+		}
 	}
+
 	return "Or";
 }
 
-char* verify_MultOp(char *term){
-	if(term[0] == 'd' || term[0] == 'D')
+char *verify_MultOp(char *term){
+	if(term[0] == 'd' || term[0] == 'D'){
 		return "Div";
-	if(term[0] == 'm' || term[0] == 'M')
+	}
+
+	if(term[0] == 'm' || term[0] == 'M'){
 		return "Mod";
-	if(strcmp(term,"/")==0)
+	}
+
+	if(strcmp(term, "/") == 0){
 		return "RealDiv";
-	if(strcmp(term,"*")==0)
+	}
+
+	if(strcmp(term, "*") == 0){
 		return "Mul";
+	}
+
 	return "And";
 }
 

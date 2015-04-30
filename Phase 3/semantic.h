@@ -21,4 +21,17 @@ typedef struct _ErrorStruct{
 	ErrorType errorType;
 }ErrorStruct;
 
+
+void create_table();
+void print_semantic();
+
+
+void create_table(){
+	
+}
+
+void print_semantic(){
+
+}
+
 #endif

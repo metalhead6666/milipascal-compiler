@@ -1,8 +1,8 @@
 %{
-	#include <string.h>
 	#include "functions.h"
 	#include "semantic.h"
 
+	/* function declaration */
 	void yyerror(char *s);
 	void cannotWriteValues_error(char* type);
 	void functionIdentifierExpected_error();
@@ -11,6 +11,9 @@
 	void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
 	void cannotAppliedType_error(char *token, char *type);
 	void cannotAppliedType2_error(char *token, char *type1, char *type2);
+	void symbolAlreadyDefined_error(char *token);
+	void symbolNotDefined_error(char *token);
+	void typeIdentifierExpected_error();
 	void variableIdentifierExpected_error();
 	void wrongNumberArguments_error(char *token, char *type1, char *type2);
 
@@ -18,7 +21,7 @@
 	extern char *yytext;
 	extern int count_line, count_column;
 
-	/* node root to print in the tree */
+	/* node root to print in the tree and auxiliars */
 	Program *program;
 	Program *aux;
 	char *aux2;
@@ -26,7 +29,7 @@
 	/* semantic error structure declaration */
 	ErrorStruct *errorStruct;
 
-	/* in case some syntax error appears, doesn't print the AST */
+	/* in case some syntax error appears, print the AST but not the symbol table */
 	int hasErrors = 0;
 	int hasErrorsSemantic = 0;
 %}
@@ -174,55 +177,64 @@ StatListRepeat: ';' Stat StatListRepeat							{aux = insert_last_brother($2); if
 Stat: CompStat													{$$ = $1;}
 
 	| IF Expr THEN Stat 										{
-																	if($4!=NULL){																		
+																	if($4 != NULL){																		
 																		$4->brother = makeNode("StatList", "", NULL, NULL);
-																		$2->brother = $4;
-																		$$ = makeNode("IfElse", "", $2, NULL);
+																		$2->brother = $4;																		
 																	}
+
 																	else{
-																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));
-																		$$ = makeNode("IfElse", "", $2, NULL);
+																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));																		
 																	}
+
+																	$$ = makeNode("IfElse", "", $2, NULL);
 																}
 
 	| IF Expr THEN Stat ELSE Stat 								{
-																	if($4==NULL && $6==NULL){
+																	if($4 == NULL && $6 == NULL){
 																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));
 																	}
-																	else if($4==NULL && $6!=NULL){
+
+																	else if($4 == NULL && $6 != NULL){
 																		$2->brother = makeNode("StatList", "", NULL, $6);
 																	}
-																	else if($4!=NULL && $6==NULL){																		
+
+																	else if($4 != NULL && $6 == NULL){																		
 																		$4->brother =  makeNode("StatList", "", NULL, NULL);
 																		$2->brother = $4;
 																	}
+
 																	else{																		
 																		$4->brother = $6;
 																		$2->brother = $4;
 																	}
+
 																	$$ = makeNode("IfElse", "", $2, NULL);
 																}
 
 
 	| WHILE Expr DO Stat 										{
-																	if($4==NULL){
+																	if($4 == NULL){
 																		$2->brother = makeNode("StatList", "", NULL, NULL);
 																	}
+
 																	else{
 																		$2->brother = $4;
 																	}
+
 																	$$ = makeNode("While", "", $2, NULL);
 																}
 
 	| REPEAT StatList UNTIL Expr 								{
-																	if($2==NULL){
+																	if($2 == NULL){
 																		aux = makeNode("StatList", "", NULL, $4);
 																		$$ = makeNode("Repeat", "", aux, NULL);
 																	}
+
 																	else{
-																		if($2->brother!=NULL){
+																		if($2->brother != NULL){
 																			$2 = makeNode("StatList", "", $2, NULL);
 																		}
+
 																		aux = insert_last_brother($2); 
 																		aux->brother = $4; 
 																		$$ = makeNode("Repeat", "", $2, NULL);
@@ -248,12 +260,12 @@ Optional: Expr 													{$$ = $1;}
 		;
 
 Expr: SimpleExpr												{$$ = $1;}
-	| SimpleExpr RELATIONALOP SimpleExpr						{aux = insert_last_brother($1); aux->brother=$3; aux2=verify_Expr($2); $$=makeNode(aux2, "", aux, NULL);}
+	| SimpleExpr RELATIONALOP SimpleExpr						{aux = insert_last_brother($1); aux->brother = $3; aux2=verify_Expr($2); $$ = makeNode(aux2, "", aux, NULL);}
 	;
 
-SimpleExpr: ADDOP Term 											{aux2 = verify_SimpleExpr($1,0); $$ = makeNode(aux2, "", $2, NULL);}
-		  | SimpleExpr ADDOP Term								{aux = insert_last_brother($1); aux->brother=$3; aux2 = verify_SimpleExpr($2,1); $$ = makeNode(aux2, "", aux, NULL);}
-		  | SimpleExpr OR Term									{aux = insert_last_brother($1); aux->brother=$3; aux2 = verify_SimpleExpr($2,2); $$ = makeNode(aux2, "", aux, NULL);}
+SimpleExpr: ADDOP Term 											{aux2 = verify_SimpleExpr($1, 0); $$ = makeNode(aux2, "", $2, NULL);}
+		  | SimpleExpr ADDOP Term								{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_SimpleExpr($2, 1); $$ = makeNode(aux2, "", aux, NULL);}
+		  | SimpleExpr OR Term									{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_SimpleExpr($2, 2); $$ = makeNode(aux2, "", aux, NULL);}
 		  | Term 												{$$ = $1;}
 		  ;
 
@@ -280,7 +292,7 @@ ParamListOptional: ',' Expr ParamListOptional 					{$2->brother = $3; $$ = $2;}
 %%
 int main(int argc, char **argv){
 	int tree = 0, semantic = 0;
-	argv++;
+	++argv;
 
 	yyparse();
 
@@ -294,7 +306,7 @@ int main(int argc, char **argv){
 				semantic = 1;
 			}
 			
-			argv++;
+			++argv;
 		}
 
 		if(tree){
@@ -303,6 +315,8 @@ int main(int argc, char **argv){
 		}
 
 		if(semantic){
+			create_table();
+
 			if(hasErrorsSemantic){
 				
 			}
@@ -312,7 +326,7 @@ int main(int argc, char **argv){
 					printf("\n");
 				}
 
-				//print_semantic();
+				print_semantic();
 			}
 		}
 	}
@@ -359,6 +373,18 @@ void cannotAppliedType_error(char *token, char *type){
 void cannotAppliedType2_error(char *token, char *type1, char *type2){
 	hasErrorsSemantic = 1;
 	printf("Operator %s cannot be applied to types %s, %s\n", token, type1, type2);
+}
+
+void symbolAlreadyDefined_error(char *token){
+	printf("Symbol %s already defined\n", token);
+}
+
+void symbolNotDefined_error(char *token){
+	printf("Symbol %s not defined\n", token);
+}
+
+void typeIdentifierExpected_error(){
+	printf("Type identifier expected\n");
 }
 
 void variableIdentifierExpected_error(){
