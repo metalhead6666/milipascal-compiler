@@ -21,13 +21,13 @@
 	extern char *yytext;
 	extern int count_line, count_column;
 
-	/* node root to print in the tree and auxiliars */
+	/* root node to print in the tree and auxiliars */
 	Program *program;
 	Program *aux;
 	char *aux2;
 
-	/* semantic error structure declaration */
-	ErrorStruct *errorStruct;
+	/* root node to the symbol table */
+	SymbolTableHeader *symbolTableHeader;
 
 	/* in case some syntax error appears, print the AST but not the symbol table */
 	int hasErrors = 0;
@@ -315,7 +315,7 @@ int main(int argc, char **argv){
 		}
 
 		if(semantic){
-			create_table();
+			symbolTableHeader = create_table();
 
 			if(hasErrorsSemantic){
 				
@@ -326,7 +326,7 @@ int main(int argc, char **argv){
 					printf("\n");
 				}
 
-				print_semantic();
+				print_semantic(symbolTableHeader);
 			}
 		}
 	}
