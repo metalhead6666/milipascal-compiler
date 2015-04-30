@@ -9,6 +9,9 @@ typedef enum _ErrorType{
 	IncompatibleTypeStatement,
 	CannotAppliedType,
 	CannotAppliedType2,
+	SymbolAlreadyDefined,
+	SymbolNotDefined,
+	TypeIdentifierExpected,
 	VariableIdentifierExpected,
 	WrongNumberArguments
 }ErrorType;
@@ -27,7 +30,7 @@ void print_semantic();
 
 
 void create_table(){
-	
+
 }
 
 void print_semantic(){
