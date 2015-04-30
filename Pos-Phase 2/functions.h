@@ -29,6 +29,7 @@ Program *makeNode(char *type, char *value, Program *son, Program *brother){
 	return program;
 }
 
+
 Program *insert_last_brother(Program *program){
 	Program *aux = program; 
 

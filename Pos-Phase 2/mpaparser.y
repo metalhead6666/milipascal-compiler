@@ -133,10 +133,10 @@ FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($
 		   ;		   
 
 FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3);}
-			   |												{$$ = makeNode("FuncParams", "", NULL, NULL);}
+			   |												{$$ = NULL;}
 			   ;
 
-FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("FuncParams", "", $2, $3);}
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("NoPrint", "", $2, $3);}
 					 |											{$$ = NULL;}
 					 ;
 
@@ -150,10 +150,10 @@ StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) $$ = makeNo
 CompStat: BEG StatList END 										{if(count_nodes($2) > 1) $$ = makeNode("StatList", "", $2, NULL); else $$ = $2;}
 		;
 
-StatList: Stat StatListRepeat									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; $$ = $1;}
+StatList: Stat StatListRepeat									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; else $1 = $2; $$ = $1;}
 		;
 
-StatListRepeat: ';' Stat StatListRepeat							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; $$ = $2;}
+StatListRepeat: ';' Stat StatListRepeat							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; else $2 = $3; $$ = $2;}
 			  |													{$$ = NULL;}
 			  ;
 
@@ -206,6 +206,9 @@ Stat: CompStat													{$$ = $1;}
 																		$$ = makeNode("Repeat", "", aux, NULL);
 																	}
 																	else{
+																		if($2->brother!=NULL){
+																			$2 = makeNode("StatList", "", $2, NULL);
+																		}
 																		aux = insert_last_brother($2); 
 																		aux->brother = $4; 
 																		$$ = makeNode("Repeat", "", $2, NULL);

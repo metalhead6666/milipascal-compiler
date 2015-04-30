@@ -5,7 +5,7 @@ d: double;
 function max(num1, num2: integer): integer; forward;
 function min(num1, num2: integer): integer;
 var
-	result: integer;
+	result: integer; merda : cona;
 begin
 	if num1 < num2
 	then
