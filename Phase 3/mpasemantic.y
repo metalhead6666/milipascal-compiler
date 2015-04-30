@@ -290,6 +290,9 @@ int main(int argc, char **argv){
 		}
 
 		if(semantic){
+			if(tree){
+				printf("\n");
+			}
 			//print_semantic();
 		}
 	}
@@ -301,3 +304,51 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
+
+
+//Tratamento de erros
+void cannotWriteValues_error(char* type){
+	hasErrorsSemantic = 1;
+	printf("Cannot write values of type %s\n", type);	
+}
+
+void functionIdentifierExpected_error(){
+	hasErrorsSemantic = 1;
+	printf("Function identifier expected\n");
+}
+
+void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2){
+	hasErrorsSemantic = 1;
+	printf("Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", num, token, type1, type2);
+}
+
+void incompatibleTypeAssigment_error(char *token, char *type1, char *type2){
+	hasErrorsSemantic = 1;
+	printf("Incompatible type in assigment to %s (got %s, expected %s)\n", token, type1, type2);
+}
+
+void incompatibleTypeStatement_error(char *statement, char *type1, char *type2){
+	hasErrorsSemantic = 1;
+	printf("Incompatible type in %s statement (got %s, expected %s)\n", statement, type1, type2);
+}
+
+void cannotApliedType_error(char *token, char *type){
+	hasErrorsSemantic = 1;
+	printf("Operator %s cannot be applied to type %s\n", token, type);
+}
+
+void cannotApliedType2_error(char *token, char *type1, char *type2){
+	hasErrorsSemantic = 1;
+	printf("Operator %s cannot be applied to types %s, %s\n", token, type1, type2);
+}
+
+void variableIdentifierExpected_error(){
+	hasErrorsSemantic = 1;
+	printf("Variable identifier expected\n");
+}
+
+void wrongNumberArguments_error(char *token, char *type1, char *type2){
+	hasErrorsSemantic = 1;
+	printf("Wrong number of arguments in call to function %s (got %s, expected %s)\n", token, type1, type2);
+}
+
