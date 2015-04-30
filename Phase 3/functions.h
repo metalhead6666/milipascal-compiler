@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Program Program;
 struct Program{
@@ -111,7 +112,7 @@ char* verify_Expr(char *expr){
 		return "Leq";
 	if(strcmp(expr,">=") == 0)
 		return "Geq";
-	
+	return "";
 }
 
 char* verify_SimpleExpr(char *expr, int type){
