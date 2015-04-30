@@ -221,11 +221,11 @@ Stat: CompStat													{$$ = $1;}
 	| 															{$$ = NULL;}
 	;
 
-WriteInPList: '(' Optional WriteInPListOptional ')'				{aux = insert_last_brother($2); aux->brother = $3; $$ = aux;}
+WriteInPList: '(' Optional WriteInPListOptional ')'				{aux = insert_last_brother($2); aux->brother = $3; $$ = $2;}
 			|													{$$ = NULL;}
 			;
 
-WriteInPListOptional: ',' Optional WriteInPListOptional 		{aux = insert_last_brother($2); aux->brother = $3; $$ = aux;}
+WriteInPListOptional: ',' Optional WriteInPListOptional 		{aux = insert_last_brother($2); aux->brother = $3; $$ = $2;}
 					| 											{$$ = NULL;}
 					;
 

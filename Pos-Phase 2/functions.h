@@ -20,7 +20,7 @@ int verify_terminal(char *type);
 
 
 Program *makeNode(char *type, char *value, Program *son, Program *brother){
-	Program* program = (Program *)malloc(sizeof(Program));
+	Program* program = (Program *)calloc(1, sizeof(Program));
 	program->type = type;
 	program->value = value;
 	program->son = son;
@@ -49,7 +49,7 @@ int count_nodes(Program *program){
 	int counter = 0;
 
 	if(aux != NULL && aux->brother != NULL){
-		counter += 2;
+		counter = 2;
 	}
 
 	return counter;
@@ -111,6 +111,7 @@ char* verify_Expr(char *expr){
 		return "Leq";
 	if(strcmp(expr,">=") == 0)
 		return "Geq";
+	
 }
 
 char* verify_SimpleExpr(char *expr, int type){
@@ -132,16 +133,15 @@ char* verify_SimpleExpr(char *expr, int type){
 }
 
 char* verify_MultOp(char *term){
-	if(strcmp(term,"div")==0)
+	if(term[0] == 'd' || term[0] == 'D')
 		return "Div";
-	if(strcmp(term,"mod")==0)
+	if(term[0] == 'm' || term[0] == 'M')
 		return "Mod";
 	if(strcmp(term,"/")==0)
 		return "RealDiv";
 	if(strcmp(term,"*")==0)
 		return "Mul";
-	if(strcmp(term,"and")==0)
-		return "And";
+	return "And";
 }
 
 #endif
