@@ -1,6 +1,7 @@
 %{
 	#include <string.h>
 	#include "functions.h"
+	#include "semantic.h"
 
 	void yyerror(char *s);
 
@@ -265,12 +266,31 @@ ParamListOptional: ',' Expr ParamListOptional 					{$2->brother = $3; $$ = $2;}
 
 %%
 int main(int argc, char **argv){
+	int tree = 0, semantic = 0;
+	argv++;
+
 	yyparse();
 
-	if(argc > 1){
-		if(strcmp(argv[1], "-t") == 0 && !hasErrors){
+	if(!hasErrors){
+		while(--argc){
+			if(strcmp(*argv, "-t") == 0){
+				tree = 1;
+			}
+			
+			else if(strcmp(*argv, "-s") == 0){
+				semantic = 1;
+			}
+			
+			*argv++;
+		}
+
+		if(tree){
 			printf("Program\n");
 			print_tree(program, 2);
+		}
+
+		if(semantic){
+			//print_semantic();
 		}
 	}
 
@@ -281,4 +301,3 @@ void yyerror(char *s){
 	hasErrors = 1;
 	printf("Line %d, col %d: %s: %s\n", count_line, (int)(count_column - strlen(yytext)), s, yytext);
 }
-
