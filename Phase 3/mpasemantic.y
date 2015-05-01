@@ -315,10 +315,10 @@ int main(int argc, char **argv){
 		}
 
 		if(semantic){
-			symbolTableHeader = create_table();
+			symbolTableHeader = create_table(program);
 
 			if(hasErrorsSemantic){
-				
+				/* TODO: error treatment */
 			}
 
 			else{
