@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "functions.h"
 
 typedef struct _SymbolTableLine SymbolTableLine;
@@ -67,8 +68,9 @@ SymbolTableLine *create_first_line(char *name, char *type, char *flag, char *val
 void insert_line_table(SymbolTableLine *temp, char *name, char *type, char *flag, char *value);
 void create_default_function_symbol_table(SymbolTableHeader *temp);
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos);
-SymbolTableHeader *variable_declaration_table(SymbolTableHeader *temp);
+SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
 int type_var(char *t);
+char *to_lower_case(char *str);
 
 /* print symbol table */
 void print_semantic(SymbolTableHeader *symbolTableHeader);
@@ -76,7 +78,7 @@ void print_semantic(SymbolTableHeader *symbolTableHeader);
 
 /* create symbol table */
 SymbolTableHeader *create_table(Program *program){
-	SymbolTableHeader *symbolTableHeader;
+	SymbolTableHeader *symbolTableHeader, *last_pos;
 
 	symbolTableHeader = (SymbolTableHeader *)calloc(1, sizeof(SymbolTableHeader));
 	symbolTableHeader->header_name = table_name[OuterSymbolTable];
@@ -91,7 +93,8 @@ SymbolTableHeader *create_table(Program *program){
 
 	create_default_function_symbol_table(symbolTableHeader);
 
-	iterate_ast(program, symbolTableHeader, NULL);
+	last_pos = declaration_table(symbolTableHeader, table_name[ProgramSymbolTable]);
+	iterate_ast(program, symbolTableHeader, last_pos);
 
 	return symbolTableHeader;
 }
@@ -141,7 +144,7 @@ void create_default_function_symbol_table(SymbolTableHeader *temp){
 	aux->next = new;
 }
 
-SymbolTableHeader *variable_declaration_table(SymbolTableHeader *temp){
+SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 	SymbolTableHeader *new, *aux = temp;
 
 	new = (SymbolTableHeader *)calloc(1, sizeof(SymbolTableHeader));
@@ -150,13 +153,14 @@ SymbolTableHeader *variable_declaration_table(SymbolTableHeader *temp){
 		aux = aux->next;
 	}
 
-	new->header_name = table_name[ProgramSymbolTable];
+	new->header_name = table;
 	aux->next = new;
 
 	return aux->next;
 }
 
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
+	SymbolTableHeader *aux;
 	Program *temp;
 	int t;
 
@@ -172,11 +176,11 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			while(program->son->brother != NULL){
 				if(last_pos->symbolTableLine == NULL){
-					last_pos->symbolTableLine = create_first_line(program->son->value, type[t], NULL, NULL);
+					last_pos->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], NULL, NULL);
 				}
 
 				else{
-					insert_line_table(last_pos->symbolTableLine, program->son->value, type[t], NULL, NULL);
+					insert_line_table(last_pos->symbolTableLine, to_lower_case(program->son->value), type[t], NULL, NULL);
 				}
 
 				program->son = program->son->brother;
@@ -184,17 +188,46 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		}
 
 		else if(strcmp(program->type, "FuncPart") == 0){
-			while(program->son != NULL){
+			temp = program->son;
+
+			while(temp != NULL){
 				if(last_pos->symbolTableLine == NULL){
-					last_pos->symbolTableLine = create_first_line(program->son->son->value, type[_function_], NULL, NULL);
+					last_pos->symbolTableLine = create_first_line(to_lower_case(temp->son->value), type[_function_], NULL, NULL);
 				}
 
 				else{
-					insert_line_table(last_pos->symbolTableLine, program->son->son->value, type[_function_], NULL, NULL);
+					insert_line_table(last_pos->symbolTableLine, to_lower_case(temp->son->value), type[_function_], NULL, NULL);
 				}
 
-				program->son = program->son->brother;
+				temp = temp->brother;
 			}
+
+			iterate_ast(program->son, symbolTableHeader, last_pos);
+		}
+
+		else if(strcmp(program->type, "FuncDef") == 0 || strcmp(program->type, "FuncDecl") == 0){
+			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable]);
+
+			t = type_var(program->son->brother->brother->value);
+
+			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
+
+			if(program->son->brother->son != NULL){
+				temp = program->son->brother->son->son;
+
+				while(temp->brother != NULL){
+					temp = temp->brother;
+				}			
+
+				t = type_var(temp->value);
+
+				temp = program->son->brother->son->son;
+
+				while(temp->brother != NULL){
+					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[Param], NULL);
+					temp = temp->brother;
+				}
+			}		
 		}
 
 		else{
@@ -206,15 +239,29 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 }
 
 int type_var(char *t){
-	if(strcmp(t, "integer") == 0){
+	if(strcmp(to_lower_case(t), "integer") == 0){
 		return _integer_;
 	}
 
-	else if(strcmp(t, "boolean") == 0){
+	else if(strcmp(to_lower_case(t), "boolean") == 0){
 		return _boolean_;
 	}
 
-	return _real_;
+	else if(strcmp(to_lower_case(t), "real") == 0){
+		return _real_;
+	}
+
+	return -1;
+}
+
+char *to_lower_case(char *str){
+	int i;
+
+	for(i = 0; str[i]; ++i){
+ 		str[i] = tolower(str[i]);
+	}
+
+	return str;
 }
 
 /* print symbol table */
