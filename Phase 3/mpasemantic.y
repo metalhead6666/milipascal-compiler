@@ -15,7 +15,7 @@
 	void symbolNotDefined_error(Program *p);
 	void typeIdentifierExpected_error(Program *p);
 	void variableIdentifierExpected_error();
-	void wrongNumberArguments_error(char *token, char *type1, char *type2);
+	void wrongNumberArguments_error(char *token, int type1, int type2);
 
 	/* values received from lex */
 	extern char *yytext;
@@ -415,9 +415,9 @@ void variableIdentifierExpected_error(){
 	}
 }
 
-void wrongNumberArguments_error(char *token, char *type1, char *type2){
+void wrongNumberArguments_error(char *token, int type1, int type2){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %d, expected %d)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
 	}
 }

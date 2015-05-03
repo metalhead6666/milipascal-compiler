@@ -1,7 +1,7 @@
 program gcd2(output);
-function declaratio1(l:integer): integer;forward;
+function declaratio1(l:integer):integer;forward;
 
-function Gcd(var A, B: integer; l, l, o: boolean): integer;
+function Gcd(var A, B: integer; l, o: boolean): integer;
 var x, y: integer;
 begin
 gcd := A;
@@ -21,6 +21,4 @@ begin
 end;
 
 begin
-    i:=pila(1, 1);
 end.
-
