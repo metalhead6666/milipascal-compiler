@@ -175,42 +175,46 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = temp->brother;
 			}
 
-			char *normalValue;
 			normalValue = (char *)calloc(1, sizeof(char));
 			strcpy(normalValue, temp->value);
 			t = type_var(temp->value);
-			if(t==-1){
-				check=0;
+
+			if(t == -1){
+				check = 0;
 				aux2 = symbolTableHeader->symbolTableLine;
-				while(aux2!=NULL){
-					if(strcmp(temp->value, aux2->name)==0){
-						check=1;
-					}
-					aux2=aux2->next;
-				}
-				aux2 = symbolTableHeader->next->next->symbolTableLine;
+
 				while(aux2 != NULL){
-					if(strcmp(temp->value, aux2->name)==0){
-						check=1;
+					if(strcmp(temp->value, aux2->name) == 0){
+						check = 1;
 					}
-					aux2=aux2->next;
+
+					aux2 = aux2->next;
+				}
+
+				aux2 = symbolTableHeader->next->next->symbolTableLine;
+				
+				while(aux2 != NULL){
+					if(strcmp(temp->value, aux2->name) == 0){
+						check = 1;
+					}
+
+					aux2 = aux2->next;
 				}
 
 				strcpy(temp->value,normalValue);
-				if(check==0){
+
+				if(check == 0){
 					symbolNotDefined_error(temp);
 					return;
 				}
 
-				else{
-					typeIdentifierExpected_error(temp);
-					return;
-				}
+				typeIdentifierExpected_error(temp);
+				return;
 			}
+
 			strcpy(temp->value,normalValue);
 
 			while(program->son->brother != NULL){
-
 				if(last_pos->symbolTableLine!=NULL){
 					normalValue = (char *)calloc(1, sizeof(char));
 					strcpy(normalValue, program->son->value);
