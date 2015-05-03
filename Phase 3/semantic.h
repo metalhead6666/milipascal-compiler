@@ -71,7 +71,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
 int type_var(char *t);
 char *to_lower_case(char *str);
-int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var);
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char *var);
 
 /* print symbol table */
 void print_semantic(SymbolTableHeader *symbolTableHeader);
@@ -165,6 +165,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 	SymbolTableLine *aux2;
 	Program *temp, *save, *temp2;
 	int t, f, check;
+	char *normalValue;
 
 	if(program != NULL){
 		if(strcmp(program->type, "VarDecl") == 0){
@@ -211,12 +212,12 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			while(program->son->brother != NULL){
 
 				if(last_pos->symbolTableLine!=NULL){
-					char *normalValue;
 					normalValue = (char *)calloc(1, sizeof(char));
 					strcpy(normalValue, program->son->value);
 					check = verifyRepeatDeclaration(last_pos, to_lower_case(program->son->value));
 					strcpy(program->son->value, normalValue);
-					if(check==1){
+					
+					if(check == 1){
 						symbolAlreadyDefined_error(program->son);
 						return;
 					}
@@ -298,7 +299,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp2 = temp2->brother;
 			}
 
-			if(save->son != NULL){
+			while(save->son != NULL && (strcmp(save->son->type, "NoPrint") == 0 || strcmp(save->son->type, "VarDecl") == 0)){
 				temp = save->son->son;
 
 				while(temp->brother != NULL){
@@ -310,21 +311,31 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = save->son->son;
 
 				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);
+					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
 					temp = temp->brother;
 				}
+
+				save = save->brother;
 			}
 		}
 
 		else if(strcmp(program->type, "FuncDecl") == 0){
 			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable]);
 
-			t = type_var(program->son->brother->brother->value);
+			temp = program->son;
+
+			while(strcmp(temp->brother->type, "Id") != 0){
+				temp = temp->brother;				
+			}
+
+			t = type_var(temp->brother->value);
 
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 
-			if(program->son->brother->son != NULL){
-				temp = program->son->brother->son->son;
+			temp2 = program->son->brother;
+
+			while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
+				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
 					temp = temp->brother;
@@ -332,24 +343,36 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 				t = type_var(temp->value);
 
-				temp = program->son->brother->son->son;
+				temp = temp2->son->son;
+
+				if(strcmp(temp2->son->type, "VarParams") == 0){
+					f = VarParam;
+				}
+
+				else{
+					f = Param;
+				}
 
 				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[Param], NULL);
+					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
 					temp = temp->brother;
 				}
+
+				temp2 = temp2->brother;
 			}
 		}
 
 		else if(strcmp(program->type, "FuncDef2") == 0){
-			if(program->son->brother->son != NULL){
-				aux = symbolTableHeader->next->next->next;
+			temp2 = program->son->brother;
 
-				while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
-					aux = aux->next;
-				}
+			aux = symbolTableHeader->next->next->next;
 
-				temp = program->son->brother->son->son;
+			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+				aux = aux->next;
+			}
+
+			while(temp2->son != NULL && (strcmp(temp2->son->type, "NoPrint") == 0 || strcmp(temp2->son->type, "VarDecl") == 0)){
+				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
 					temp = temp->brother;
@@ -357,12 +380,14 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 				t = type_var(temp->value);
 
-				temp = program->son->brother->son->son;
+				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
 					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
 					temp = temp->brother;
 				}
+
+				temp2 = temp2->brother;
 			}
 		}
 
@@ -428,14 +453,17 @@ void print_semantic(SymbolTableHeader *symbolTableHeader){
 	}
 }
 
-int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var){
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char *var){
 	SymbolTableLine *line = tab->symbolTableLine;
 
-	while(line!=NULL){
-		if(strcmp(line->name,var)==0)
+	while(line != NULL){
+		if(strcmp(line->name,var) == 0){
 			return 1;
+		}
+
 		line = line->next;
 	}
+
 	return 0;
 }
 
