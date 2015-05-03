@@ -71,7 +71,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
 int type_var(char *t);
 char *to_lower_case(char *str);
-int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var, char* value);
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var);
 
 /* print symbol table */
 void print_semantic(SymbolTableHeader *symbolTableHeader);
@@ -181,7 +181,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 					char *normalValue;
 					normalValue = (char *)calloc(1, sizeof(char));
 					strcpy(normalValue, program->son->value);
-					check = verifyRepeatDeclaration(last_pos, to_lower_case(program->son->value), type[t]);
+					check = verifyRepeatDeclaration(last_pos, to_lower_case(program->son->value));
 					strcpy(program->son->value, normalValue);
 					if(check==1){
 						symbolAlreadyDefined_error(program->son);
@@ -394,11 +394,11 @@ void print_semantic(SymbolTableHeader *symbolTableHeader){
 	}
 }
 
-int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var, char* value){
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var){
 	SymbolTableLine *line = tab->symbolTableLine;
 
 	while(line!=NULL){
-		if(strcmp(line->name,var)==0 && strcmp(line->type, value)==0)
+		if(strcmp(line->name,var)==0)
 			return 1;
 		line = line->next;
 	}
