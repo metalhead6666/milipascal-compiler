@@ -208,14 +208,16 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 					return;
 				}
 
-				typeIdentifierExpected_error(temp);
-				return;
+				else{
+					typeIdentifierExpected_error(temp);
+					return;
+				}
 			}
 
 			strcpy(temp->value,normalValue);
 
 			while(program->son->brother != NULL){
-				if(last_pos->symbolTableLine!=NULL){
+				if(last_pos->symbolTableLine != NULL){
 					normalValue = (char *)calloc(1, sizeof(char));
 					strcpy(normalValue, program->son->value);
 					check = verifyRepeatDeclaration(last_pos, to_lower_case(program->son->value));
