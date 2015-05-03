@@ -1,5 +1,5 @@
 program gcd2(output);
-function declaratio1(l:integer):integer;forward;
+function declaratio1(l:integer): Integers;forward;
 
 function Gcd(var A, B: integer; l, o: boolean): integer;
 var x, y: integer;

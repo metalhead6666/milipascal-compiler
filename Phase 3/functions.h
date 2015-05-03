@@ -18,6 +18,7 @@ struct Program{
 void symbolAlreadyDefined_error(Program *p);
 void symbolNotDefined_error(Program *p);
 void typeIdentifierExpected_error(Program *p);
+void functionIdentifierExpected_error(Program *p);
 
 Program *makeNode(char *type, char *value, Program *son, Program *brother, int line, int column);
 Program *insert_last_brother(Program *program);

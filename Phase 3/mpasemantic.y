@@ -5,7 +5,7 @@
 	/* function declaration */
 	void yyerror(char *s);
 	void cannotWriteValues_error(char* type);
-	void functionIdentifierExpected_error();
+	void functionIdentifierExpected_error(Program *p);
 	void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2);
 	void incompatibleTypeAssigment_error(char *token, char *type1, char *type2);
 	void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
@@ -148,7 +148,7 @@ FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1,
 			   | FuncHeading ';' varPart StatPart 				{aux = insert_last_brother($3); aux->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL, 0, 0);}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL, 0, 0); else $3 = makeNode("Id", $5, NULL, NULL, 0, 0); $$ = makeNode("Id", $2, NULL, $3, 0, 0);}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL, @5.first_line, @5.first_column); else $3 = makeNode("Id", $5, NULL, NULL, @5.first_line, @5.first_column); $$ = makeNode("Id", $2, NULL, $3, 0, 0);}
 		   ;		   
 
 FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3, 0, 0);}
@@ -345,10 +345,10 @@ void cannotWriteValues_error(char* type){
 	}	
 }
 
-void functionIdentifierExpected_error(){
+void functionIdentifierExpected_error(Program *p){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Function identifier expected\n", count_line, (int)(count_column - strlen(yytext)));	
+		printf("Line %d, col %d: Function identifier expected\n",  p->line, p->column);	
 	}
 }
 

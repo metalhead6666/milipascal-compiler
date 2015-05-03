@@ -281,7 +281,48 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = temp->brother;				
 			}
 
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, temp->brother->value);
+
 			t = type_var(temp->brother->value);
+
+			if(t == -1){
+				
+				check = 0;
+				aux2 = symbolTableHeader->symbolTableLine;
+
+				while(aux2 != NULL){
+					if(strcmp(temp->brother->value, aux2->name) == 0){
+						check = 1;
+					}
+
+					aux2 = aux2->next;
+				}
+
+				aux2 = symbolTableHeader->next->next->symbolTableLine;
+				
+				while(aux2 != NULL){
+					if(strcmp(temp->brother->value, aux2->name) == 0){
+						check = 1;
+					}
+
+					aux2 = aux2->next;
+				}
+
+				strcpy(temp->brother->value, normalValue);
+				if(check == 0){
+					symbolNotDefined_error(temp->brother);
+					return;
+				}
+
+				else{
+					functionIdentifierExpected_error(temp->brother);
+					return;
+				}
+			}
+
+			strcpy(temp->brother->value, normalValue);
+
 
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 			insert_line_func(program->son->brother, aux);
