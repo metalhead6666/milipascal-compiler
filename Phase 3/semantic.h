@@ -278,7 +278,6 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			temp2 = program->son->brother;
 
 			while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
-
 				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
@@ -463,7 +462,7 @@ int verifyRepeatDeclaration(SymbolTableHeader *tab, char *var){
 	SymbolTableLine *line = tab->symbolTableLine;
 
 	while(line != NULL){
-		if(strcmp(line->name,var) == 0){
+		if(strcmp(line->name, var) == 0){
 			return 1;
 		}
 
