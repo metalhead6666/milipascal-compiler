@@ -319,11 +319,7 @@ int main(int argc, char **argv){
 		if(semantic){
 			symbolTableHeader = create_table(program);
 
-			if(hasErrorsSemantic){
-				/* TODO: error treatment */
-			}
-
-			else{
+			if(!hasErrorsSemantic){
 				if(tree){
 					printf("\n");
 				}
@@ -378,7 +374,10 @@ void cannotAppliedType2_error(char *token, char *type1, char *type2){
 }
 
 void symbolAlreadyDefined_error(Program *p){
-	printf("Line %d, col %d: Symbol %s already defined\n", p->line, p->column, p->value);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Symbol %s already defined\n", p->line, p->column, p->value);
+	}
 }
 
 void symbolNotDefined_error(char *token){
