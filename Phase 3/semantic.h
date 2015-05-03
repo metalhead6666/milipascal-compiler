@@ -208,7 +208,13 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		else if(strcmp(program->type, "FuncDef") == 0){
 			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable]);
 
-			t = type_var(program->son->brother->brother->value);
+			temp = program->son;
+
+			while(strcmp(temp->brother->type, "VarPart") != 0){
+				temp = temp->brother;				
+			}
+
+			t = type_var(temp->value);
 
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 
