@@ -71,6 +71,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
 int type_var(char *t);
 char *to_lower_case(char *str);
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var, char* value);
 
 /* print symbol table */
 void print_semantic(SymbolTableHeader *symbolTableHeader);
@@ -162,7 +163,7 @@ SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
 	SymbolTableHeader *aux;
 	Program *temp, *save, *temp2;
-	int t, f;
+	int t, f, check;
 
 	if(program != NULL){
 		if(strcmp(program->type, "VarDecl") == 0){
@@ -175,6 +176,19 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			t = type_var(temp->value);
 
 			while(program->son->brother != NULL){
+
+				if(last_pos->symbolTableLine!=NULL){
+					char *normalValue;
+					normalValue = (char *)calloc(1, sizeof(char));
+					strcpy(normalValue, program->son->value);
+					check = verifyRepeatDeclaration(last_pos, to_lower_case(program->son->value), type[t]);
+					strcpy(program->son->value, normalValue);
+					if(check==1){
+						symbolAlreadyDefined_error(program->son);
+						return;
+					}
+				}
+
 				if(last_pos->symbolTableLine == NULL){
 					last_pos->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], NULL, NULL);
 				}
@@ -378,6 +392,17 @@ void print_semantic(SymbolTableHeader *symbolTableHeader){
 			printf("\n");
 		}
 	}
+}
+
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char* var, char* value){
+	SymbolTableLine *line = tab->symbolTableLine;
+
+	while(line!=NULL){
+		if(strcmp(line->name,var)==0 && strcmp(line->type, value)==0)
+			return 1;
+		line = line->next;
+	}
+	return 0;
 }
 
 #endif
