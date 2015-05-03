@@ -188,15 +188,17 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		}
 
 		else if(strcmp(program->type, "FuncPart") == 0){
-			temp = program->son;
+			temp = program;
 
-			while(temp != NULL){
-				if(last_pos->symbolTableLine == NULL){
-					last_pos->symbolTableLine = create_first_line(to_lower_case(temp->son->value), type[_function_], NULL, NULL);
-				}
+			while(temp->son != NULL && (strcmp(temp->son->type, "FuncDecl") != 0 || strcmp(temp->son->type, "FuncDef") != 0) && (strcmp(temp->type, "FuncPart") == 0 || strcmp(temp->type, "NoPrint") == 0)){
+				if(strcmp(temp->son->type, "FuncDef2") != 0){
+					if(last_pos->symbolTableLine == NULL){
+						last_pos->symbolTableLine = create_first_line(to_lower_case(temp->son->son->value), type[_function_], NULL, NULL);
+					}
 
-				else{
-					insert_line_table(last_pos->symbolTableLine, to_lower_case(temp->son->value), type[_function_], NULL, NULL);
+					else{
+						insert_line_table(last_pos->symbolTableLine, to_lower_case(temp->son->son->value), type[_function_], NULL, NULL);
+					}
 				}
 
 				temp = temp->brother;
@@ -221,7 +223,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			temp2 = program->son->brother;
 
-			while(strcmp(temp2->type, "Id") != 0){
+			while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
 				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
@@ -291,12 +293,14 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			}
 		}
 
-		/*else if(strcmp(program->type, "FuncDef2") == 0){
-			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable]);
-
-			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[_type_], flag[Return], NULL);
-
+		else if(strcmp(program->type, "FuncDef2") == 0){
 			if(program->son->brother->son != NULL){
+				aux = symbolTableHeader->next->next->next;
+
+				while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+					aux = aux->next;
+				}
+
 				temp = program->son->brother->son->son;
 
 				while(temp->brother != NULL){
@@ -308,28 +312,11 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = program->son->brother->son->son;
 
 				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[VarParam], NULL);
+					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
 					temp = temp->brother;
 				}
 			}
-
-			if(program->son->brother->brother->brother->son != NULL){
-				temp = program->son->brother->brother->brother->son->son;
-
-				while(temp->brother != NULL){
-					temp = temp->brother;
-				}			
-
-				t = type_var(temp->value);
-
-				temp = program->son->brother->brother->brother->son->son;
-
-				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[VarParam], NULL);
-					temp = temp->brother;
-				}
-			}
-		}*/
+		}
 
 		else{
 			iterate_ast(program->son, symbolTableHeader, last_pos);
