@@ -69,7 +69,7 @@ void insert_line_table(SymbolTableLine *temp, char *name, char *type, char *flag
 void create_default_function_symbol_table(SymbolTableHeader *temp);
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos);
 SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
-void last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos);
+SymbolTableHeader *last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos);
 void insert_line_func(Program *program, SymbolTableHeader *aux);
 void insert_line_var_decl(Program *program, SymbolTableHeader *aux);
 int type_var(char *t);
@@ -219,7 +219,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				}
 			}
 
-			strcpy(temp->value,normalValue);
+			strcpy(temp->value, normalValue);
 
 			while(program->son->brother != NULL){
 				if(last_pos->symbolTableLine != NULL){
@@ -234,7 +234,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 					}
 				}
 
-				last_pos_symbol(program->son->value, t, last_pos);
+				last_pos = last_pos_symbol(program->son->value, t, last_pos);
 
 				program->son = program->son->brother;
 			}
@@ -245,7 +245,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			while(temp->son != NULL && (strcmp(temp->son->type, "FuncDecl") != 0 || strcmp(temp->son->type, "FuncDef") != 0) && (strcmp(temp->type, "FuncPart") == 0 || strcmp(temp->type, "NoPrint") == 0)){
 				if(strcmp(temp->son->type, "FuncDef2") != 0){
-					last_pos_symbol(program->son->value, _function_, last_pos);
+					last_pos = last_pos_symbol(temp->son->son->value, _function_, last_pos);
 				}
 
 				temp = temp->brother;
@@ -305,7 +305,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 	}
 }
 
-void last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos){
+SymbolTableHeader *last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos){
 	if(last_pos->symbolTableLine == NULL){
 		last_pos->symbolTableLine = create_first_line(to_lower_case(value), type[t], NULL, NULL);
 	}
@@ -313,6 +313,8 @@ void last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos){
 	else{
 		insert_line_table(last_pos->symbolTableLine, to_lower_case(value), type[t], NULL, NULL);
 	}
+
+	return last_pos;
 }
 
 void insert_line_func(Program *program, SymbolTableHeader *aux){
