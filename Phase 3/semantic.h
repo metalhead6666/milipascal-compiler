@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include "functions.h"
 
+extern int hasErrorsSemantic;
+
 typedef struct _SymbolTableLine SymbolTableLine;
 typedef struct _SymbolTableHeader SymbolTableHeader;
 struct _SymbolTableHeader{
@@ -172,7 +174,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 	int t, check;
 	char *normalValue;
 
-	if(program != NULL){
+	if(program != NULL && !hasErrorsSemantic){
 		if(strcmp(program->type, "VarDecl") == 0){
 			temp = program->son;
 
@@ -286,8 +288,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			t = type_var(temp->brother->value);
 
-			if(t == -1){
-				
+			if(t == -1){				
 				check = 0;
 				aux2 = symbolTableHeader->symbolTableLine;
 
@@ -310,6 +311,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				}
 
 				strcpy(temp->brother->value, normalValue);
+
 				if(check == 0){
 					symbolNotDefined_error(temp->brother);
 					return;
@@ -323,7 +325,6 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			strcpy(temp->brother->value, normalValue);
 
-
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 			insert_line_func(program->son->brother, aux);
 		}
@@ -331,7 +332,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		else if(strcmp(program->type, "FuncDef2") == 0){
 			aux = symbolTableHeader->next->next->next;
 
-			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+			while(aux != NULL && aux->symbolTableLine != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
 				aux = aux->next;
 			}
 
