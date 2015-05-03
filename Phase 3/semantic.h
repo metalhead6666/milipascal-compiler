@@ -69,6 +69,9 @@ void insert_line_table(SymbolTableLine *temp, char *name, char *type, char *flag
 void create_default_function_symbol_table(SymbolTableHeader *temp);
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos);
 SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
+void last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos);
+void insert_line_func(Program *program, SymbolTableHeader *aux);
+void insert_line_var_decl(Program *program, SymbolTableHeader *aux);
 int type_var(char *t);
 char *to_lower_case(char *str);
 
@@ -165,8 +168,8 @@ SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
 	SymbolTableHeader *aux;
 	SymbolTableLine *aux2;
-	Program *temp, *save, *temp2;
-	int t, f, check;
+	Program *temp, *save;
+	int t, check;
 	char *normalValue;
 
 	if(program != NULL){
@@ -203,7 +206,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 					aux2 = aux2->next;
 				}
 
-				strcpy(temp->value,normalValue);
+				strcpy(temp->value, normalValue);
 
 				if(check == 0){
 					symbolNotDefined_error(temp);
@@ -231,13 +234,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 					}
 				}
 
-				if(last_pos->symbolTableLine == NULL){
-					last_pos->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], NULL, NULL);
-				}
-
-				else{
-					insert_line_table(last_pos->symbolTableLine, to_lower_case(program->son->value), type[t], NULL, NULL);
-				}
+				last_pos_symbol(program->son->value, t, last_pos);
 
 				program->son = program->son->brother;
 			}
@@ -248,13 +245,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			while(temp->son != NULL && (strcmp(temp->son->type, "FuncDecl") != 0 || strcmp(temp->son->type, "FuncDef") != 0) && (strcmp(temp->type, "FuncPart") == 0 || strcmp(temp->type, "NoPrint") == 0)){
 				if(strcmp(temp->son->type, "FuncDef2") != 0){
-					if(last_pos->symbolTableLine == NULL){
-						last_pos->symbolTableLine = create_first_line(to_lower_case(temp->son->son->value), type[_function_], NULL, NULL);
-					}
-
-					else{
-						insert_line_table(last_pos->symbolTableLine, to_lower_case(temp->son->son->value), type[_function_], NULL, NULL);
-					}
+					last_pos_symbol(program->son->value, _function_, last_pos);
 				}
 
 				temp = temp->brother;
@@ -277,53 +268,8 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 
-			temp2 = program->son->brother;
-
-			while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
-				temp = temp2->son->son;
-
-				while(temp->brother != NULL){
-					temp = temp->brother;
-				}			
-
-				t = type_var(temp->value);
-
-				temp = temp2->son->son;
-
-				if(strcmp(temp2->son->type, "VarParams") == 0){
-					f = VarParam;
-				}
-
-				else{
-					f = Param;
-				}
-
-				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
-					temp = temp->brother;
-				}
-
-				temp2 = temp2->brother;
-			}
-
-			while(save->son != NULL && (strcmp(save->son->type, "NoPrint") == 0 || strcmp(save->son->type, "VarDecl") == 0)){
-				temp = save->son->son;
-
-				while(temp->brother != NULL){
-					temp = temp->brother;
-				}			
-
-				t = type_var(temp->value);
-
-				temp = save->son->son;
-
-				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
-					temp = temp->brother;
-				}
-
-				save = save->brother;
-			}
+			insert_line_func(program->son->brother, aux);
+			insert_line_var_decl(save, aux);
 		}
 
 		else if(strcmp(program->type, "FuncDecl") == 0){
@@ -338,64 +284,17 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			t = type_var(temp->brother->value);
 
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
-
-			temp2 = program->son->brother;
-
-			while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
-				temp = temp2->son->son;
-
-				while(temp->brother != NULL){
-					temp = temp->brother;
-				}			
-
-				t = type_var(temp->value);
-
-				temp = temp2->son->son;
-
-				if(strcmp(temp2->son->type, "VarParams") == 0){
-					f = VarParam;
-				}
-
-				else{
-					f = Param;
-				}
-
-				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
-					temp = temp->brother;
-				}
-
-				temp2 = temp2->brother;
-			}
+			insert_line_func(program->son->brother, aux);
 		}
 
 		else if(strcmp(program->type, "FuncDef2") == 0){
-			temp2 = program->son->brother;
-
 			aux = symbolTableHeader->next->next->next;
 
 			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
 				aux = aux->next;
 			}
 
-			while(temp2->son != NULL && (strcmp(temp2->son->type, "NoPrint") == 0 || strcmp(temp2->son->type, "VarDecl") == 0)){
-				temp = temp2->son->son;
-
-				while(temp->brother != NULL){
-					temp = temp->brother;
-				}			
-
-				t = type_var(temp->value);
-
-				temp = temp2->son->son;
-
-				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
-					temp = temp->brother;
-				}
-
-				temp2 = temp2->brother;
-			}
+			insert_line_var_decl(program->son->brother, aux);
 		}
 
 		else{
@@ -403,6 +302,72 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		}
 
 		iterate_ast(program->brother, symbolTableHeader, last_pos);
+	}
+}
+
+void last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos){
+	if(last_pos->symbolTableLine == NULL){
+		last_pos->symbolTableLine = create_first_line(to_lower_case(value), type[t], NULL, NULL);
+	}
+
+	else{
+		insert_line_table(last_pos->symbolTableLine, to_lower_case(value), type[t], NULL, NULL);
+	}
+}
+
+void insert_line_func(Program *program, SymbolTableHeader *aux){
+	Program *temp, *temp2 = program;
+	int t, f;
+
+	while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
+		temp = temp2->son->son;
+
+		while(temp->brother != NULL){
+			temp = temp->brother;
+		}			
+
+		t = type_var(temp->value);
+
+		temp = temp2->son->son;
+
+		if(strcmp(temp2->son->type, "VarParams") == 0){
+			f = VarParam;
+		}
+
+		else{
+			f = Param;
+		}
+
+		while(temp->brother != NULL){
+			insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
+			temp = temp->brother;
+		}
+
+		temp2 = temp2->brother;
+	}
+}
+
+void insert_line_var_decl(Program *program, SymbolTableHeader *aux){
+	Program *temp, *temp2 = program;
+	int t;
+
+	while(temp2->son != NULL && (strcmp(temp2->son->type, "NoPrint") == 0 || strcmp(temp2->son->type, "VarDecl") == 0)){
+		temp = temp2->son->son;
+
+		while(temp->brother != NULL){
+			temp = temp->brother;
+		}			
+
+		t = type_var(temp->value);
+
+		temp = temp2->son->son;
+
+		while(temp->brother != NULL){
+			insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
+			temp = temp->brother;
+		}
+
+		temp2 = temp2->brother;
 	}
 }
 
