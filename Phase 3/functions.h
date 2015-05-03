@@ -11,10 +11,13 @@ struct Program{
 	char* value;
 	Program *son;
 	Program *brother;
+	int line;
+	int column;
 };
 
+void symbolAlreadyDefined_error(Program *p);
 
-Program *makeNode(char *type, char *value, Program *son, Program *brother);
+Program *makeNode(char *type, char *value, Program *son, Program *brother, int line, int column);
 Program *insert_last_brother(Program *program);
 int count_nodes(Program *program);
 void print_tree(Program *program, int counter);
@@ -25,12 +28,14 @@ char *verify_SimpleExpr(char *expr, int type);
 char *verify_MultOp(char *term);
 
 
-Program *makeNode(char *type, char *value, Program *son, Program *brother){
+Program *makeNode(char *type, char *value, Program *son, Program *brother, int line, int column){
 	Program* program = (Program *)calloc(1, sizeof(Program));
 	program->type = type;
 	program->value = value;
 	program->son = son;
 	program->brother = brother;
+	program->line = line;
+	program->column = column;
 
 	return program;
 }
