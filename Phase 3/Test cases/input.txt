@@ -1,17 +1,24 @@
-program exFunction(output);
-var A, b, RET: Coiso;
-function max(num1, num2: integer): integer;
-var result: integer;
+program gcd2(output);
+function declaratio1(l:integer):integer;forward;
+
+function Gcd(var A, B: integer; l, o: boolean): integer;
+var x, y: integer;
 begin
-   if (num1 > num2) then
-      result := num1
-   else
-      result := num2;
-   max := result;
+gcd := A;
 end;
+
+function decla:integer;forward;
+
+function declaratio1;
+var qwerty:integer;
+pilas:integer;
 begin
-   a := 100;
-   b := 200;
-   ret := max(a, b);
-   writeln( 'Max value is : ', ret );
+end;
+
+function decla;
+var int:integer;
+begin
+end;
+
+begin
 end.
