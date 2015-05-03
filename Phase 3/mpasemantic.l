@@ -1,7 +1,8 @@
 %{
 	#include "y.tab.h"
 	
-	int start_line = 1, start_column = 1, count_line = 1, count_column = 1;
+	int start_line = 1, start_column = 1, count_line = 1, count_column = 1, yycolumn=1;
+	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno = count_line; yylloc.first_column = yycolumn = count_column; yylloc.last_column = yycolumn+yyleng-1; yycolumn += yyleng;
 %}
 
 %X STATE

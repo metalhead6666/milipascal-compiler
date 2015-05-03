@@ -11,7 +11,7 @@
 	void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
 	void cannotAppliedType_error(char *token, char *type);
 	void cannotAppliedType2_error(char *token, char *type1, char *type2);
-	void symbolAlreadyDefined_error(char *token);
+	void symbolAlreadyDefined_error(Program *p);
 	void symbolNotDefined_error(char *token);
 	void typeIdentifierExpected_error();
 	void variableIdentifierExpected_error();
@@ -33,6 +33,8 @@
 	int hasErrors = 0;
 	int hasErrorsSemantic = 0;
 %}
+
+%locations
 
 %token BEG
 %token DO
@@ -106,7 +108,7 @@
 };
 
 %%
-Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode("Id", $1, NULL, $3);}
+Prog: ProgHeading ';' ProgBlock '.'         					{program = makeNode("Id", $1, NULL, $3, 0 , 0);}
 	;
 
 ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
@@ -115,56 +117,56 @@ ProgHeading: PROGRAM ID '(' OUTPUT ')'							{$$ = $2;}
 ProgBlock: varPart funcPart StatPart							{aux = insert_last_brother($2); if(aux != NULL) aux->brother = $3; aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; $$ = $1;}
 		 ;
 
-varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = makeNode("VarPart", "", $2, $4);}
-	   |														{$$ = makeNode("VarPart", "", NULL, NULL);}
+varPart: VAR VarDeclaration ';' VarDeclarationRepeat			{$$ = makeNode("VarPart", "", $2, $4, 0, 0);}
+	   |														{$$ = makeNode("VarPart", "", NULL, NULL, 0, 0);}
 	   ;
 
-VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = makeNode("NoPrint", "", $1, $3);}
+VarDeclarationRepeat: VarDeclaration ';' VarDeclarationRepeat	{$$ = makeNode("NoPrint", "", $1, $3, 0 , 0);}
 					|											{$$ = NULL;}
 					;		   
 
-VarDeclaration: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL); $$ = makeNode("VarDecl", "", $1, NULL);}
+VarDeclaration: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL, @3.first_line, @3.first_column); $$ = makeNode("VarDecl", "", $1, NULL, 0, 0);}
 			  ;		 
 
-IDList: ID IDListRepeat											{$$ = makeNode("Id", $1, NULL, $2);}
+IDList: ID IDListRepeat											{$$ = makeNode("Id", $1, NULL, $2, @1.first_line, @1.first_column);}
 	  ;
 
-IDListRepeat: ',' ID IDListRepeat								{$$ = makeNode("Id", $2, NULL, $3);}
+IDListRepeat: ',' ID IDListRepeat								{$$ = makeNode("Id", $2, NULL, $3, @2.first_line, @2.first_column);}
 	  |															{$$ = NULL;}
 	  ;
 
-funcPart: FuncDeclaration ';' FuncDeclRepeat 					{$$ = makeNode("FuncPart", "", $1, $3);}	
-		|														{$$ = makeNode("FuncPart", "", NULL, NULL);}
+funcPart: FuncDeclaration ';' FuncDeclRepeat 					{$$ = makeNode("FuncPart", "", $1, $3, 0, 0);}	
+		|														{$$ = makeNode("FuncPart", "", NULL, NULL, 0, 0);}
 		;
 
-FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ = makeNode("NoPrint", "", $1, $3);}
+FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ = makeNode("NoPrint", "", $1, $3, 0, 0);}
 			  |													{$$ = NULL;}
 			  ;
 
-FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL);}
-			   | FUNCTION ID ';' varPart StatPart				{aux = insert_last_brother($4); aux->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4), NULL);}
-			   | FuncHeading ';' varPart StatPart 				{aux = insert_last_brother($3); aux->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL);}
+FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL, 0, 0);}
+			   | FUNCTION ID ';' varPart StatPart				{aux = insert_last_brother($4); aux->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4, 0, 0), NULL, 0, 0);}
+			   | FuncHeading ';' varPart StatPart 				{aux = insert_last_brother($3); aux->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL, 0, 0);}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL); else $3 = makeNode("Id", $5, NULL, NULL); $$ = makeNode("Id", $2, NULL, $3);}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL, 0, 0); else $3 = makeNode("Id", $5, NULL, NULL, 0, 0); $$ = makeNode("Id", $2, NULL, $3, 0, 0);}
 		   ;		   
 
-FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3);}
-			   |												{$$ = makeNode("FuncParams", "", NULL, NULL);}
+FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3, 0, 0);}
+			   |												{$$ = makeNode("FuncParams", "", NULL, NULL, 0, 0);}
 			   ;
 
-FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("NoPrint", "", $2, $3);}
+FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("NoPrint", "", $2, $3, 0, 0);}
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL); else $1 = makeNode("Id", $3, NULL, NULL); $$ = makeNode("Params", "", $1, NULL);}
-			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL); else $2 = makeNode("Id", $4, NULL, NULL); $$ = makeNode("VarParams", "", $2, NULL);}
+FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL, 0, 0); else $1 = makeNode("Id", $3, NULL, NULL, 0, 0); $$ = makeNode("Params", "", $1, NULL, 0, 0);}
+			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL, 0, 0); else $2 = makeNode("Id", $4, NULL, NULL, 0, 0); $$ = makeNode("VarParams", "", $2, NULL, 0, 0);}
 			;
 
-StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) $$ = makeNode("StatList", "", NULL, NULL); else $$ = $1;}
+StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) $$ = makeNode("StatList", "", NULL, NULL, 0, 0); else $$ = $1;}
 		;
 
-CompStat: BEG StatList END 										{if(count_nodes($2) > 1) $$ = makeNode("StatList", "", $2, NULL); else $$ = $2;}
+CompStat: BEG StatList END 										{if(count_nodes($2) > 1) $$ = makeNode("StatList", "", $2, NULL, 0, 0); else $$ = $2;}
 		;
 
 StatList: Stat StatListRepeat									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = $2; else $1 = $2; $$ = $1;}
@@ -178,28 +180,28 @@ Stat: CompStat													{$$ = $1;}
 
 	| IF Expr THEN Stat 										{
 																	if($4 != NULL){																		
-																		$4->brother = makeNode("StatList", "", NULL, NULL);
+																		$4->brother = makeNode("StatList", "", NULL, NULL, 0, 0);
 																		$2->brother = $4;																		
 																	}
 
 																	else{
-																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));																		
+																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL, 0, 0), 0, 0);																		
 																	}
 
-																	$$ = makeNode("IfElse", "", $2, NULL);
+																	$$ = makeNode("IfElse", "", $2, NULL, 0, 0);
 																}
 
 	| IF Expr THEN Stat ELSE Stat 								{
 																	if($4 == NULL && $6 == NULL){
-																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL));
+																		$2->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL, 0, 0), 0, 0);
 																	}
 
 																	else if($4 == NULL && $6 != NULL){
-																		$2->brother = makeNode("StatList", "", NULL, $6);
+																		$2->brother = makeNode("StatList", "", NULL, $6, 0, 0);
 																	}
 
 																	else if($4 != NULL && $6 == NULL){																		
-																		$4->brother =  makeNode("StatList", "", NULL, NULL);
+																		$4->brother =  makeNode("StatList", "", NULL, NULL, 0, 0);
 																		$2->brother = $4;
 																	}
 
@@ -208,42 +210,42 @@ Stat: CompStat													{$$ = $1;}
 																		$2->brother = $4;
 																	}
 
-																	$$ = makeNode("IfElse", "", $2, NULL);
+																	$$ = makeNode("IfElse", "", $2, NULL, 0, 0);
 																}
 
 
 	| WHILE Expr DO Stat 										{
 																	if($4 == NULL){
-																		$2->brother = makeNode("StatList", "", NULL, NULL);
+																		$2->brother = makeNode("StatList", "", NULL, NULL, 0, 0);
 																	}
 
 																	else{
 																		$2->brother = $4;
 																	}
 
-																	$$ = makeNode("While", "", $2, NULL);
+																	$$ = makeNode("While", "", $2, NULL, 0, 0);
 																}
 
 	| REPEAT StatList UNTIL Expr 								{
 																	if($2 == NULL){
-																		aux = makeNode("StatList", "", NULL, $4);
-																		$$ = makeNode("Repeat", "", aux, NULL);
+																		aux = makeNode("StatList", "", NULL, $4, 0, 0);
+																		$$ = makeNode("Repeat", "", aux, NULL, 0, 0);
 																	}
 
 																	else{
 																		if($2->brother != NULL){
-																			$2 = makeNode("StatList", "", $2, NULL);
+																			$2 = makeNode("StatList", "", $2, NULL, 0, 0);
 																		}
 
 																		aux = insert_last_brother($2); 
 																		aux->brother = $4; 
-																		$$ = makeNode("Repeat", "", $2, NULL);
+																		$$ = makeNode("Repeat", "", $2, NULL, 0, 0);
 																	}																	
 																}
 
-	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{aux = insert_last_brother($5); aux->brother = makeNode("Id",$8,NULL,NULL); $$ = makeNode("ValParam", "", aux, NULL);}
-	| ID ASSIGN Expr 											{$$ = makeNode("Assign", "", makeNode("Id", $1, NULL, $3), NULL);}
-	| WRITELN WriteInPList 										{$$ = makeNode("WriteLn", "", $2, NULL);}
+	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{aux = insert_last_brother($5); aux->brother = makeNode("Id",$8,NULL,NULL, 0, 0); $$ = makeNode("ValParam", "", aux, NULL, 0, 0);}
+	| ID ASSIGN Expr 											{$$ = makeNode("Assign", "", makeNode("Id", $1, NULL, $3, 0, 0), NULL, 0, 0);}
+	| WRITELN WriteInPList 										{$$ = makeNode("WriteLn", "", $2, NULL, 0, 0);}
 	| 															{$$ = NULL;}
 	;
 
@@ -256,29 +258,29 @@ WriteInPListOptional: ',' Optional WriteInPListOptional 		{aux = insert_last_bro
 					;
 
 Optional: Expr 													{$$ = $1;}
-		| STRING 												{$$ = makeNode("String", $1, NULL, NULL);}
+		| STRING 												{$$ = makeNode("String", $1, NULL, NULL, 0, 0);}
 		;
 
 Expr: SimpleExpr												{$$ = $1;}
-	| SimpleExpr RELATIONALOP SimpleExpr						{aux = insert_last_brother($1); aux->brother = $3; aux2=verify_Expr($2); $$ = makeNode(aux2, "", aux, NULL);}
+	| SimpleExpr RELATIONALOP SimpleExpr						{aux = insert_last_brother($1); aux->brother = $3; aux2=verify_Expr($2); $$ = makeNode(aux2, "", aux, NULL, 0, 0);}
 	;
 
-SimpleExpr: ADDOP Term 											{aux2 = verify_SimpleExpr($1, 0); $$ = makeNode(aux2, "", $2, NULL);}
-		  | SimpleExpr ADDOP Term								{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_SimpleExpr($2, 1); $$ = makeNode(aux2, "", aux, NULL);}
-		  | SimpleExpr OR Term									{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_SimpleExpr($2, 2); $$ = makeNode(aux2, "", aux, NULL);}
+SimpleExpr: ADDOP Term 											{aux2 = verify_SimpleExpr($1, 0); $$ = makeNode(aux2, "", $2, NULL, 0, 0);}
+		  | SimpleExpr ADDOP Term								{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_SimpleExpr($2, 1); $$ = makeNode(aux2, "", aux, NULL, 0, 0);}
+		  | SimpleExpr OR Term									{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_SimpleExpr($2, 2); $$ = makeNode(aux2, "", aux, NULL, 0, 0);}
 		  | Term 												{$$ = $1;}
 		  ;
 
 Term: Factor													{$$ = $1;}
-	| Term MULTOP Factor										{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_MultOp($2); $$ = makeNode(aux2, "", aux, NULL);}
+	| Term MULTOP Factor										{aux = insert_last_brother($1); aux->brother = $3; aux2 = verify_MultOp($2); $$ = makeNode(aux2, "", aux, NULL, 0, 0);}
 	;
 
 Factor: '(' Expr ')'											{$$ = $2;}
-	  | NOT Factor  											{$$ = makeNode("Not", "", $2, NULL);}
-  	  | INTEGER													{$$ = makeNode("IntLit", $1, NULL, NULL);}										
-  	  | REAL 													{$$ = makeNode("RealLit", $1, NULL, NULL);}
-  	  | ID 														{$$ = makeNode("Id", $1, NULL, NULL);}
-  	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2), NULL);}
+	  | NOT Factor  											{$$ = makeNode("Not", "", $2, NULL, 0, 0);}
+  	  | INTEGER													{$$ = makeNode("IntLit", $1, NULL, NULL, 0, 0);}										
+  	  | REAL 													{$$ = makeNode("RealLit", $1, NULL, NULL, 0, 0);}
+  	  | ID 														{$$ = makeNode("Id", $1, NULL, NULL, 0, 0);}
+  	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2, 0, 0), NULL, 0, 0);}
   	  ;
 
 ParamList: '(' Expr ParamListOptional ')' 						{$2->brother = $3; $$ = $2;}
@@ -375,8 +377,8 @@ void cannotAppliedType2_error(char *token, char *type1, char *type2){
 	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
 }
 
-void symbolAlreadyDefined_error(char *token){
-	printf("Line %d, col %d: Symbol %s already defined\n", count_line, (int)(count_column - strlen(yytext)), token);
+void symbolAlreadyDefined_error(Program *p){
+	printf("Line %d, col %d: Symbol %s already defined\n", p->line, p->column, p->value);
 }
 
 void symbolNotDefined_error(char *token){
