@@ -71,10 +71,12 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
 int type_var(char *t);
 char *to_lower_case(char *str);
-int verifyRepeatDeclaration(SymbolTableHeader *tab, char *var);
 
 /* print symbol table */
 void print_semantic(SymbolTableHeader *symbolTableHeader);
+
+/* error finding */
+int verifyRepeatDeclaration(SymbolTableHeader *tab, char *var);
 
 
 /* create symbol table */
@@ -458,6 +460,7 @@ void print_semantic(SymbolTableHeader *symbolTableHeader){
 	}
 }
 
+/* error finding */
 int verifyRepeatDeclaration(SymbolTableHeader *tab, char *var){
 	SymbolTableLine *line = tab->symbolTableLine;
 
