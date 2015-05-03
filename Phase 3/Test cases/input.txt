@@ -1,5 +1,5 @@
 program exFunction(output);
-var A, b, RET: integer; ReT : boolean;
+var A, b, RET: Coiso;
 function max(num1, num2: integer): integer;
 var result: integer;
 begin

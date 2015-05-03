@@ -12,8 +12,8 @@
 	void cannotAppliedType_error(char *token, char *type);
 	void cannotAppliedType2_error(char *token, char *type1, char *type2);
 	void symbolAlreadyDefined_error(Program *p);
-	void symbolNotDefined_error(char *token);
-	void typeIdentifierExpected_error();
+	void symbolNotDefined_error(Program *p);
+	void typeIdentifierExpected_error(Program *p);
 	void variableIdentifierExpected_error();
 	void wrongNumberArguments_error(char *token, char *type1, char *type2);
 
@@ -394,17 +394,17 @@ void symbolAlreadyDefined_error(Program *p){
 	}
 }
 
-void symbolNotDefined_error(char *token){
+void symbolNotDefined_error(Program *p){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Symbol %s not defined\n", count_line, (int)(count_column - strlen(yytext)), token);
+		printf("Line %d, col %d: Symbol %s not defined\n", p->line, p->column, p->value);
 	}
 }
 
-void typeIdentifierExpected_error(){
+void typeIdentifierExpected_error(Program *p){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Type identifier expected\n", count_line, (int)(count_column - strlen(yytext)));
+		printf("Line %d, col %d: Type identifier expected\n",  p->line, p->column);
 	}
 }
 

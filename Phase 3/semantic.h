@@ -162,6 +162,7 @@ SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
 	SymbolTableHeader *aux;
+	SymbolTableLine *aux2;
 	Program *temp, *save, *temp2;
 	int t, f, check;
 
@@ -173,7 +174,39 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = temp->brother;
 			}
 
+			char *normalValue;
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, temp->value);
 			t = type_var(temp->value);
+			if(t==-1){
+				check=0;
+				aux2 = symbolTableHeader->symbolTableLine;
+				while(aux2!=NULL){
+					if(strcmp(temp->value, aux2->name)==0){
+						check=1;
+					}
+					aux2=aux2->next;
+				}
+				aux2 = symbolTableHeader->next->next->symbolTableLine;
+				while(aux2 != NULL){
+					if(strcmp(temp->value, aux2->name)==0){
+						check=1;
+					}
+					aux2=aux2->next;
+				}
+
+				strcpy(temp->value,normalValue);
+				if(check==0){
+					symbolNotDefined_error(temp);
+					return;
+				}
+
+				else{
+					typeIdentifierExpected_error(temp);
+					return;
+				}
+			}
+			strcpy(temp->value,normalValue);
 
 			while(program->son->brother != NULL){
 
@@ -238,6 +271,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			temp2 = program->son->brother;
 
 			while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
+
 				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
