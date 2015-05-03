@@ -330,13 +330,54 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		}
 
 		else if(strcmp(program->type, "FuncDef2") == 0){
+			aux = symbolTableHeader->next->next;
+			check = 0;
+
+			while(aux->symbolTableLine != NULL){
+				if(strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) == 0){
+					check = 1;
+					break;
+				}
+
+				aux->symbolTableLine = aux->symbolTableLine->next;
+			}
+
+			if(!check){
+				functionIdentifierExpected_error(program->son);
+				return;
+			}
+
 			aux = symbolTableHeader->next->next->next;
 
-			while(aux != NULL && aux->symbolTableLine != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
 				aux = aux->next;
 			}
 
 			insert_line_var_decl(program->son->brother, aux);
+		}
+
+		else if(strcmp(program->type, "Call") == 0){
+			aux = symbolTableHeader->next->next;
+			check = 0;
+
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, program->son->value);
+
+			while(aux->symbolTableLine != NULL){
+				if(strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) == 0){
+					check = 1;
+					break;
+				}
+
+				aux->symbolTableLine = aux->symbolTableLine->next;
+			}
+
+			if(!check){
+				functionIdentifierExpected_error(program->son);
+				return;
+			}
+
+			strcpy(program->son->value, normalValue);
 		}
 
 		else{
@@ -360,8 +401,9 @@ SymbolTableHeader *last_pos_symbol(char *value, int t, SymbolTableHeader *last_p
 }
 
 void insert_line_func(Program *program, SymbolTableHeader *aux){
+	SymbolTableLine *aux2;
 	Program *temp, *temp2 = program;
-	int t, f;
+	int t, f, check;
 
 	while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
 		temp = temp2->son->son;
@@ -383,7 +425,27 @@ void insert_line_func(Program *program, SymbolTableHeader *aux){
 		}
 
 		while(temp->brother != NULL){
-			insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
+			aux2 = aux->symbolTableLine->next;
+			check = 0;
+
+			while(aux2 != NULL){
+				if(strcmp(to_lower_case(temp->value), aux2->name) == 0){
+					check = 1;
+					break;
+				}
+
+				aux2 = aux2->next;
+			}
+
+			if(!check){
+				insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
+			}
+
+			else{
+				symbolAlreadyDefined_error(temp);
+				return;
+			}
+
 			temp = temp->brother;
 		}
 
@@ -392,8 +454,9 @@ void insert_line_func(Program *program, SymbolTableHeader *aux){
 }
 
 void insert_line_var_decl(Program *program, SymbolTableHeader *aux){
+	SymbolTableLine *aux2;
 	Program *temp, *temp2 = program;
-	int t;
+	int t, check;
 
 	while(temp2->son != NULL && (strcmp(temp2->son->type, "NoPrint") == 0 || strcmp(temp2->son->type, "VarDecl") == 0)){
 		temp = temp2->son->son;
@@ -407,7 +470,27 @@ void insert_line_var_decl(Program *program, SymbolTableHeader *aux){
 		temp = temp2->son->son;
 
 		while(temp->brother != NULL){
-			insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);			
+			aux2 = aux->symbolTableLine->next;
+			check = 0;
+
+			while(aux2 != NULL){
+				if(strcmp(to_lower_case(temp->value), aux2->name) == 0){
+					check = 1;
+					break;
+				}
+
+				aux2 = aux2->next;
+			}
+
+			if(!check){
+				insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);
+			}
+
+			else{
+				symbolAlreadyDefined_error(temp);
+				return;
+			}
+
 			temp = temp->brother;
 		}
 

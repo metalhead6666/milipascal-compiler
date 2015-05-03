@@ -144,7 +144,7 @@ FuncDeclRepeat: FuncDeclaration ';' FuncDeclRepeat				{$$ = makeNode("NoPrint", 
 			  ;
 
 FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1, NULL, 0, 0);}
-			   | FUNCTION ID ';' varPart StatPart				{aux = insert_last_brother($4); aux->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4, 0, 0), NULL, 0, 0);}
+			   | FUNCTION ID ';' varPart StatPart				{aux = insert_last_brother($4); aux->brother = $5; $$ = makeNode("FuncDef2", "", makeNode("Id", $2, NULL, $4, @2.first_line, @2.first_column), NULL, 0, 0);}
 			   | FuncHeading ';' varPart StatPart 				{aux = insert_last_brother($3); aux->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL, 0, 0);}
 			   ;
 
@@ -280,7 +280,7 @@ Factor: '(' Expr ')'											{$$ = $2;}
   	  | INTEGER													{$$ = makeNode("IntLit", $1, NULL, NULL, 0, 0);}										
   	  | REAL 													{$$ = makeNode("RealLit", $1, NULL, NULL, 0, 0);}
   	  | ID 														{$$ = makeNode("Id", $1, NULL, NULL, 0, 0);}
-  	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2, 0, 0), NULL, 0, 0);}
+  	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2, @1.first_line, @1.first_column), NULL, 0, 0);}
   	  ;
 
 ParamList: '(' Expr ParamListOptional ')' 						{$2->brother = $3; $$ = $2;}
