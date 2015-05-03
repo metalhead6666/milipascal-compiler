@@ -161,8 +161,8 @@ SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
 	SymbolTableHeader *aux;
-	Program *temp;
-	int t;
+	Program *temp, *save, *temp2;
+	int t, f;
 
 	if(program != NULL){
 		if(strcmp(program->type, "VarDecl") == 0){
@@ -214,12 +214,15 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = temp->brother;				
 			}
 
+			save = temp->brother;
 			t = type_var(temp->value);
 
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 
-			if(program->son->brother->son != NULL){
-				temp = program->son->brother->son->son;
+			temp2 = program->son->brother;
+
+			while(strcmp(temp2->type, "Id") != 0){
+				temp = temp2->son->son;
 
 				while(temp->brother != NULL){
 					temp = temp->brother;
@@ -227,16 +230,26 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 				t = type_var(temp->value);
 
-				temp = program->son->brother->son->son;
+				temp = temp2->son->son;
+
+				if(strcmp(temp2->son->type, "VarParams") == 0){
+					f = VarParam;
+				}
+
+				else{
+					f = Param;
+				}
 
 				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[Param], NULL);
+					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
 					temp = temp->brother;
 				}
+
+				temp2 = temp2->brother;
 			}
 
-			if(program->son->brother->brother->brother->son != NULL){
-				temp = program->son->brother->brother->brother->son->son;
+			if(save->son != NULL){
+				temp = save->son->son;
 
 				while(temp->brother != NULL){
 					temp = temp->brother;
@@ -244,10 +257,10 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 				t = type_var(temp->value);
 
-				temp = program->son->brother->brother->brother->son->son;
+				temp = save->son->son;
 
 				while(temp->brother != NULL){
-					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[VarParam], NULL);
+					insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);
 					temp = temp->brother;
 				}
 			}
