@@ -339,38 +339,52 @@ void yyerror(char *s){
 
 /* error treatment */
 void cannotWriteValues_error(char* type){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Cannot write values of type %s\n", count_line, (int)(count_column - strlen(yytext)), type);	
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Cannot write values of type %s\n", count_line, (int)(count_column - strlen(yytext)), type);
+	}	
 }
 
 void functionIdentifierExpected_error(){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Function identifier expected\n", count_line, (int)(count_column - strlen(yytext)));
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Function identifier expected\n", count_line, (int)(count_column - strlen(yytext)));	
+	}
 }
 
 void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), num, token, type1, type2);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), num, token, type1, type2);
+	}
 }
 
 void incompatibleTypeAssigment_error(char *token, char *type1, char *type2){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Incompatible type in assigment to %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Incompatible type in assigment to %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+	}
 }
 
 void incompatibleTypeStatement_error(char *statement, char *type1, char *type2){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Incompatible type in %s statement (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), statement, type1, type2);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Incompatible type in %s statement (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), statement, type1, type2);
+	}
 }
 
 void cannotAppliedType_error(char *token, char *type){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", count_line, (int)(count_column - strlen(yytext)), token, type);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Operator %s cannot be applied to type %s\n", count_line, (int)(count_column - strlen(yytext)), token, type);
+	}
 }
 
 void cannotAppliedType2_error(char *token, char *type1, char *type2){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Operator %s cannot be applied to types %s, %s\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+	}
 }
 
 void symbolAlreadyDefined_error(Program *p){
@@ -381,19 +395,29 @@ void symbolAlreadyDefined_error(Program *p){
 }
 
 void symbolNotDefined_error(char *token){
-	printf("Line %d, col %d: Symbol %s not defined\n", count_line, (int)(count_column - strlen(yytext)), token);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Symbol %s not defined\n", count_line, (int)(count_column - strlen(yytext)), token);
+	}
 }
 
 void typeIdentifierExpected_error(){
-	printf("Line %d, col %d: Type identifier expected\n", count_line, (int)(count_column - strlen(yytext)));
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Type identifier expected\n", count_line, (int)(count_column - strlen(yytext)));
+	}
 }
 
 void variableIdentifierExpected_error(){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Variable identifier expected\n", count_line, (int)(count_column - strlen(yytext)));
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Variable identifier expected\n", count_line, (int)(count_column - strlen(yytext)));
+	}
 }
 
 void wrongNumberArguments_error(char *token, char *type1, char *type2){
-	hasErrorsSemantic = 1;
-	printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+	if(!hasErrorsSemantic){
+		hasErrorsSemantic = 1;
+		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+	}
 }
