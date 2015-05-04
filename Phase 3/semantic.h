@@ -21,7 +21,7 @@ extern void symbolAlreadyDefined_error(Program *p);
 extern void symbolNotDefined_error(Program *p);
 extern void typeIdentifierExpected_error(Program *p);
 extern void variableIdentifierExpected_error();
-extern void wrongNumberArguments_error(char *token, int type1, int type2);
+extern void wrongNumberArguments_error(Program *p, char *token, int type1, int type2);
 
 typedef struct _SymbolTableLine SymbolTableLine;
 typedef struct _SymbolTableHeader SymbolTableHeader;
@@ -185,7 +185,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 	SymbolTableHeader *aux;
 	SymbolTableLine *aux2;
 	Program *temp, *save;
-	int t, check;
+	int t, check, counter, counter2;
 	char *normalValue;
 
 	if(program != NULL && !hasErrorsSemantic){
@@ -261,6 +261,19 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			while(temp->son != NULL && (strcmp(temp->son->type, "FuncDecl") != 0 || strcmp(temp->son->type, "FuncDef") != 0) && (strcmp(temp->type, "FuncPart") == 0 || strcmp(temp->type, "NoPrint") == 0)){
 				if(strcmp(temp->son->type, "FuncDef2") != 0){
+					check = 0;
+
+					aux2 = last_pos->symbolTableLine;
+
+					while(aux2 != NULL){
+						if(strcmp(to_lower_case(temp->son->son->value), aux2->name) == 0){
+							symbolAlreadyDefined_error(temp->son->son);
+							return;
+						}
+
+						aux2 = aux2->next;
+					}
+
 					last_pos = last_pos_symbol(temp->son->son->value, _function_, last_pos);
 				}
 
@@ -286,6 +299,51 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			insert_line_func(program->son->brother, aux);
 			insert_line_var_decl(save, aux);
+
+			/*temp = program->son->brother;
+
+			while(temp != NULL){
+				while(temp->son != NULL){
+					if(strcmp(temp->son->type, "Call") == 0){
+						counter2 = 1;
+						counter = 0;
+
+						aux = symbolTableHeader->next->next->next;
+
+						while(aux != NULL && strcmp(to_lower_case(temp->son->son->value), aux->symbolTableLine->name) != 0){
+							aux = aux->next;
+						}
+
+						aux2 = aux->symbolTableLine->next;
+
+						while(aux2 != NULL){
+							if(aux2->flag != NULL){
+								++counter;
+							}
+
+							aux2 = aux2->next;
+						}
+
+						save = temp->son->son->brother;
+
+						while(save->brother != NULL){
+							++counter2;
+							save = save->brother;
+						}
+
+						if(counter != counter2){
+							wrongNumberArguments_error(temp->son->son, temp->son->son->value, counter2, counter);
+							return;
+						}
+
+						break;
+					}
+
+					temp->son = temp->son->brother;
+				}
+
+				temp = temp->brother;
+			}*/
 		}
 
 		else if(strcmp(program->type, "FuncDecl") == 0){
@@ -304,6 +362,27 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		}
 
 		else if(strcmp(program->type, "FuncDef2") == 0){
+			aux = symbolTableHeader->next->next;
+
+			while(aux != NULL){
+				aux2 = aux->symbolTableLine;
+
+				while(aux2 != NULL){
+					if(strcmp(to_lower_case(program->son->value), aux2->name) == 0){
+						if(strcmp(aux2->type, type[_function_]) != 0){
+							if(aux2->flag != NULL && strcmp(aux2->flag, flag[Return]) != 0){						
+								functionIdentifierExpected_error(program->son);
+								return;								
+							}
+						}						
+					}
+
+					aux2 = aux2->next;
+				}
+
+				aux = aux->next;
+			}
+
 			aux = symbolTableHeader->next->next->next;
 
 			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
@@ -311,7 +390,85 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			}
 
 			insert_line_var_decl(program->son->brother, aux);
+
+			/*temp = program->son->brother;
+
+			while(temp != NULL){
+				while(temp->son != NULL){
+					if(strcmp(temp->son->type, "Call") == 0){
+						counter2 = 1;
+						counter = 0;
+
+						aux = symbolTableHeader->next->next->next;
+
+						while(aux != NULL && strcmp(to_lower_case(temp->son->son->value), aux->symbolTableLine->name) != 0){
+							aux = aux->next;
+						}
+
+						aux2 = aux->symbolTableLine->next;
+
+						while(aux2 != NULL){
+							if(aux2->flag != NULL){
+								++counter;
+							}
+
+							aux2 = aux2->next;
+						}
+
+						save = temp->son->son->brother;
+
+						while(save->brother != NULL){
+							++counter2;
+							save = save->brother;
+						}
+
+						if(counter != counter2){
+							wrongNumberArguments_error(temp->son->son, temp->son->son->value, counter2, counter);
+							return;
+						}
+
+						break;
+					}
+
+					temp->son = temp->son->brother;
+				}
+
+				temp = temp->brother;
+			}*/
 		}
+
+		/*else if(strcmp(program->type, "Call") == 0){
+			counter2 = 1;
+			counter = 0;
+
+			aux = symbolTableHeader->next->next->next;
+
+			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+				aux = aux->next;
+			}
+
+			aux2 = aux->symbolTableLine->next;
+
+			while(aux2 != NULL){
+				if(aux2->flag != NULL){
+					++counter;
+				}
+
+				aux2 = aux2->next;
+			}
+
+			temp = program->son->brother;
+
+			while(temp->brother != NULL){
+				++counter2;
+				temp = temp->brother;
+			}
+
+			if(counter != counter2){
+				wrongNumberArguments_error(program->son, program->son->value, counter2, counter);
+				return;
+			}
+		}*/
 
 		else{
 			iterate_ast(program->son, symbolTableHeader, last_pos);

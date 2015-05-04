@@ -15,7 +15,7 @@
 	void symbolNotDefined_error(Program *p);
 	void typeIdentifierExpected_error(Program *p);
 	void variableIdentifierExpected_error();
-	void wrongNumberArguments_error(char *token, int type1, int type2);
+	void wrongNumberArguments_error(Program *p, char *token, int type1, int type2);
 
 	/* values received from lex */
 	extern char *yytext;
@@ -148,7 +148,7 @@ FuncDeclaration: FuncHeading ';' FORWARD						{$$ = makeNode("FuncDecl", "", $1,
 			   | FuncHeading ';' varPart StatPart 				{aux = insert_last_brother($3); aux->brother = $4; aux = insert_last_brother($1); aux->brother = $3; $$ = makeNode("FuncDef", "", $1, NULL, 0, 0);}
 			   ;
 
-FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL, @5.first_line, @5.first_column); else $3 = makeNode("Id", $5, NULL, NULL, @5.first_line, @5.first_column); $$ = makeNode("Id", $2, NULL, $3, 0, 0);}
+FuncHeading: FUNCTION ID FormalParamList ':' ID 				{aux = insert_last_brother($3); if(aux != NULL) aux->brother = makeNode("Id", $5, NULL, NULL, @5.first_line, @5.first_column); else $3 = makeNode("Id", $5, NULL, NULL, @5.first_line, @5.first_column); $$ = makeNode("Id", $2, NULL, $3, @2.first_line, @2.first_column);}
 		   ;		   
 
 FormalParamList: '(' FormalParams FormalParamListRepeat ')'		{$$ = makeNode("FuncParams", "", $2, $3, 0, 0);}
@@ -348,7 +348,7 @@ void cannotWriteValues_error(char* type){
 void functionIdentifierExpected_error(Program *p){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Function identifier expected\n",  p->line, p->column);	
+		printf("Line %d, col %d: Function identifier expected\n", p->line, p->column);	
 	}
 }
 
@@ -415,9 +415,9 @@ void variableIdentifierExpected_error(){
 	}
 }
 
-void wrongNumberArguments_error(char *token, int type1, int type2){
+void wrongNumberArguments_error(Program *p, char *token, int type1, int type2){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %d, expected %d)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+		printf("Line %d, col %d: Wrong number of arguments in call to function %s (got %d, expected %d)\n", p->line, p->column, token, type1, type2);
 	}
 }
