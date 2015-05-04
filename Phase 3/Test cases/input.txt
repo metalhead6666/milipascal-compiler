@@ -1,5 +1,6 @@
 program gcd2(output);
-function declaratio1(l:integer):integer;forward;
+var isjdkh:integer;
+function declaratio1(l:integer; p: real):integer;forward;
 
 function Gcd(var A, B: integer; l, o: boolean): integer;
 var x, y: integer;
@@ -10,7 +11,8 @@ end;
 function decla:integer;forward;
 
 function declaratio1;
-var qwerty:integer;
+var decla:integer;
+qwerty:integer;
 pilas:integer;
 begin
 end;
@@ -18,6 +20,7 @@ end;
 function decla;
 var int:integer;
 begin
+i := declaratio1(1, int);
 end;
 
 begin

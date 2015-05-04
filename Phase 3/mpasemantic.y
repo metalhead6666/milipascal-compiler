@@ -6,7 +6,7 @@
 	void yyerror(char *s);
 	void cannotWriteValues_error(char* type);
 	void functionIdentifierExpected_error(Program *p);
-	void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2);
+	void incompatibleTypeArgument_error(Program *p, int num, char *token, char *type1, char *type2);
 	void incompatibleTypeAssigment_error(char *token, char *type1, char *type2);
 	void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
 	void cannotAppliedType_error(char *token, char *type);
@@ -159,8 +159,8 @@ FormalParamListRepeat: ';' FormalParams FormalParamListRepeat	{$$ = makeNode("No
 					 |											{$$ = NULL;}
 					 ;
 
-FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL, 0, 0); else $1 = makeNode("Id", $3, NULL, NULL, 0, 0); $$ = makeNode("Params", "", $1, NULL, 0, 0);}
-			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL, 0, 0); else $2 = makeNode("Id", $4, NULL, NULL, 0, 0); $$ = makeNode("VarParams", "", $2, NULL, 0, 0);}
+FormalParams: IDList ':' ID 									{aux = insert_last_brother($1); if(aux != NULL) aux->brother = makeNode("Id", $3, NULL, NULL, @3.first_line, @3.first_column); else $1 = makeNode("Id", $3, NULL, NULL, @3.first_line, @3.first_column); $$ = makeNode("Params", "", $1, NULL, 0, 0);}
+			| VAR IDList ':' ID 								{aux = insert_last_brother($2); if(aux != NULL) aux->brother = makeNode("Id", $4, NULL, NULL, @4.first_line, @4.first_column); else $2 = makeNode("Id", $4, NULL, NULL, @4.first_line, @4.first_column); $$ = makeNode("VarParams", "", $2, NULL, 0, 0);}
 			;
 
 StatPart: CompStat												{if($1 == NULL || count_nodes($1) > 1) $$ = makeNode("StatList", "", NULL, NULL, 0, 0); else $$ = $1;}
@@ -277,9 +277,9 @@ Term: Factor													{$$ = $1;}
 
 Factor: '(' Expr ')'											{$$ = $2;}
 	  | NOT Factor  											{$$ = makeNode("Not", "", $2, NULL, 0, 0);}
-  	  | INTEGER													{$$ = makeNode("IntLit", $1, NULL, NULL, 0, 0);}										
-  	  | REAL 													{$$ = makeNode("RealLit", $1, NULL, NULL, 0, 0);}
-  	  | ID 														{$$ = makeNode("Id", $1, NULL, NULL, 0, 0);}
+  	  | INTEGER													{$$ = makeNode("IntLit", $1, NULL, NULL, @1.first_line, @1.first_column);}										
+  	  | REAL 													{$$ = makeNode("RealLit", $1, NULL, NULL, @1.first_line, @1.first_column);}
+  	  | ID 														{$$ = makeNode("Id", $1, NULL, NULL, @1.first_line, @1.first_column);}
   	  | ID ParamList 											{$$ = makeNode("Call", "", makeNode("Id", $1, NULL, $2, @1.first_line, @1.first_column), NULL, 0, 0);}
   	  ;
 
@@ -352,10 +352,10 @@ void functionIdentifierExpected_error(Program *p){
 	}
 }
 
-void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2){
+void incompatibleTypeArgument_error(Program *p, int num, char *token, char *type1, char *type2){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), num, token, type1, type2);
+		printf("Line %d, col %d: Incompatible type for argument %d in call to function %s (got %s, expected %s)\n", p->line, p->column, num, token, type1, type2);
 	}
 }
 

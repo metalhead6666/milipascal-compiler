@@ -9,10 +9,10 @@
 
 extern int hasErrorsSemantic;
 
-	/* function declaration */
+/* function declaration */
 extern void cannotWriteValues_error(char* type);
 extern void functionIdentifierExpected_error(Program *p);
-extern void incompatibleTypeArgument_error(int num, char *token, char *type1, char *type2);
+extern void incompatibleTypeArgument_error(Program *p, int num, char *token, char *type1, char *type2);
 extern void incompatibleTypeAssigment_error(char *token, char *type1, char *type2);
 extern void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
 extern void cannotAppliedType_error(char *token, char *type);
@@ -183,7 +183,7 @@ SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
 	SymbolTableHeader *aux;
-	SymbolTableLine *aux2;
+	SymbolTableLine *aux2, *aux3;
 	Program *temp, *save;
 	int t, check, counter, counter2;
 	char *normalValue;
@@ -295,12 +295,17 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			save = temp->brother;
 			t = type_var(temp->value);
 
+			if(t == -1){
+				typeIdentifierExpected_error(temp);
+				return;
+			}
+
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 
 			insert_line_func(program->son->brother, aux);
 			insert_line_var_decl(save, aux);
 
-			/*temp = program->son->brother;
+			temp = program->son->brother;
 
 			while(temp != NULL){
 				while(temp->son != NULL){
@@ -336,6 +341,56 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 							return;
 						}
 
+						aux2 = aux->symbolTableLine->next;
+						aux = symbolTableHeader->next->next->next;
+
+						while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+							aux = aux->next;
+						}
+
+						save = temp->son->son->brother;
+						counter = 1;						
+
+						while(save != NULL){
+							if(strcmp(save->type, "IntLit") == 0 && strcmp(aux2->type, type[_integer_]) != 0){
+								incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
+								return;
+							}
+
+							if(strcmp(save->type, "RealLit") == 0 && strcmp(aux2->type, type[_real_]) != 0){
+								incompatibleTypeArgument_error(save, counter, program->son->value, type[_real_], aux2->type);
+								return;
+							}
+
+							if(strcmp(save->type, "Id") == 0){
+								aux3 = last_pos->symbolTableLine;
+
+								while(aux3 != NULL){
+									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
+										return;
+									}
+
+									aux3 = aux3->next;
+								}
+
+								aux3 = aux->symbolTableLine->next;
+
+								while(aux3 != NULL){
+									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
+										return;
+									}
+
+									aux3 = aux3->next;
+								}
+							}
+
+							++counter;
+							save = save->brother;
+							aux2 = aux2->next;
+						}
+
 						break;
 					}
 
@@ -343,7 +398,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				}
 
 				temp = temp->brother;
-			}*/
+			}
 		}
 
 		else if(strcmp(program->type, "FuncDecl") == 0){
@@ -357,32 +412,16 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			t = type_var(temp->brother->value);
 
+			if(t == -1){
+				typeIdentifierExpected_error(temp->brother);
+				return;
+			}
+
 			aux->symbolTableLine = create_first_line(to_lower_case(program->son->value), type[t], flag[Return], NULL);
 			insert_line_func(program->son->brother, aux);
 		}
 
 		else if(strcmp(program->type, "FuncDef2") == 0){
-			aux = symbolTableHeader->next->next;
-
-			while(aux != NULL){
-				aux2 = aux->symbolTableLine;
-
-				while(aux2 != NULL){
-					if(strcmp(to_lower_case(program->son->value), aux2->name) == 0){
-						if(strcmp(aux2->type, type[_function_]) != 0){
-							if(aux2->flag != NULL && strcmp(aux2->flag, flag[Return]) != 0){						
-								functionIdentifierExpected_error(program->son);
-								return;								
-							}
-						}						
-					}
-
-					aux2 = aux2->next;
-				}
-
-				aux = aux->next;
-			}
-
 			aux = symbolTableHeader->next->next->next;
 
 			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
@@ -391,7 +430,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			insert_line_var_decl(program->son->brother, aux);
 
-			/*temp = program->son->brother;
+			temp = program->son->brother;
 
 			while(temp != NULL){
 				while(temp->son != NULL){
@@ -427,6 +466,56 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 							return;
 						}
 
+						aux2 = aux->symbolTableLine->next;
+						aux = symbolTableHeader->next->next->next;
+
+						while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+							aux = aux->next;
+						}
+
+						save = temp->son->son->brother;						
+						counter = 1;						
+
+						while(save != NULL){
+							if(strcmp(save->type, "IntLit") == 0 && strcmp(aux2->type, type[_integer_]) != 0){
+								incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
+								return;
+							}
+
+							if(strcmp(save->type, "RealLit") == 0 && strcmp(aux2->type, type[_real_]) != 0){
+								incompatibleTypeArgument_error(save, counter, program->son->value, type[_real_], aux2->type);
+								return;
+							}
+
+							if(strcmp(save->type, "Id") == 0){
+								aux3 = last_pos->symbolTableLine;
+
+								while(aux3 != NULL){
+									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
+										return;
+									}
+
+									aux3 = aux3->next;
+								}
+
+								aux3 = aux->symbolTableLine->next;
+
+								while(aux3 != NULL){
+									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
+										return;
+									}
+
+									aux3 = aux3->next;
+								}
+							}
+
+							++counter;
+							save = save->brother;
+							aux2 = aux2->next;
+						}
+
 						break;
 					}
 
@@ -434,10 +523,10 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				}
 
 				temp = temp->brother;
-			}*/
+			}
 		}
 
-		/*else if(strcmp(program->type, "Call") == 0){
+		else if(strcmp(program->type, "Call") == 0){
 			counter2 = 1;
 			counter = 0;
 
@@ -468,7 +557,40 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				wrongNumberArguments_error(program->son, program->son->value, counter2, counter);
 				return;
 			}
-		}*/
+
+			temp = program->son->brother;
+			aux2 = aux->symbolTableLine->next;
+			counter = 1;
+
+			while(temp != NULL){
+				if(strcmp(temp->type, "IntLit") == 0 && strcmp(aux2->type, "_integer_") != 0){
+					incompatibleTypeArgument_error(temp, counter, program->son->value, type[_integer_], aux2->type);
+					return;
+				}
+
+				if(strcmp(temp->type, "RealLit") == 0 && strcmp(aux2->type, "_real_") != 0){
+					incompatibleTypeArgument_error(temp, counter, program->son->value, type[_real_], aux2->type);
+					return;
+				}
+
+				if(strcmp(temp->type, "Id") == 0){
+					aux3 = last_pos->symbolTableLine;
+
+					while(aux3 != NULL){
+						if(strcmp(to_lower_case(temp->value), aux3->name) == 0){
+							incompatibleTypeArgument_error(temp, counter, program->son->value, aux3->type, aux2->type);
+							return;
+						}
+
+						aux3 = aux3->next;
+					}
+				}
+
+				++counter;
+				temp = temp->brother;
+				aux2 = aux2->next;
+			}
+		}
 
 		else{
 			iterate_ast(program->son, symbolTableHeader, last_pos);
