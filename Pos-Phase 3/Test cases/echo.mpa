@@ -1,0 +1,19 @@
+program gcd(output);
+begin
+	begin
+		begin
+			a:=a;
+			a:=a;
+		end;
+		begin
+			a:=a;
+			a:=a;
+		end;
+		begin
+			a:=b;
+		end;
+		begin
+
+		end;
+	end
+end.
