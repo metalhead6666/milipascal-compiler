@@ -5,7 +5,7 @@ function declaratio1(l:integer; p: real):integer;forward;
 function Gcd(var A, B: integer; l, o: boolean): integer;
 var x, y: integer;
 begin
-gcd := A;
+gcd := gcd(1, 2, true, true);
 end;
 
 function decla:integer;forward;
@@ -13,15 +13,18 @@ function decla:integer;forward;
 function declaratio1;
 var decla:integer;
 qwerty:integer;
-pilas:integer;
+coisas:integer;
 begin
 end;
 
 function decla;
 var int:integer;
+x:real;
 begin
-i := declaratio1(1, int);
+decla := x;
+i := decla;
 end;
 
 begin
+cona := x;
 end.

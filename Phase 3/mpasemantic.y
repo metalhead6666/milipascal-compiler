@@ -7,7 +7,7 @@
 	void cannotWriteValues_error(char* type);
 	void functionIdentifierExpected_error(Program *p);
 	void incompatibleTypeArgument_error(Program *p, int num, char *token, char *type1, char *type2);
-	void incompatibleTypeAssigment_error(char *token, char *type1, char *type2);
+	void incompatibleTypeAssigment_error(Program *p, char *token, char *type1, char *type2);
 	void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
 	void cannotAppliedType_error(char *token, char *type);
 	void cannotAppliedType2_error(char *token, char *type1, char *type2);
@@ -244,7 +244,7 @@ Stat: CompStat													{$$ = $1;}
 																}
 
 	| VAL '(' PARAMSTR '(' Expr ')' ',' ID ')' 					{aux = insert_last_brother($5); aux->brother = makeNode("Id",$8,NULL,NULL, 0, 0); $$ = makeNode("ValParam", "", aux, NULL, 0, 0);}
-	| ID ASSIGN Expr 											{$$ = makeNode("Assign", "", makeNode("Id", $1, NULL, $3, 0, 0), NULL, 0, 0);}
+	| ID ASSIGN Expr 											{$$ = makeNode("Assign", "", makeNode("Id", $1, NULL, $3, @1.first_line, @1.first_column), NULL, 0, 0);}
 	| WRITELN WriteInPList 										{$$ = makeNode("WriteLn", "", $2, NULL, 0, 0);}
 	| 															{$$ = NULL;}
 	;
@@ -359,10 +359,10 @@ void incompatibleTypeArgument_error(Program *p, int num, char *token, char *type
 	}
 }
 
-void incompatibleTypeAssigment_error(char *token, char *type1, char *type2){
+void incompatibleTypeAssigment_error(Program *p, char *token, char *type1, char *type2){
 	if(!hasErrorsSemantic){
 		hasErrorsSemantic = 1;
-		printf("Line %d, col %d: Incompatible type in assigment to %s (got %s, expected %s)\n", count_line, (int)(count_column - strlen(yytext)), token, type1, type2);
+		printf("Line %d, col %d: Incompatible type in assigment to %s (got %s, expected %s)\n", p->line, p->column, token, type1, type2);
 	}
 }
 

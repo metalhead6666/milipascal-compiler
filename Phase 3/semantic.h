@@ -13,7 +13,7 @@ extern int hasErrorsSemantic;
 extern void cannotWriteValues_error(char* type);
 extern void functionIdentifierExpected_error(Program *p);
 extern void incompatibleTypeArgument_error(Program *p, int num, char *token, char *type1, char *type2);
-extern void incompatibleTypeAssigment_error(char *token, char *type1, char *type2);
+extern void incompatibleTypeAssigment_error(Program *p, char *token, char *type1, char *type2);
 extern void incompatibleTypeStatement_error(char *statement, char *type1, char *type2);
 extern void cannotAppliedType_error(char *token, char *type);
 extern void cannotAppliedType2_error(char *token, char *type1, char *type2);
@@ -27,6 +27,7 @@ typedef struct _SymbolTableLine SymbolTableLine;
 typedef struct _SymbolTableHeader SymbolTableHeader;
 struct _SymbolTableHeader{
 	SymbolTableHeader *next;
+	int defined;
 	char *header_name;
 	SymbolTableLine *symbolTableLine;
 };
@@ -84,7 +85,7 @@ SymbolTableLine *create_first_line(char *name, char *type, char *flag, char *val
 void insert_line_table(SymbolTableLine *temp, char *name, char *type, char *flag, char *value);
 void create_default_function_symbol_table(SymbolTableHeader *temp);
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos);
-SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table);
+SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table, int num);
 SymbolTableHeader *last_pos_symbol(char *value, int t, SymbolTableHeader *last_pos);
 void insert_line_func(Program *program, SymbolTableHeader *aux);
 void insert_line_var_decl(Program *program, SymbolTableHeader *aux);
@@ -115,7 +116,7 @@ SymbolTableHeader *create_table(Program *program){
 
 	create_default_function_symbol_table(symbolTableHeader);
 
-	last_pos = declaration_table(symbolTableHeader, table_name[ProgramSymbolTable]);
+	last_pos = declaration_table(symbolTableHeader, table_name[ProgramSymbolTable], 42);
 	iterate_ast(program, symbolTableHeader, last_pos);
 
 	return symbolTableHeader;
@@ -166,7 +167,7 @@ void create_default_function_symbol_table(SymbolTableHeader *temp){
 	aux->next = new;
 }
 
-SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
+SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table, int num){
 	SymbolTableHeader *new, *aux = temp;
 
 	new = (SymbolTableHeader *)calloc(1, sizeof(SymbolTableHeader));
@@ -176,13 +177,15 @@ SymbolTableHeader *declaration_table(SymbolTableHeader *temp, char *table){
 	}
 
 	new->header_name = table;
+	new->defined = num;
 	aux->next = new;
 
 	return aux->next;
 }
 
+
 void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolTableHeader *last_pos){
-	SymbolTableHeader *aux;
+	SymbolTableHeader *aux, *aux4;
 	SymbolTableLine *aux2, *aux3;
 	Program *temp, *save;
 	int t, check, counter, counter2;
@@ -261,12 +264,13 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 			while(temp->son != NULL && (strcmp(temp->son->type, "FuncDecl") != 0 || strcmp(temp->son->type, "FuncDef") != 0) && (strcmp(temp->type, "FuncPart") == 0 || strcmp(temp->type, "NoPrint") == 0)){
 				if(strcmp(temp->son->type, "FuncDef2") != 0){
-					check = 0;
-
 					aux2 = last_pos->symbolTableLine;
+					normalValue = (char *)calloc(1, sizeof(char));
 
-					while(aux2 != NULL){
-						if(strcmp(to_lower_case(temp->son->son->value), aux2->name) == 0){
+					while(aux2 != NULL){						
+						strcpy(normalValue, temp->son->son->value);
+
+						if(strcmp(to_lower_case(normalValue), aux2->name) == 0){
 							symbolAlreadyDefined_error(temp->son->son);
 							return;
 						}
@@ -284,7 +288,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		}
 
 		else if(strcmp(program->type, "FuncDef") == 0){
-			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable]);
+			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable], 2);
 
 			temp = program->son;
 
@@ -293,10 +297,24 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			}
 
 			save = temp->brother;
-			t = type_var(temp->value);
+
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, temp->value);
+			t = type_var(normalValue);
 
 			if(t == -1){
-				typeIdentifierExpected_error(temp);
+				aux2 = last_pos->symbolTableLine;
+
+				while(aux2 != NULL){
+					if(strcmp(aux2->name, normalValue) == 0){
+						typeIdentifierExpected_error(temp);
+						return;
+					}
+
+					aux2 = aux2->next;
+				}
+
+				symbolNotDefined_error(temp);
 				return;
 			}
 
@@ -306,16 +324,40 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			insert_line_var_decl(save, aux);
 
 			temp = program->son->brother;
+			aux4 = aux;
 
-			while(temp != NULL){
+			while(temp != NULL){				
 				while(temp->son != NULL){
 					if(strcmp(temp->son->type, "Call") == 0){
 						counter2 = 1;
 						counter = 0;
+						check = 0;
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, temp->son->son->value);
+
+						aux2 = last_pos->symbolTableLine;
+
+						while(aux2 != NULL){
+							if(strcmp(aux2->name, to_lower_case(normalValue)) == 0){
+								if(strcmp(aux2->type, type[_function_]) == 0){
+									check = 1;
+									break;
+								}
+
+								break;
+							}
+
+							aux2 = aux2->next;							
+						}
+
+						if(!check){
+							functionIdentifierExpected_error(temp->son->son);
+							return;
+						}
 
 						aux = symbolTableHeader->next->next->next;
 
-						while(aux != NULL && strcmp(to_lower_case(temp->son->son->value), aux->symbolTableLine->name) != 0){
+						while(aux != NULL && strcmp(to_lower_case(normalValue), aux->symbolTableLine->name) != 0){
 							aux = aux->next;
 						}
 
@@ -351,10 +393,21 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 						save = temp->son->son->brother;
 						counter = 1;						
 
-						while(save != NULL){
-							if(strcmp(save->type, "IntLit") == 0 && strcmp(aux2->type, type[_integer_]) != 0){
-								incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
-								return;
+						while(save != NULL && aux2->flag != NULL){
+							if(strcmp(save->type, "IntLit") == 0){
+								if(strcmp(aux2->flag, flag[Param]) == 0){
+									if(strcmp(aux2->type, type[_integer_]) != 0 && strcmp(aux2->type, type[_real_]) != 0){
+										incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
+										return;
+									}
+								}
+
+								else{
+									if(strcmp(aux2->type, type[_integer_]) != 0){
+										incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
+										return;
+									}
+								}					
 							}
 
 							if(strcmp(save->type, "RealLit") == 0 && strcmp(aux2->type, type[_real_]) != 0){
@@ -363,10 +416,16 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 							}
 
 							if(strcmp(save->type, "Id") == 0){
+								if((strcmp(to_lower_case(save->value), "true") == 0 || strcmp(to_lower_case(save->value), "false") == 0) && strcmp(aux2->type, type[_boolean_]) != 0){
+									incompatibleTypeArgument_error(save, counter, program->son->value, type[_boolean_], aux2->type);
+									return;
+								}
+
 								aux3 = last_pos->symbolTableLine;
+								strcpy(normalValue, save->value);
 
 								while(aux3 != NULL){
-									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+									if(strcmp(to_lower_case(normalValue), aux3->name) == 0){										
 										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
 										return;
 									}
@@ -377,7 +436,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 								aux3 = aux->symbolTableLine->next;
 
 								while(aux3 != NULL){
-									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+									if(strcmp(to_lower_case(normalValue), aux3->name) == 0){										
 										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
 										return;
 									}
@@ -394,15 +453,115 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 						break;
 					}
 
+					else if(strcmp(temp->son->type, "Assign") == 0){
+						char *s = (char *)calloc(1, sizeof(char));
+						strcpy(s, program->son->value);
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, temp->son->son->brother->value);						
+						counter = 0;
+
+						if(strcmp(to_lower_case(normalValue), to_lower_case(s)) == 0){
+							aux2 = aux4->symbolTableLine->next;
+
+							while(aux2 != NULL){
+								if(aux2->flag != NULL){
+									++counter;
+								}
+
+								aux2 = aux2->next;
+							}
+
+							if(counter > 0){
+								wrongNumberArguments_error(temp->son->son->brother, temp->son->son->brother->value, 0, counter);
+								return;
+							}	
+						}
+
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, program->son->value);
+						
+						if(strcmp(to_lower_case(normalValue), temp->son->son->value) == 0){
+							aux2 = aux4->symbolTableLine;
+							save = temp->son->son->brother;
+							normalValue = (char *)calloc(1, sizeof(char));
+							strcpy(normalValue, save->value);
+
+							while(save != NULL){
+								while(aux2 != NULL){
+									if(strcmp(normalValue, aux2->name) == 0){
+										if(strcmp(aux2->type, aux4->symbolTableLine->type) != 0){
+											incompatibleTypeAssigment_error(temp->son->son, program->son->value, aux2->type, aux4->symbolTableLine->type);
+											return;
+										}
+									}
+
+									aux2 = aux2->next;
+								}
+
+								save = save->brother;
+							}
+						}						
+					}
+
 					temp->son = temp->son->brother;
 				}
+
+				/*if(strcmp(temp->type, "Assign") == 0){
+					normalValue = (char *)calloc(1, sizeof(char));
+					strcpy(normalValue, program->son->value);
+					
+					if(strcmp(to_lower_case(normalValue), temp->son->value) == 0){
+						aux2 = aux4->symbolTableLine;
+						save = temp->son->brother;
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, save->value);
+
+						while(save != NULL){
+							while(aux2 != NULL){
+								if(strcmp(normalValue, aux2->name) == 0){
+									if(strcmp(aux2->type, aux4->symbolTableLine->type) != 0){
+										incompatibleTypeAssigment_error(temp->son, program->son->value, aux2->type, aux4->symbolTableLine->type);
+										return;
+									}
+								}
+
+								aux2 = aux2->next;
+							}
+
+							save = save->brother;
+						}
+					}
+
+					char *s = (char *)calloc(1, sizeof(char));
+					strcpy(s, program->son->value);
+					normalValue = (char *)calloc(1, sizeof(char));
+					strcpy(normalValue, temp->son->brother->value);			
+					counter = 0;
+
+					if(strcmp(to_lower_case(normalValue), to_lower_case(s)) == 0){
+						aux2 = aux4->symbolTableLine->next;
+
+						while(aux2 != NULL){
+							if(aux2->flag != NULL){
+								++counter;
+							}
+
+							aux2 = aux2->next;
+						}
+
+						if(counter > 0){
+							wrongNumberArguments_error(temp->son->brother, temp->son->brother->value, 0, counter);
+							return;
+						}
+					}
+				}*/
 
 				temp = temp->brother;
 			}
 		}
 
 		else if(strcmp(program->type, "FuncDecl") == 0){
-			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable]);
+			aux = declaration_table(symbolTableHeader, table_name[FunctionSymbolTable], 1);
 
 			temp = program->son;
 
@@ -410,10 +569,24 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 				temp = temp->brother;				
 			}
 
-			t = type_var(temp->brother->value);
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, temp->brother->value);
+
+			t = type_var(normalValue);
 
 			if(t == -1){
-				typeIdentifierExpected_error(temp->brother);
+				aux2 = last_pos->symbolTableLine;
+
+				while(aux2 != NULL){
+					if(strcmp(aux2->name, normalValue) == 0){
+						typeIdentifierExpected_error(temp->brother);
+						return;
+					}
+
+					aux2 = aux2->next;
+				}
+
+				symbolNotDefined_error(temp->brother);
 				return;
 			}
 
@@ -423,12 +596,27 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 
 		else if(strcmp(program->type, "FuncDef2") == 0){
 			aux = symbolTableHeader->next->next->next;
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, program->son->value);
 
-			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+			while(aux != NULL && strcmp(to_lower_case(normalValue), aux->symbolTableLine->name) != 0){
 				aux = aux->next;
 			}
 
+			if(aux == NULL){
+				symbolNotDefined_error(program->son);
+				return;
+			}
+
+			if(aux->defined == 2){
+				symbolAlreadyDefined_error(program->son);
+				return;
+			}
+
+			aux->defined = 2;
+
 			insert_line_var_decl(program->son->brother, aux);
+			aux4 = aux;
 
 			temp = program->son->brother;
 
@@ -437,10 +625,34 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 					if(strcmp(temp->son->type, "Call") == 0){
 						counter2 = 1;
 						counter = 0;
+						check = 0;
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, temp->son->son->value);
+
+						aux2 = last_pos->symbolTableLine;
+
+						while(aux2 != NULL){
+							if(strcmp(aux2->name, to_lower_case(normalValue)) == 0){
+								if(strcmp(aux2->type, type[_function_]) == 0){
+									check = 1;
+									break;
+								}
+
+								break;
+							}
+
+							aux2 = aux2->next;
+							
+						}
+
+						if(!check){
+							functionIdentifierExpected_error(temp->son->son);
+							return;
+						}
 
 						aux = symbolTableHeader->next->next->next;
 
-						while(aux != NULL && strcmp(to_lower_case(temp->son->son->value), aux->symbolTableLine->name) != 0){
+						while(aux != NULL && strcmp(to_lower_case(normalValue), aux->symbolTableLine->name) != 0){
 							aux = aux->next;
 						}
 
@@ -473,25 +685,42 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 							aux = aux->next;
 						}
 
-						save = temp->son->son->brother;						
+						save = temp->son->son->brother;
 						counter = 1;						
 
-						while(save != NULL){
-							if(strcmp(save->type, "IntLit") == 0 && strcmp(aux2->type, type[_integer_]) != 0){
-								incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
-								return;
+						while(save != NULL && aux2->flag != NULL){
+							if(strcmp(save->type, "IntLit") == 0){
+								if(strcmp(aux2->flag, flag[Param]) == 0){
+									if(strcmp(aux2->type, type[_integer_]) != 0 && strcmp(aux2->type, type[_real_]) != 0){
+										incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
+										return;
+									}
+								}
+
+								else{
+									if(strcmp(aux2->type, type[_integer_]) != 0){
+										incompatibleTypeArgument_error(save, counter, program->son->value, type[_integer_], aux2->type);
+										return;
+									}
+								}					
 							}
 
 							if(strcmp(save->type, "RealLit") == 0 && strcmp(aux2->type, type[_real_]) != 0){
 								incompatibleTypeArgument_error(save, counter, program->son->value, type[_real_], aux2->type);
 								return;
-							}
+							}							
 
 							if(strcmp(save->type, "Id") == 0){
+								if((strcmp(to_lower_case(save->value), "true") == 0 || strcmp(to_lower_case(save->value), "false") == 0) && strcmp(aux2->type, type[_boolean_]) != 0){
+									incompatibleTypeArgument_error(save, counter, program->son->value, type[_boolean_], aux2->type);
+									return;
+								}
+
 								aux3 = last_pos->symbolTableLine;
+								strcpy(normalValue, save->value);
 
 								while(aux3 != NULL){
-									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+									if(strcmp(to_lower_case(normalValue), aux3->name) == 0){										
 										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
 										return;
 									}
@@ -502,7 +731,7 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 								aux3 = aux->symbolTableLine->next;
 
 								while(aux3 != NULL){
-									if(strcmp(to_lower_case(save->value), aux3->name) == 0){										
+									if(strcmp(to_lower_case(normalValue), aux3->name) == 0){										
 										incompatibleTypeArgument_error(save, counter, program->son->value, aux3->type, aux2->type);
 										return;
 									}
@@ -519,8 +748,108 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 						break;
 					}
 
+					else if(strcmp(temp->son->type, "Assign") == 0){
+						char *s = (char *)calloc(1, sizeof(char));
+						strcpy(s, program->son->value);
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, temp->son->son->brother->value);						
+						counter = 0;
+
+						if(strcmp(to_lower_case(normalValue), to_lower_case(s)) == 0){
+							aux2 = aux4->symbolTableLine->next;
+
+							while(aux2 != NULL){
+								if(aux2->flag != NULL){
+									++counter;
+								}
+
+								aux2 = aux2->next;
+							}
+
+							if(counter > 0){
+								wrongNumberArguments_error(temp->son->son->brother, temp->son->son->brother->value, 0, counter);
+								return;
+							}
+						}
+
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, program->son->value);
+						
+						if(strcmp(to_lower_case(normalValue), temp->son->son->value) == 0){
+							aux2 = aux4->symbolTableLine;
+							save = temp->son->son->brother;
+							normalValue = (char *)calloc(1, sizeof(char));
+							strcpy(normalValue, save->value);
+
+							while(save != NULL){
+								while(aux2 != NULL){
+									if(strcmp(normalValue, aux2->name) == 0){
+										if(strcmp(aux2->type, aux4->symbolTableLine->type) != 0){
+											incompatibleTypeAssigment_error(temp->son->son, program->son->value, aux2->type, aux4->symbolTableLine->type);
+											return;
+										}
+									}
+
+									aux2 = aux2->next;
+								}
+
+								save = save->brother;
+							}
+						}
+					}
+
 					temp->son = temp->son->brother;
 				}
+
+				/*if(strcmp(temp->type, "Assign") == 0){
+					normalValue = (char *)calloc(1, sizeof(char));
+					strcpy(normalValue, program->son->value);
+					
+					if(strcmp(to_lower_case(normalValue), temp->son->value) == 0){
+						aux2 = aux4->symbolTableLine;
+						save = temp->son->brother;
+						normalValue = (char *)calloc(1, sizeof(char));
+						strcpy(normalValue, save->value);
+
+						while(save != NULL){
+							while(aux2 != NULL){
+								if(strcmp(normalValue, aux2->name) == 0){
+									if(strcmp(aux2->type, aux4->symbolTableLine->type) != 0){
+										incompatibleTypeAssigment_error(temp->son, program->son->value, aux2->type, aux4->symbolTableLine->type);
+										return;
+									}
+								}
+
+								aux2 = aux2->next;
+							}
+
+							save = save->brother;
+						}
+					}
+
+					char *s = (char *)calloc(1, sizeof(char));
+					strcpy(s, program->son->value);
+					normalValue = (char *)calloc(1, sizeof(char));
+					strcpy(normalValue, temp->son->brother->value);						
+					counter = 0;
+
+					if(strcmp(to_lower_case(normalValue), to_lower_case(s)) == 0){
+						aux2 = aux4->symbolTableLine->next;
+
+						while(aux2 != NULL){
+							if(aux2->flag != NULL){
+								++counter;
+							}
+
+							aux2 = aux2->next;
+						}
+
+						if(counter > 0){
+							wrongNumberArguments_error(temp->son->brother, temp->son->brother->value, 0, counter);
+							return;
+						}
+					}
+				}*/
 
 				temp = temp->brother;
 			}
@@ -529,10 +858,33 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 		else if(strcmp(program->type, "Call") == 0){
 			counter2 = 1;
 			counter = 0;
+			check = 0;
+
+			aux2 = last_pos->symbolTableLine;
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, program->son->value);
+
+			while(aux2 != NULL){
+				if(strcmp(aux2->name, to_lower_case(normalValue)) == 0){
+					if(strcmp(aux2->type, type[_function_]) == 0){
+						check = 1;
+						break;
+					}
+
+					break;
+				}
+
+				aux2 = aux2->next;
+			}
+
+			if(!check){
+				functionIdentifierExpected_error(program->son);
+				return;
+			}
 
 			aux = symbolTableHeader->next->next->next;
 
-			while(aux != NULL && strcmp(to_lower_case(program->son->value), aux->symbolTableLine->name) != 0){
+			while(aux != NULL && strcmp(to_lower_case(normalValue), aux->symbolTableLine->name) != 0){
 				aux = aux->next;
 			}
 
@@ -562,22 +914,39 @@ void iterate_ast(Program *program, SymbolTableHeader *symbolTableHeader, SymbolT
 			aux2 = aux->symbolTableLine->next;
 			counter = 1;
 
-			while(temp != NULL){
-				if(strcmp(temp->type, "IntLit") == 0 && strcmp(aux2->type, "_integer_") != 0){
-					incompatibleTypeArgument_error(temp, counter, program->son->value, type[_integer_], aux2->type);
-					return;
+			while(temp != NULL && aux2->flag != NULL){
+				if(strcmp(temp->type, "IntLit") == 0){
+					if(strcmp(aux2->flag, flag[Param]) == 0){
+						if(strcmp(aux2->type, type[_integer_]) != 0 && strcmp(aux2->type, type[_real_]) != 0){
+							incompatibleTypeArgument_error(temp, counter, program->son->value, type[_integer_], aux2->type);
+							return;
+						}
+					}
+
+					else{
+						if(strcmp(aux2->type, type[_integer_]) != 0){
+							incompatibleTypeArgument_error(temp, counter, program->son->value, type[_integer_], aux2->type);
+							return;
+						}
+					}					
 				}
 
-				if(strcmp(temp->type, "RealLit") == 0 && strcmp(aux2->type, "_real_") != 0){
+				if(strcmp(temp->type, "RealLit") == 0 && strcmp(aux2->type, type[_real_]) != 0){
 					incompatibleTypeArgument_error(temp, counter, program->son->value, type[_real_], aux2->type);
 					return;
 				}
 
 				if(strcmp(temp->type, "Id") == 0){
+					if((strcmp(to_lower_case(temp->value), "true") == 0 || strcmp(to_lower_case(temp->value), "false") == 0) && strcmp(aux2->type, type[_boolean_]) != 0){
+						incompatibleTypeArgument_error(temp, counter, program->son->value, type[_boolean_], aux2->type);
+						return;
+					}
+
 					aux3 = last_pos->symbolTableLine;
+					strcpy(normalValue, temp->value);
 
 					while(aux3 != NULL){
-						if(strcmp(to_lower_case(temp->value), aux3->name) == 0){
+						if(strcmp(to_lower_case(normalValue), aux3->name) == 0){
 							incompatibleTypeArgument_error(temp, counter, program->son->value, aux3->type, aux2->type);
 							return;
 						}
@@ -615,7 +984,8 @@ SymbolTableHeader *last_pos_symbol(char *value, int t, SymbolTableHeader *last_p
 void insert_line_func(Program *program, SymbolTableHeader *aux){
 	SymbolTableLine *aux2;
 	Program *temp, *temp2 = program;
-	int t, f, check;
+	int t, f;
+	char *normalValue;
 
 	while(temp2->son != NULL && strcmp(temp2->son->type, "Id") != 0){
 		temp = temp2->son->son;
@@ -624,7 +994,9 @@ void insert_line_func(Program *program, SymbolTableHeader *aux){
 			temp = temp->brother;
 		}			
 
-		t = type_var(temp->value);
+		normalValue = (char *)calloc(1, sizeof(char));
+		strcpy(normalValue, temp->value);
+		t = type_var(normalValue);
 
 		temp = temp2->son->son;
 
@@ -637,26 +1009,20 @@ void insert_line_func(Program *program, SymbolTableHeader *aux){
 		}
 
 		while(temp->brother != NULL){
-			aux2 = aux->symbolTableLine->next;
-			check = 0;
+			aux2 = aux->symbolTableLine;
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, temp->value);
 
 			while(aux2 != NULL){
-				if(strcmp(to_lower_case(temp->value), aux2->name) == 0){
-					check = 1;
-					break;
+				if(strcmp(to_lower_case(normalValue), aux2->name) == 0){
+					symbolAlreadyDefined_error(temp);
+					return;
 				}
 
 				aux2 = aux2->next;
 			}
-
-			if(!check){
-				insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
-			}
-
-			else{
-				symbolAlreadyDefined_error(temp);
-				return;
-			}
+			
+			insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], flag[f], NULL);
 
 			temp = temp->brother;
 		}
@@ -668,7 +1034,8 @@ void insert_line_func(Program *program, SymbolTableHeader *aux){
 void insert_line_var_decl(Program *program, SymbolTableHeader *aux){
 	SymbolTableLine *aux2;
 	Program *temp, *temp2 = program;
-	int t, check;
+	char *normalValue;
+	int t;
 
 	while(temp2->son != NULL && (strcmp(temp2->son->type, "NoPrint") == 0 || strcmp(temp2->son->type, "VarDecl") == 0)){
 		temp = temp2->son->son;
@@ -677,31 +1044,27 @@ void insert_line_var_decl(Program *program, SymbolTableHeader *aux){
 			temp = temp->brother;
 		}			
 
-		t = type_var(temp->value);
+		normalValue = (char *)calloc(1, sizeof(char));
+		strcpy(normalValue, temp->value);
+		t = type_var(normalValue);
 
 		temp = temp2->son->son;
 
 		while(temp->brother != NULL){
-			aux2 = aux->symbolTableLine->next;
-			check = 0;
+			aux2 = aux->symbolTableLine;			
+			normalValue = (char *)calloc(1, sizeof(char));
+			strcpy(normalValue, temp->value);
 
 			while(aux2 != NULL){
-				if(strcmp(to_lower_case(temp->value), aux2->name) == 0){
-					check = 1;
-					break;
+				if(strcmp(to_lower_case(normalValue), aux2->name) == 0){
+					symbolAlreadyDefined_error(temp);
+					return;
 				}
 
 				aux2 = aux2->next;
 			}
 
-			if(!check){
-				insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);
-			}
-
-			else{
-				symbolAlreadyDefined_error(temp);
-				return;
-			}
+			insert_line_table(aux->symbolTableLine, to_lower_case(temp->value), type[t], NULL, NULL);
 
 			temp = temp->brother;
 		}
