@@ -1,4 +1,4 @@
-lex mpasemantic.l 
-yacc -v -d mpasemantic.y 
-cc -Wall -Wextra -g -o mpasemantic *.c *.h -ll -ly -g
-zip mpasemantic.zip mpasemantic.l mpasemantic.y functions.h semantic.h
+lex mpacompiler.l 
+yacc -v -d mpacompiler.y 
+cc -Wall -Wextra -g -o mpacompiler *.c *.h -ll -ly -g
+zip mpacompiler.zip mpacompiler.l mpacompiler.y functions.h semantic.h
