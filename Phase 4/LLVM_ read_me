@@ -1,0 +1,75 @@
+
+> Executar Ficheiro 
+	Ficheiro LLVM - hello.ll
+
+	>> Executar directamente com LLVM Interpretor (lli)
+		# lli hello.ll
+
+	>> Compilar para ficheiro objecto
+		>>> Executar o LLVM Compiler (llc), para gerar ficheiro em assembly
+			# llc hello.ll
+		>>> Gerar o executável
+			# clang -o hello hello.s
+
+	>> Executar ficheiro
+		# ./hello
+
+
+> Tipos
+	X - numero de bits que o tipo usa (32/64)
+
+	>> Tipos primitivos
+		int - i32 / i64
+		float - f32
+		double - f64
+
+	>> Ponteiros 
+		i32* - ponteiro para um inteiro 
+		i32 (i32)* - ponteiro para uma função que recebe um inteiro e devolve um inteiro
+
+	>> Arrays
+		[40 x i32] - array de inteiros de tamanho 40
+
+	>> True/False
+		i1
+
+
+> Operações sobre tipos nativos
+
+	|	definei32 @main(){
+	|		%1 = mul i32 2 , 8
+	|		%2 = add i32 %1, 2
+	|		ret i32 %2
+	|	}
+
+	Em LLVM IR, as variáveis começam por % se forem locais ou @ se forem globais.
+	LLVM IR é SSA (Static Single Assignment), o que implica que uma variável não pode ser definida duas vezes.
+
+	>> %1 = mul i32 2 , 8 
+		SINTAXE: mul <tipo> op1, op2
+		Guarda na variável %1 o resultado da multiplicação da constante 2 por 8 (16).
+
+	>> %2 = add i32 %1, 2
+		SINTAXE: add <tipo> op1, op2
+
+	>> Outras operações
+		- sub (subtracção)
+		- udiv (divisão inteira)
+		- urem (módulo da divisão inteira)
+
+	>> Operações bitwise
+		- and
+		- or
+
+	>> Operações de comparação 
+		SINTAXE: icmp <comp> <tipo> op1, op2
+			>>> COMP pode ser:
+				- eq (==)
+				- ne (!=)
+				- sgt (>)
+				- sge (>=)
+				- slt(<)
+				- sle(<=)
+			Esta operação devolve True ou False
+
+
