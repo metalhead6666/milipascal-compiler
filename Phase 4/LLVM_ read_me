@@ -70,6 +70,40 @@
 				- sge (>=)
 				- slt(<)
 				- sle(<=)
-			Esta operação devolve True ou False
+		Esta operação devolve True ou False
 
 
+> Operações sobre arrays
+
+	|	define i32 @main () {
+	|		%arr = alloca i32 , i32 3
+	|
+	|		%ind0 = getelementptr i32∗ %arr , i32 0
+	|		store i32 9, i32∗ %ind0
+	|
+	|		%ind1 = getelementptr i32* %arr , i32 1
+	|		store i32 8, i32∗ %ind1
+	|
+	|		%ind2 = getelementptr i32∗ %arr , i32 2
+	|		store i32 7, i32∗ %ind2
+	|
+	|		%ind1v = load i32∗ %ind1
+	|		ret i32 %ind1v
+	|	}
+
+	>> %arr = alloca i32 , i32 3
+		O %arr é um array alocado dinamicamente com o tamanho 3
+
+	>> %ind0 = getelementptr i32∗ %arr , i32 0
+		Trata da alocação do espaço necessário para o array.
+		O operador getelementptr(GEP) vai buscar o endereço de memória onde está guardado o elemento 0 do array %arr.
+
+	>> store i32 9, i32∗ %ind0
+		Guarda o numero 9 no endereço de memória respectivo ao indice.
+
+	>> %ind1 v = load i32∗ %ind1
+		Vai buscar o valor guardado em memória no índice 1. 
+		O load tal como o store actuam em ponteiros de memória, que têm de ser obtidos previamente com o getelementptr.
+
+
+> Operações sobre Estruturas 
