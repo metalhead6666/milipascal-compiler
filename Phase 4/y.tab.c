@@ -66,6 +66,7 @@
 
 	#include "functions.h"
 	#include "semantic.h"
+	#include "generator.h"
 
 	/* function declaration */
 	void yyerror(char *s);
@@ -98,7 +99,7 @@
 	int hasErrors = 0;
 	int hasErrorsSemantic = 0;
 
-#line 102 "y.tab.c" /* yacc.c:339  */
+#line 103 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -198,12 +199,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 105 "mpacompiler.y" /* yacc.c:355  */
+#line 106 "mpacompiler.y" /* yacc.c:355  */
 
 	struct Program* program;
 	char *string;
 
-#line 207 "y.tab.c" /* yacc.c:355  */
+#line 208 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -232,7 +233,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 236 "y.tab.c" /* yacc.c:358  */
+#line 237 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -534,13 +535,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   111,   111,   114,   117,   120,   121,   124,   125,   128,
-     131,   134,   135,   138,   139,   142,   143,   146,   147,   148,
-     151,   154,   155,   158,   159,   162,   163,   166,   169,   172,
-     175,   176,   179,   181,   194,   217,   229,   246,   247,   248,
-     249,   252,   253,   256,   257,   260,   261,   264,   265,   268,
-     269,   270,   271,   274,   275,   278,   279,   280,   281,   282,
-     283,   286,   289,   290
+       0,   112,   112,   115,   118,   121,   122,   125,   126,   129,
+     132,   135,   136,   139,   140,   143,   144,   147,   148,   149,
+     152,   155,   156,   159,   160,   163,   164,   167,   170,   173,
+     176,   177,   180,   182,   195,   218,   230,   247,   248,   249,
+     250,   253,   254,   257,   258,   261,   262,   265,   266,   269,
+     270,   271,   272,   275,   276,   279,   280,   281,   282,   283,
+     284,   287,   290,   291
 };
 #endif
 
@@ -1493,193 +1494,193 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 111 "mpacompiler.y" /* yacc.c:1646  */
+#line 112 "mpacompiler.y" /* yacc.c:1646  */
     {program = makeNode("Id", (yyvsp[-3].string), NULL, (yyvsp[-1].program), 0 , 0);}
-#line 1499 "y.tab.c" /* yacc.c:1646  */
+#line 1500 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 114 "mpacompiler.y" /* yacc.c:1646  */
+#line 115 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.string) = (yyvsp[-3].string);}
-#line 1505 "y.tab.c" /* yacc.c:1646  */
+#line 1506 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 117 "mpacompiler.y" /* yacc.c:1646  */
+#line 118 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-1].program)); if(aux != NULL) aux->brother = (yyvsp[0].program); aux = insert_last_brother((yyvsp[-2].program)); if(aux != NULL) aux->brother = (yyvsp[-1].program); (yyval.program) = (yyvsp[-2].program);}
-#line 1511 "y.tab.c" /* yacc.c:1646  */
+#line 1512 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 120 "mpacompiler.y" /* yacc.c:1646  */
+#line 121 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("VarPart", "", (yyvsp[-2].program), (yyvsp[0].program), 0, 0);}
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 1518 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 121 "mpacompiler.y" /* yacc.c:1646  */
+#line 122 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("VarPart", "", NULL, NULL, 0, 0);}
-#line 1523 "y.tab.c" /* yacc.c:1646  */
+#line 1524 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 124 "mpacompiler.y" /* yacc.c:1646  */
+#line 125 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("NoPrint", "", (yyvsp[-2].program), (yyvsp[0].program), 0 , 0);}
-#line 1529 "y.tab.c" /* yacc.c:1646  */
+#line 1530 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 125 "mpacompiler.y" /* yacc.c:1646  */
+#line 126 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1535 "y.tab.c" /* yacc.c:1646  */
+#line 1536 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 128 "mpacompiler.y" /* yacc.c:1646  */
+#line 129 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); if(aux != NULL) aux->brother = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); (yyval.program) = makeNode("VarDecl", "", (yyvsp[-2].program), NULL, 0, 0);}
-#line 1541 "y.tab.c" /* yacc.c:1646  */
+#line 1542 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 131 "mpacompiler.y" /* yacc.c:1646  */
+#line 132 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("Id", (yyvsp[-1].string), NULL, (yyvsp[0].program), (yylsp[-1]).first_line, (yylsp[-1]).first_column);}
-#line 1547 "y.tab.c" /* yacc.c:1646  */
+#line 1548 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 134 "mpacompiler.y" /* yacc.c:1646  */
+#line 135 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("Id", (yyvsp[-1].string), NULL, (yyvsp[0].program), (yylsp[-1]).first_line, (yylsp[-1]).first_column);}
-#line 1553 "y.tab.c" /* yacc.c:1646  */
+#line 1554 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 135 "mpacompiler.y" /* yacc.c:1646  */
+#line 136 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
+#line 1560 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 138 "mpacompiler.y" /* yacc.c:1646  */
+#line 139 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("FuncPart", "", (yyvsp[-2].program), (yyvsp[0].program), 0, 0);}
-#line 1565 "y.tab.c" /* yacc.c:1646  */
+#line 1566 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 139 "mpacompiler.y" /* yacc.c:1646  */
+#line 140 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("FuncPart", "", NULL, NULL, 0, 0);}
-#line 1571 "y.tab.c" /* yacc.c:1646  */
+#line 1572 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 142 "mpacompiler.y" /* yacc.c:1646  */
+#line 143 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("NoPrint", "", (yyvsp[-2].program), (yyvsp[0].program), 0, 0);}
-#line 1577 "y.tab.c" /* yacc.c:1646  */
+#line 1578 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 143 "mpacompiler.y" /* yacc.c:1646  */
+#line 144 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1583 "y.tab.c" /* yacc.c:1646  */
+#line 1584 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 146 "mpacompiler.y" /* yacc.c:1646  */
+#line 147 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("FuncDecl", "", (yyvsp[-2].program), NULL, 0, 0);}
-#line 1589 "y.tab.c" /* yacc.c:1646  */
+#line 1590 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 147 "mpacompiler.y" /* yacc.c:1646  */
+#line 148 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-1].program)); aux->brother = (yyvsp[0].program); (yyval.program) = makeNode("FuncDef2", "", makeNode("Id", (yyvsp[-3].string), NULL, (yyvsp[-1].program), (yylsp[-3]).first_line, (yylsp[-3]).first_column), NULL, 0, 0);}
-#line 1595 "y.tab.c" /* yacc.c:1646  */
+#line 1596 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 148 "mpacompiler.y" /* yacc.c:1646  */
+#line 149 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-1].program)); aux->brother = (yyvsp[0].program); aux = insert_last_brother((yyvsp[-3].program)); aux->brother = (yyvsp[-1].program); (yyval.program) = makeNode("FuncDef", "", (yyvsp[-3].program), NULL, 0, 0);}
-#line 1601 "y.tab.c" /* yacc.c:1646  */
+#line 1602 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 151 "mpacompiler.y" /* yacc.c:1646  */
+#line 152 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); if(aux != NULL) aux->brother = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); else (yyvsp[-2].program) = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); (yyval.program) = makeNode("Id", (yyvsp[-3].string), NULL, (yyvsp[-2].program), (yylsp[-3]).first_line, (yylsp[-3]).first_column);}
-#line 1607 "y.tab.c" /* yacc.c:1646  */
+#line 1608 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 154 "mpacompiler.y" /* yacc.c:1646  */
+#line 155 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("FuncParams", "", (yyvsp[-2].program), (yyvsp[-1].program), 0, 0);}
-#line 1613 "y.tab.c" /* yacc.c:1646  */
+#line 1614 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 155 "mpacompiler.y" /* yacc.c:1646  */
+#line 156 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("FuncParams", "", NULL, NULL, 0, 0);}
-#line 1619 "y.tab.c" /* yacc.c:1646  */
+#line 1620 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 158 "mpacompiler.y" /* yacc.c:1646  */
+#line 159 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("NoPrint", "", (yyvsp[-1].program), (yyvsp[0].program), 0, 0);}
-#line 1625 "y.tab.c" /* yacc.c:1646  */
+#line 1626 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 159 "mpacompiler.y" /* yacc.c:1646  */
+#line 160 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1631 "y.tab.c" /* yacc.c:1646  */
+#line 1632 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 162 "mpacompiler.y" /* yacc.c:1646  */
+#line 163 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); if(aux != NULL) aux->brother = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); else (yyvsp[-2].program) = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); (yyval.program) = makeNode("Params", "", (yyvsp[-2].program), NULL, 0, 0);}
-#line 1637 "y.tab.c" /* yacc.c:1646  */
+#line 1638 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 163 "mpacompiler.y" /* yacc.c:1646  */
+#line 164 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); if(aux != NULL) aux->brother = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); else (yyvsp[-2].program) = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column); (yyval.program) = makeNode("VarParams", "", (yyvsp[-2].program), NULL, 0, 0);}
-#line 1643 "y.tab.c" /* yacc.c:1646  */
+#line 1644 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 166 "mpacompiler.y" /* yacc.c:1646  */
+#line 167 "mpacompiler.y" /* yacc.c:1646  */
     {if((yyvsp[0].program) == NULL || count_nodes((yyvsp[0].program)) > 1) (yyval.program) = makeNode("StatList", "", NULL, NULL, 0, 0); else (yyval.program) = (yyvsp[0].program);}
-#line 1649 "y.tab.c" /* yacc.c:1646  */
+#line 1650 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 169 "mpacompiler.y" /* yacc.c:1646  */
+#line 170 "mpacompiler.y" /* yacc.c:1646  */
     {if(count_nodes((yyvsp[-1].program)) > 1) (yyval.program) = makeNode("StatList", "", (yyvsp[-1].program), NULL, 0, 0); else (yyval.program) = (yyvsp[-1].program);}
-#line 1655 "y.tab.c" /* yacc.c:1646  */
+#line 1656 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 172 "mpacompiler.y" /* yacc.c:1646  */
+#line 173 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-1].program)); if(aux != NULL) aux->brother = (yyvsp[0].program); else (yyvsp[-1].program) = (yyvsp[0].program); (yyval.program) = (yyvsp[-1].program);}
-#line 1661 "y.tab.c" /* yacc.c:1646  */
+#line 1662 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 175 "mpacompiler.y" /* yacc.c:1646  */
+#line 176 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-1].program)); if(aux != NULL) aux->brother = (yyvsp[0].program); else (yyvsp[-1].program) = (yyvsp[0].program); (yyval.program) = (yyvsp[-1].program);}
-#line 1667 "y.tab.c" /* yacc.c:1646  */
+#line 1668 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 176 "mpacompiler.y" /* yacc.c:1646  */
+#line 177 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1673 "y.tab.c" /* yacc.c:1646  */
+#line 1674 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 179 "mpacompiler.y" /* yacc.c:1646  */
+#line 180 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = (yyvsp[0].program);}
-#line 1679 "y.tab.c" /* yacc.c:1646  */
+#line 1680 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 181 "mpacompiler.y" /* yacc.c:1646  */
+#line 182 "mpacompiler.y" /* yacc.c:1646  */
     {
 																	if((yyvsp[0].program) != NULL){																		
 																		(yyvsp[0].program)->brother = makeNode("StatList", "", NULL, NULL, 0, 0);
@@ -1692,11 +1693,11 @@ yyreduce:
 
 																	(yyval.program) = makeNode("IfElse", "", (yyvsp[-2].program), NULL, 0, 0);
 																}
-#line 1696 "y.tab.c" /* yacc.c:1646  */
+#line 1697 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 194 "mpacompiler.y" /* yacc.c:1646  */
+#line 195 "mpacompiler.y" /* yacc.c:1646  */
     {
 																	if((yyvsp[-2].program) == NULL && (yyvsp[0].program) == NULL){
 																		(yyvsp[-4].program)->brother = makeNode("StatList", "", NULL, makeNode("StatList", "", NULL, NULL, 0, 0), 0, 0);
@@ -1718,11 +1719,11 @@ yyreduce:
 
 																	(yyval.program) = makeNode("IfElse", "", (yyvsp[-4].program), NULL, 0, 0);
 																}
-#line 1722 "y.tab.c" /* yacc.c:1646  */
+#line 1723 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 217 "mpacompiler.y" /* yacc.c:1646  */
+#line 218 "mpacompiler.y" /* yacc.c:1646  */
     {
 																	if((yyvsp[0].program) == NULL){
 																		(yyvsp[-2].program)->brother = makeNode("StatList", "", NULL, NULL, 0, 0);
@@ -1734,11 +1735,11 @@ yyreduce:
 
 																	(yyval.program) = makeNode("While", "", (yyvsp[-2].program), NULL, 0, 0);
 																}
-#line 1738 "y.tab.c" /* yacc.c:1646  */
+#line 1739 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 229 "mpacompiler.y" /* yacc.c:1646  */
+#line 230 "mpacompiler.y" /* yacc.c:1646  */
     {
 																	if((yyvsp[-2].program) == NULL){
 																		aux = makeNode("StatList", "", NULL, (yyvsp[0].program), 0, 0);
@@ -1755,173 +1756,173 @@ yyreduce:
 																		(yyval.program) = makeNode("Repeat", "", (yyvsp[-2].program), NULL, 0, 0);
 																	}																	
 																}
-#line 1759 "y.tab.c" /* yacc.c:1646  */
+#line 1760 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 246 "mpacompiler.y" /* yacc.c:1646  */
+#line 247 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-4].program)); aux->brother = makeNode("Id",(yyvsp[-1].string),NULL,NULL, 0, 0); (yyval.program) = makeNode("ValParam", "", aux, NULL, 0, 0);}
-#line 1765 "y.tab.c" /* yacc.c:1646  */
+#line 1766 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 247 "mpacompiler.y" /* yacc.c:1646  */
+#line 248 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("Assign", "", makeNode("Id", (yyvsp[-2].string), NULL, (yyvsp[0].program), (yylsp[-2]).first_line, (yylsp[-2]).first_column), NULL, 0, 0);}
-#line 1771 "y.tab.c" /* yacc.c:1646  */
+#line 1772 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 248 "mpacompiler.y" /* yacc.c:1646  */
+#line 249 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("WriteLn", "", (yyvsp[0].program), NULL, 0, 0);}
-#line 1777 "y.tab.c" /* yacc.c:1646  */
+#line 1778 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 249 "mpacompiler.y" /* yacc.c:1646  */
+#line 250 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1783 "y.tab.c" /* yacc.c:1646  */
+#line 1784 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 252 "mpacompiler.y" /* yacc.c:1646  */
+#line 253 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); aux->brother = (yyvsp[-1].program); (yyval.program) = (yyvsp[-2].program);}
-#line 1789 "y.tab.c" /* yacc.c:1646  */
+#line 1790 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 253 "mpacompiler.y" /* yacc.c:1646  */
+#line 254 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1795 "y.tab.c" /* yacc.c:1646  */
+#line 1796 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 256 "mpacompiler.y" /* yacc.c:1646  */
+#line 257 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-1].program)); aux->brother = (yyvsp[0].program); (yyval.program) = (yyvsp[-1].program);}
-#line 1801 "y.tab.c" /* yacc.c:1646  */
+#line 1802 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 257 "mpacompiler.y" /* yacc.c:1646  */
+#line 258 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1807 "y.tab.c" /* yacc.c:1646  */
+#line 1808 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 260 "mpacompiler.y" /* yacc.c:1646  */
+#line 261 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = (yyvsp[0].program);}
-#line 1813 "y.tab.c" /* yacc.c:1646  */
+#line 1814 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 261 "mpacompiler.y" /* yacc.c:1646  */
+#line 262 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("String", (yyvsp[0].string), NULL, NULL, 0, 0);}
-#line 1819 "y.tab.c" /* yacc.c:1646  */
+#line 1820 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 264 "mpacompiler.y" /* yacc.c:1646  */
+#line 265 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = (yyvsp[0].program);}
-#line 1825 "y.tab.c" /* yacc.c:1646  */
+#line 1826 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 265 "mpacompiler.y" /* yacc.c:1646  */
+#line 266 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); aux->brother = (yyvsp[0].program); aux2=verify_Expr((yyvsp[-1].string)); (yyval.program) = makeNode(aux2, "", aux, NULL, 0, 0);}
-#line 1831 "y.tab.c" /* yacc.c:1646  */
+#line 1832 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 268 "mpacompiler.y" /* yacc.c:1646  */
+#line 269 "mpacompiler.y" /* yacc.c:1646  */
     {aux2 = verify_SimpleExpr((yyvsp[-1].string), 0); (yyval.program) = makeNode(aux2, "", (yyvsp[0].program), NULL, 0, 0);}
-#line 1837 "y.tab.c" /* yacc.c:1646  */
+#line 1838 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 269 "mpacompiler.y" /* yacc.c:1646  */
+#line 270 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); aux->brother = (yyvsp[0].program); aux2 = verify_SimpleExpr((yyvsp[-1].string), 1); (yyval.program) = makeNode(aux2, "", aux, NULL, 0, 0);}
-#line 1843 "y.tab.c" /* yacc.c:1646  */
+#line 1844 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 270 "mpacompiler.y" /* yacc.c:1646  */
+#line 271 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); aux->brother = (yyvsp[0].program); aux2 = verify_SimpleExpr((yyvsp[-1].string), 2); (yyval.program) = makeNode(aux2, "", aux, NULL, 0, 0);}
-#line 1849 "y.tab.c" /* yacc.c:1646  */
+#line 1850 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 271 "mpacompiler.y" /* yacc.c:1646  */
+#line 272 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = (yyvsp[0].program);}
-#line 1855 "y.tab.c" /* yacc.c:1646  */
+#line 1856 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 274 "mpacompiler.y" /* yacc.c:1646  */
+#line 275 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = (yyvsp[0].program);}
-#line 1861 "y.tab.c" /* yacc.c:1646  */
+#line 1862 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 275 "mpacompiler.y" /* yacc.c:1646  */
+#line 276 "mpacompiler.y" /* yacc.c:1646  */
     {aux = insert_last_brother((yyvsp[-2].program)); aux->brother = (yyvsp[0].program); aux2 = verify_MultOp((yyvsp[-1].string)); (yyval.program) = makeNode(aux2, "", aux, NULL, 0, 0);}
-#line 1867 "y.tab.c" /* yacc.c:1646  */
+#line 1868 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 278 "mpacompiler.y" /* yacc.c:1646  */
+#line 279 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = (yyvsp[-1].program);}
-#line 1873 "y.tab.c" /* yacc.c:1646  */
+#line 1874 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 279 "mpacompiler.y" /* yacc.c:1646  */
+#line 280 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("Not", "", (yyvsp[0].program), NULL, 0, 0);}
-#line 1879 "y.tab.c" /* yacc.c:1646  */
+#line 1880 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 280 "mpacompiler.y" /* yacc.c:1646  */
+#line 281 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("IntLit", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column);}
-#line 1885 "y.tab.c" /* yacc.c:1646  */
+#line 1886 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 281 "mpacompiler.y" /* yacc.c:1646  */
+#line 282 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("RealLit", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column);}
-#line 1891 "y.tab.c" /* yacc.c:1646  */
+#line 1892 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 282 "mpacompiler.y" /* yacc.c:1646  */
+#line 283 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("Id", (yyvsp[0].string), NULL, NULL, (yylsp[0]).first_line, (yylsp[0]).first_column);}
-#line 1897 "y.tab.c" /* yacc.c:1646  */
+#line 1898 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 283 "mpacompiler.y" /* yacc.c:1646  */
+#line 284 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = makeNode("Call", "", makeNode("Id", (yyvsp[-1].string), NULL, (yyvsp[0].program), (yylsp[-1]).first_line, (yylsp[-1]).first_column), NULL, 0, 0);}
-#line 1903 "y.tab.c" /* yacc.c:1646  */
+#line 1904 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 286 "mpacompiler.y" /* yacc.c:1646  */
+#line 287 "mpacompiler.y" /* yacc.c:1646  */
     {(yyvsp[-2].program)->brother = (yyvsp[-1].program); (yyval.program) = (yyvsp[-2].program);}
-#line 1909 "y.tab.c" /* yacc.c:1646  */
+#line 1910 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 289 "mpacompiler.y" /* yacc.c:1646  */
+#line 290 "mpacompiler.y" /* yacc.c:1646  */
     {(yyvsp[-1].program)->brother = (yyvsp[0].program); (yyval.program) = (yyvsp[-1].program);}
-#line 1915 "y.tab.c" /* yacc.c:1646  */
+#line 1916 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 290 "mpacompiler.y" /* yacc.c:1646  */
+#line 291 "mpacompiler.y" /* yacc.c:1646  */
     {(yyval.program) = NULL;}
-#line 1921 "y.tab.c" /* yacc.c:1646  */
+#line 1922 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1925 "y.tab.c" /* yacc.c:1646  */
+#line 1926 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2156,7 +2157,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 294 "mpacompiler.y" /* yacc.c:1906  */
+#line 295 "mpacompiler.y" /* yacc.c:1906  */
 
 int main(int argc, char **argv){
 	int tree = 0, semantic = 0;
@@ -2194,8 +2195,9 @@ int main(int argc, char **argv){
 			}
 		}
 
-		if(!tree && !semantic)
-			printf("AQUI!");
+		if(!tree && !semantic){
+			generateProgram(program);
+		}
 	}
 
 	return 0;

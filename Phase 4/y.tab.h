@@ -110,7 +110,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 105 "mpacompiler.y" /* yacc.c:1909  */
+#line 106 "mpacompiler.y" /* yacc.c:1909  */
 
 	struct Program* program;
 	char *string;

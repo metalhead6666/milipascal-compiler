@@ -1,6 +1,7 @@
 %{
 	#include "functions.h"
 	#include "semantic.h"
+	#include "generator.h"
 
 	/* function declaration */
 	void yyerror(char *s);
@@ -329,7 +330,7 @@ int main(int argc, char **argv){
 		}
 
 		if(!tree && !semantic){
-			//printf("AQUI!");
+			generateProgram(program);
 		}
 	}
 
