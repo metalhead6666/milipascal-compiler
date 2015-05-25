@@ -8,19 +8,10 @@
 
 void generateProgram(Program* program){
 	if(program != NULL){
-		if(strcmp(program->type, "NoPrint") == 0){
-			generateProgram(program->son);
-			generateProgram(program->brother);
-			return;
+		if(strcmp(program->type,"WriteLn")==0){
+			printf("WriteLn\n");
 		}
 
-		if(verify_terminal(program->type)){
-			printf("%s(%s)\n", program->type, program->value);
-		}
-
-		else{
-			printf("%s\n", program->type);
-		}
 
 		generateProgram(program->son);
 		generateProgram(program->brother);
