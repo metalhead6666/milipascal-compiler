@@ -9,8 +9,8 @@ function gcd(A, B: integer): integer;
 				while B > 0 do
 					if A > B then
 						A := A - B
-				else
-					B := B - A;
+					else
+						B := B - A;
 				gcd := A
 			end
 	end;
