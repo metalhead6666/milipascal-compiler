@@ -305,6 +305,10 @@ int main(int argc, char **argv){
 		}
 
 		if(semantic){
+			if(tree){
+				printf("\n");
+			}
+			
 			symbolTableHeader = create_table(program);
 			print_semantic(symbolTableHeader);
 		}
