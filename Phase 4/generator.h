@@ -7,7 +7,7 @@
 #include "functions.h"
 
 void generateProgram(Program* program){
-	if(program!=NULL){
+	if(program != NULL){
 		if(strcmp(program->type, "NoPrint") == 0){
 			generateProgram(program->son);
 			generateProgram(program->brother);
