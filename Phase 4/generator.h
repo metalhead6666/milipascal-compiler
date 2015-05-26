@@ -29,31 +29,39 @@ void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 
 void createHeaderFunction(char* name, Program *program, SymbolTableHeader *symbolTableHeader){
 	SymbolTableHeader *table;
+
 	table = findTableFunction(name, symbolTableHeader->next);
 	printf("define %s @%s(", varType(table->symbolTableLine->type), table->symbolTableLine->name);
 }
 
 SymbolTableHeader *findTableFunction(char* name, SymbolTableHeader *symbolTableHeader){
 	SymbolTableLine *line;
-	while(symbolTableHeader!=NULL){	
+
+	while(symbolTableHeader != NULL){	
 		line = symbolTableHeader->symbolTableLine;
-		if(strcmp(to_lower_case(name), line->name)==0){
+
+		if(strcmp(to_lower_case(name), line->name) == 0){
 			return symbolTableHeader;
-		}		
+		}
+
 		symbolTableHeader = symbolTableHeader->next;
 	}
+	
 	return NULL;
 }
 
 char *varType(char *type){
-	if(strcmp(type, "_integer_") == 0)
+	if(strcmp(type, "_integer_") == 0){
 		return "i32";
+	}
 
-	if(strcmp(type, "_boolean_") == 0)
+	if(strcmp(type, "_boolean_") == 0){
 		return "i1";
+	}
 
-	if(strcmp(type, "_real_") == 0)
+	if(strcmp(type, "_real_") == 0){
 		return "double";
+	}
 
 	return NULL;
 }
