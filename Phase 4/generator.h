@@ -5,38 +5,54 @@
 #include <stdlib.h>
 #include <string.h>
 #include "functions.h"
+#include "semantic.h"
+
 
 /*Functions*/
-void generateProgram(Program* program);
-void generateFunctions(char* type, char* name, Program *program);
+void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader);
+void createHeaderFunction(char* name, Program *program, SymbolTableHeader *symbolTableHeader);
+SymbolTableHeader *findTableFunction(char* name, SymbolTableHeader *symbolTableHeader);
 char *varType(char *type);
 
 
-void generateProgram(Program* program){
+void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 
-	generateFunctions(program->value, "main", program);
+	if(program != NULL){
+		if(strcmp(program->type, "FuncDef")==0){
+			createHeaderFunction(program->son->value, program->son, symbolTableHeader);
+		}
 
-	if(program != NULL){	
-		generateProgram(program->son);
-		generateProgram(program->brother);
+		generateProgram(program->son,symbolTableHeader);
+		generateProgram(program->brother,symbolTableHeader);
 	}
 }
 
-void generateFunctions(char* type, char* name, Program *program){
-	printf("define %s @%s(", varType(type), name);
-	while(){
-		
+void createHeaderFunction(char* name, Program *program, SymbolTableHeader *symbolTableHeader){
+	SymbolTableHeader *table;
+	table = findTableFunction(name, symbolTableHeader->next);
+	printf("define %s @%s(", varType(table->symbolTableLine->type), table->symbolTableLine->name);
+}
+
+SymbolTableHeader *findTableFunction(char* name, SymbolTableHeader *symbolTableHeader){
+	SymbolTableLine *line;
+	while(symbolTableHeader!=NULL){	
+		line = symbolTableHeader->symbolTableLine;
+		if(strcmp(to_lower_case(name), line->name)==0){
+			return symbolTableHeader;
+		}		
+		symbolTableHeader = symbolTableHeader->next;
 	}
+	return NULL;
 }
 
 char *varType(char *type){
-	if(strcmp(type, "integer") == 0)
+	if(strcmp(type, "_integer_") == 0)
 		return "i32";
 
-	if(strcmp(type, "boolean") == 0)
+	if(strcmp(type, "_boolean_") == 0)
 		return "i1";
 
-	if(strcmp(type, "real") == 0)
+	if(strcmp(type, "_real_") == 0)
 		return "double";
 
 	return NULL;

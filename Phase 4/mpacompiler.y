@@ -287,6 +287,8 @@ int main(int argc, char **argv){
 	yyparse();
 
 	if(!hasErrors){
+		symbolTableHeader = create_table(program);
+
 		while(--argc){
 			if(strcmp(*argv, "-t") == 0){
 				tree = 1;
@@ -309,12 +311,11 @@ int main(int argc, char **argv){
 				printf("\n");
 			}
 			
-			symbolTableHeader = create_table(program);
 			print_semantic(symbolTableHeader);
 		}
 
 		if(!tree && !semantic){
-			generateProgram(program);
+			generateProgram(program, symbolTableHeader->next->next);
 		}
 	}
 
