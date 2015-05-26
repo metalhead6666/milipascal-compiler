@@ -8,13 +8,13 @@
 
 /*Functions*/
 void generateProgram(Program* program);
-void generateFunctions(char* type, char* name, program);
+void generateFunctions(char* type, char* name, Program *program);
 char *varType(char *type);
 
 
 void generateProgram(Program* program){
 
-	generateFunctions("i32", "main", program);
+	generateFunctions(program->value, "main", program);
 
 	if(program != NULL){	
 		generateProgram(program->son);
@@ -22,8 +22,11 @@ void generateProgram(Program* program){
 	}
 }
 
-void generateFunctions(char* type, char* name, program){
-	printf("define %s @%s() {\n", type, name);
+void generateFunctions(char* type, char* name, Program *program){
+	printf("define %s @%s(", varType(type), name);
+	while(){
+		
+	}
 }
 
 char *varType(char *type){
