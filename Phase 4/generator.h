@@ -7,13 +7,22 @@
 #include "functions.h"
 #include "semantic.h"
 
+typedef struct save_strings save_strings;
+struct save_strings{
+	save_strings *next;
+	char *value;
+	int id;
+};
+
 int index_string_name = 0;
+save_strings *string_list = NULL;
 
 /*Functions*/
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader);
 void declarePrint();
 void printAllStrings(Program *program);
 char *formatString(char *str);
+void insert_into_list_string(char *value);
 void printString(char *name);
 int typeFunctionGlobalTable(char *type);
 void printGlobalVariable(SymbolTableLine *symbolTableLine);
@@ -74,6 +83,7 @@ void printAllStrings(Program *program){
 	if(program != NULL){
 		if(strcmp(program->type, "String") == 0){
 			program->value = formatString(program->value);
+			insert_into_list_string(program->value);
 			printString(program->value);
 		}
 
@@ -89,6 +99,29 @@ char *formatString(char *str){
 	strncpy(temp, str + 1, strlen(str) - 2);
 
 	return temp;
+}
+
+void insert_into_list_string(char *value){
+	save_strings *new, *aux;
+
+	if(string_list == NULL){
+		string_list = (save_strings *)calloc(1, sizeof(save_strings));
+		string_list->value = value;
+		string_list->id = index_string_name;
+	}
+
+	else{
+		aux = string_list;
+		new = (save_strings *)calloc(1, sizeof(save_strings));
+
+		while(aux->next != NULL){
+			aux = aux->next;
+		}
+
+		new->value = value;
+		new->id = index_string_name;
+		aux->next = new;
+	}
 }
 
 void printString(char *name){
@@ -111,8 +144,7 @@ void createHeaderFunction(char *name, Program *program, SymbolTableHeader *symbo
 	
 	printHeaderFunction(varType(table->symbolTableLine->type), table->symbolTableLine->name);
 	
-	temp = findParamFunction(table->symbolTableLine->next);
-	printf(") {\n");
+	temp = findParamFunction(table->symbolTableLine->next);	
 	findVarFunction(temp);
 	
 	printReturnFunction(varType(table->symbolTableLine->type), "0");
@@ -139,6 +171,11 @@ void printHeaderFunction(char *type, char *name){
 }
 
 SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine){
+	if(symbolTableLine == NULL){
+		printf(") {\n");
+		return symbolTableLine;
+	}
+
 	while(1){
 		printf("%s %%%s", varType(symbolTableLine->type), symbolTableLine->name);
 
@@ -149,6 +186,7 @@ SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine){
 		}
 
 		else{
+			printf(") {\n");
 			break;
 		}
 	}
