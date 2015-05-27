@@ -7,9 +7,14 @@
 #include "functions.h"
 #include "semantic.h"
 
+int index_string_name = 0;
 
 /*Functions*/
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader);
+void declarePrint();
+void printAllStrings(Program *program);
+char *formatString(char *str);
+void printString(char *name);
 int typeFunctionGlobalTable(char *type);
 void printGlobalVariable(SymbolTableLine *symbolTableLine);
 void createHeaderFunction(char* name, Program *program, SymbolTableHeader *symbolTableHeader);
@@ -23,6 +28,9 @@ char *varType(char *type);
 
 
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
+	declarePrint();
+	printAllStrings(program);
+
 	while(symbolTableHeader->symbolTableLine != NULL){
 		if(typeFunctionGlobalTable(symbolTableHeader->symbolTableLine->type)){
 			createHeaderFunction(symbolTableHeader->symbolTableLine->name, program, symbolTableHeader);			
@@ -45,6 +53,46 @@ void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 		generateProgram(program->brother, symbolTableHeader);
 	}
 	*/
+}
+
+void declarePrint(){
+	printf("; Default Declarations\n");
+	printf("@.strNewLine = private unnamed_addr constant [2 x i8] c\"\\0A\\00\"\n");
+	printf("@.strInt = private unnamed_addr constant [3 x i8] c\"%%d\\00\"\n");
+	printf("@.strDouble = private unnamed_addr constant [6 x i8] c\"%%.12F\\00\"\n");
+	printf("@.str = private unnamed_addr constant [3 x i8] c\"%%s\\00\"\n");
+	printf("@.strTrue = private unnamed_addr constant [5 x i8] c\"TRUE\\00\"\n");
+	printf("@.strFalse = private unnamed_addr constant [6 x i8] c\"FALSE\\00\"\n");
+	printf("\n");
+
+	printf("; Print Declaration\n");
+	printf("declare i32 @printf(i8*, ...)\n");
+	printf("\n");
+}
+
+void printAllStrings(Program *program){
+	if(program != NULL){
+		if(strcmp(program->type, "String") == 0){
+			program->value = formatString(program->value);
+			printString(program->value);
+		}
+
+		printAllStrings(program->son);
+		printAllStrings(program->brother);
+	}
+}
+
+char *formatString(char *str){
+	char *temp;
+
+	temp = (char *)malloc(sizeof(char) * strlen(str) - 2);
+	strncpy(temp, str + 1, strlen(str) - 2);
+
+	return temp;
+}
+
+void printString(char *name){
+	printf("@str.%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name), name);
 }
 
 int typeFunctionGlobalTable(char *type){
@@ -117,7 +165,7 @@ void findVarFunction(SymbolTableLine *symbolTableLine){
 }
 
 void printVarFunction(char *name, char *type){
-	printf("  @%s = local %s 0\n", name, type);
+	printf("  %%%s = alloca %s\n", name, type);
 }
 
 void printReturnFunction(char *type, char *name){
