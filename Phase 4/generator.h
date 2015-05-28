@@ -18,6 +18,7 @@ struct save_strings{
 };
 
 int index_string_name = 0;
+int index_variable_name = 0;
 save_strings *string_list = NULL;
 
 /*Functions*/
@@ -34,10 +35,11 @@ SymbolTableHeader *findTableFunction(char* name, SymbolTableHeader *symbolTableH
 void printHeaderFunction(char *type, char *name);
 SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine);
 void findVarFunction(SymbolTableLine *symbolTableLine);
-void printVarFunction(char *name, char *type);
+void printVarFunction(char *name, char *type, char *value);
 Program *findFunction(Program *program, char *name);
 void printReturnFunction(char *type, char *name);
 char *varTypeTable(char *type);
+char *varTypeValue(char *type);
 int findId(char *value);
 Program *findMain(Program *program);
 void searchInMain(Program *program);
@@ -206,14 +208,16 @@ SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine){
 
 void findVarFunction(SymbolTableLine *symbolTableLine){
 	while(symbolTableLine != NULL){
-		printVarFunction(symbolTableLine->name, varTypeTable(symbolTableLine->type));
+		printVarFunction(symbolTableLine->name, varTypeTable(symbolTableLine->type), varTypeValue(symbolTableLine->type));
 
 		symbolTableLine = symbolTableLine->next;
 	}
 }
 
-void printVarFunction(char *name, char *type){
+void printVarFunction(char *name, char *type, char *value){
 	printf("  %%%s = alloca %s\n", name, type);
+	printf("  store %s %s, %s* %%%s\n", type, value, type, name);
+	printf("  %%%d = load %s* %%%s\n", index_variable_name++, type, name);
 }
 
 Program *findFunction(Program *program, char *name){
@@ -244,6 +248,14 @@ char *varTypeTable(char *type){
 	}
 
 	return "double";
+}
+
+char *varTypeValue(char *type){
+	if(strcmp(type, "_boolean_") == 0){
+		return "false";
+	}
+
+	return "0";
 }
 
 int findId(char *value){
