@@ -7,6 +7,9 @@
 #include "functions.h"
 #include "semantic.h"
 
+#define SIZE_INT 3
+#define SIZE_DOUBLE 6
+
 typedef struct save_strings save_strings;
 struct save_strings{
 	save_strings *next;
@@ -35,9 +38,11 @@ void printVarFunction(char *name, char *type);
 Program *findFunction(Program *program, char *name);
 void printReturnFunction(char *type, char *name);
 char *varTypeTable(char *type);
-char *varTypeTree(char *type, char *value);
 int findId(char *value);
 Program *findMain(Program *program);
+void searchInMain(Program *program);
+void searchWriteLn(Program *program);
+void printWriteLn(int size, char *id, char *value);
 
 
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
@@ -58,7 +63,11 @@ void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 		symbolTableHeader->symbolTableLine = symbolTableHeader->symbolTableLine->next;
 	}
 
+	printHeaderFunction("i32", "main");
+	printf(") {\n");
 	aux = findMain(program);
+	searchInMain(aux);
+	printReturnFunction("i32", "0");
 }
 
 void declarePrint(){
@@ -122,7 +131,7 @@ void insert_into_list_string(char *value){
 }
 
 void printString(char *name){
-	printf("@str.%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name), name);
+	printf("@.str.%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name), name);
 }
 
 int typeFunctionGlobalTable(char *type){
@@ -146,6 +155,7 @@ void createHeaderFunction(char *name, Program *program, SymbolTableHeader *symbo
 	findVarFunction(temp);
 
 	aux = findFunction(program, table->symbolTableLine->name);
+	searchInMain(aux);
 	
 	printReturnFunction(varTypeTable(table->symbolTableLine->type), "0");
 }
@@ -210,13 +220,14 @@ Program *findFunction(Program *program, char *name){
 	Program *aux = program;
 
 	/* goes to the son of FUNCPART, to find the function name */
-	aux = aux->son->brother->brother->son;
+	aux = aux->brother->brother->son;
 
 	while(strcmp(aux->son->value, name) != 0){
 		aux = aux->brother;
 	}
 
 	return findMain(aux->son);
+	//return NULL;
 }
 
 void printReturnFunction(char *type, char *name){
@@ -233,21 +244,6 @@ char *varTypeTable(char *type){
 	}
 
 	return "double";
-}
-
-char *varTypeTree(char *type, char *value){
-	char *temp = (char *)calloc(1, sizeof(char) * 12);
-
-	if(strcmp(type, "IntLit") == 0){
-		return "i32";
-	}
-
-	if(strcmp(type, "RealLit") == 0){
-		return "double";
-	}
-
-	sprintf(temp, "%d", findId(value));
-	return temp;
 }
 
 int findId(char *value){
@@ -274,6 +270,45 @@ Program *findMain(Program *program){
 	}
 
 	return aux;
+}
+
+void searchInMain(Program *program){
+	if(program != NULL){
+		if(strcmp(program->type, "WriteLn") == 0){
+			program = program->son;
+			searchWriteLn(program);
+		}
+
+		searchInMain(program->son);
+		searchInMain(program->brother);
+	}
+}
+
+void searchWriteLn(Program *program){
+	char temp[17];
+	
+	while(program != NULL){
+		if(strcmp(program->type, "IntLit") == 0){
+			printWriteLn(SIZE_INT, "@.strInt", program->value);
+		}
+
+		else if(strcmp(program->type, "RealLit") == 0){
+			printWriteLn(SIZE_INT, "@.strDouble", program->value);
+		}
+
+		else if(strcmp(program->type, "String") == 0){
+			sprintf(temp, "%d", findId(program->value));
+			printWriteLn(SIZE_INT, temp, "0");
+		}
+
+		program = program->brother;
+	}
+
+	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_string_name++);
+}
+
+void printWriteLn(int size, char *id, char *value){
+	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* %s, i32 0, i32 %s))\n", index_string_name++, size, id, value);
 }
 
 #endif
