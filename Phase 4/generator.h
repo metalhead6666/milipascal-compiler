@@ -74,7 +74,7 @@ void declarePrint(){
 	printf("; Default Declarations\n");
 	printf("@.strNewLine = private unnamed_addr constant [2 x i8] c\"\\0A\\00\"\n");
 	printf("@.strInt = private unnamed_addr constant [3 x i8] c\"%%d\\00\"\n");
-	printf("@.strDouble = private unnamed_addr constant [6 x i8] c\"%%.12F\\00\"\n");
+	printf("@.strDouble = private unnamed_addr constant [6 x i8] c\"%%.12E\\00\"\n");
 	printf("@.str = private unnamed_addr constant [3 x i8] c\"%%s\\00\"\n");
 	printf("@.strTrue = private unnamed_addr constant [5 x i8] c\"TRUE\\00\"\n");
 	printf("@.strFalse = private unnamed_addr constant [6 x i8] c\"FALSE\\00\"\n");
@@ -293,12 +293,12 @@ void searchWriteLn(Program *program){
 		}
 
 		else if(strcmp(program->type, "RealLit") == 0){
-			printWriteLn(SIZE_INT, "@.strDouble", program->value);
+			printWriteLn(SIZE_DOUBLE, "@.strDouble", program->value);
 		}
 
 		else if(strcmp(program->type, "String") == 0){
-			sprintf(temp, "%d", findId(program->value));
-			printWriteLn(SIZE_INT, temp, "0");
+			sprintf(temp, "@.str.%d", findId(program->value));
+			printWriteLn((int)strlen(program->value), temp, "0");
 		}
 
 		program = program->brother;
