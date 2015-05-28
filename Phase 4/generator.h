@@ -32,11 +32,17 @@ void printHeaderFunction(char *type, char *name);
 SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine);
 void findVarFunction(SymbolTableLine *symbolTableLine);
 void printVarFunction(char *name, char *type);
+Program *findFunction(Program *program, char *name);
 void printReturnFunction(char *type, char *name);
-char *varType(char *type);
+char *varTypeTable(char *type);
+char *varTypeTree(char *type, char *value);
+int findId(char *value);
+Program *findMain(Program *program);
 
 
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
+	Program *aux;
+
 	declarePrint();
 	printAllStrings(program);
 
@@ -52,16 +58,7 @@ void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 		symbolTableHeader->symbolTableLine = symbolTableHeader->symbolTableLine->next;
 	}
 
-	/* 
-	if(program != NULL){
-		if(strcmp(program->type, "FuncDef") == 0){
-			createHeaderFunction(program->son->value, program->son, symbolTableHeader);
-		}
-
-		generateProgram(program->son, symbolTableHeader);
-		generateProgram(program->brother, symbolTableHeader);
-	}
-	*/
+	aux = findMain(program);
 }
 
 void declarePrint(){
@@ -133,21 +130,24 @@ int typeFunctionGlobalTable(char *type){
 }
 
 void printGlobalVariable(SymbolTableLine *symbolTableLine){
-	printf("@%s = common global %s 0\n", symbolTableLine->name, varType(symbolTableLine->type));
+	printf("@%s = common global %s 0\n", symbolTableLine->name, varTypeTable(symbolTableLine->type));
 }
 
 void createHeaderFunction(char *name, Program *program, SymbolTableHeader *symbolTableHeader){
 	SymbolTableHeader *table;
 	SymbolTableLine *temp;
+	Program *aux;
 
 	table = findTableFunction(name, symbolTableHeader->next);
 	
-	printHeaderFunction(varType(table->symbolTableLine->type), table->symbolTableLine->name);
+	printHeaderFunction(varTypeTable(table->symbolTableLine->type), table->symbolTableLine->name);
 	
 	temp = findParamFunction(table->symbolTableLine->next);	
 	findVarFunction(temp);
+
+	aux = findFunction(program, table->symbolTableLine->name);
 	
-	printReturnFunction(varType(table->symbolTableLine->type), "0");
+	printReturnFunction(varTypeTable(table->symbolTableLine->type), "0");
 }
 
 SymbolTableHeader *findTableFunction(char *name, SymbolTableHeader *symbolTableHeader){
@@ -177,7 +177,7 @@ SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine){
 	}
 
 	while(1){
-		printf("%s %%%s", varType(symbolTableLine->type), symbolTableLine->name);
+		printf("%s %%%s", varTypeTable(symbolTableLine->type), symbolTableLine->name);
 
 		symbolTableLine = symbolTableLine->next;
 
@@ -196,7 +196,7 @@ SymbolTableLine *findParamFunction(SymbolTableLine *symbolTableLine){
 
 void findVarFunction(SymbolTableLine *symbolTableLine){
 	while(symbolTableLine != NULL){
-		printVarFunction(symbolTableLine->name, varType(symbolTableLine->type));
+		printVarFunction(symbolTableLine->name, varTypeTable(symbolTableLine->type));
 
 		symbolTableLine = symbolTableLine->next;
 	}
@@ -206,11 +206,24 @@ void printVarFunction(char *name, char *type){
 	printf("  %%%s = alloca %s\n", name, type);
 }
 
+Program *findFunction(Program *program, char *name){
+	Program *aux = program;
+
+	/* goes to the son of FUNCPART, to find the function name */
+	aux = aux->son->brother->brother->son;
+
+	while(strcmp(aux->son->value, name) != 0){
+		aux = aux->brother;
+	}
+
+	return findMain(aux->son);
+}
+
 void printReturnFunction(char *type, char *name){
 	printf("  ret %s %s\n}\n", type, name);
 }
 
-char *varType(char *type){
+char *varTypeTable(char *type){
 	if(strcmp(type, "_integer_") == 0){
 		return "i32";
 	}
@@ -219,11 +232,48 @@ char *varType(char *type){
 		return "i1";
 	}
 
-	if(strcmp(type, "_real_") == 0){
+	return "double";
+}
+
+char *varTypeTree(char *type, char *value){
+	char *temp = (char *)calloc(1, sizeof(char) * 12);
+
+	if(strcmp(type, "IntLit") == 0){
+		return "i32";
+	}
+
+	if(strcmp(type, "RealLit") == 0){
 		return "double";
 	}
 
-	return NULL;
+	sprintf(temp, "%d", findId(value));
+	return temp;
+}
+
+int findId(char *value){
+	save_strings *aux = string_list;
+
+	while(strcmp(value, aux->value) != 0){
+		aux = aux->next;
+	}
+
+	return aux->id;
+}
+
+Program *findMain(Program *program){
+	Program *aux = program;
+
+	while(strcmp(aux->type, "VarPart") != 0){
+		aux = aux->brother;
+	}
+
+	aux = aux->brother;
+
+	if(strcmp(aux->type, "FuncPart") == 0){
+		aux = aux->brother;
+	}
+
+	return aux;
 }
 
 #endif
