@@ -17,10 +17,20 @@ struct save_strings{
 	int id;
 };
 
+typedef struct Save_variables Save_variables;
+struct Save_variables{
+	char *func_name;
+	char *name;
+	char *type;
+	char *registry;
+	Save_variables *next;
+};
+
 int index_string_name = 1;
 int index_variable_name = 1;
 save_strings *string_list = NULL;
 SymbolTableLine *globalTableLine;
+Save_variables *store_variables = NULL;
 
 /*Functions*/
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader);
@@ -42,12 +52,15 @@ void printReturnFunction(char *type, char *name);
 char *varTypeTable(char *type);
 int findId(char *value);
 Program *findMain(Program *program);
-void searchInMain(Program *program, SymbolTableLine *symbolTableLine);
-void searchWriteLn(Program *program);
+void searchInMain(Program *program, SymbolTableLine *symbolTableLine, SymbolTableHeader *symbolTableHeader);
+void searchWriteLn(Program *program, SymbolTableHeader *symbolTableHeader);
 void printWriteLn(int size, char *id, char *value);
+void printWriteLnId(int size, char *id, char *value);
 char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine);
 int hasTerminalSymbol(char* type);
 SymbolTableLine *findGlobalLine(char *name);
+void save_variables_function(char* func_name, char* name, char* type, char* registry);
+Save_variables *find_variables_function(char* func_name, char* name);
 
 
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
@@ -73,7 +86,7 @@ void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 	printHeaderFunction("i32", "main");
 	printf(") {\n");
 	aux = findMain(program);
-	searchInMain(aux, temp);
+	searchInMain(aux, temp, NULL);
 	printReturnFunction("i32", "0");
 }
 
@@ -162,7 +175,7 @@ void createHeaderFunction(char *name, Program *program, SymbolTableHeader *symbo
 	findVarFunction(temp);
 
 	aux = findFunction(program, table->symbolTableLine->name);
-	searchInMain(aux, table->symbolTableLine);
+	searchInMain(aux, table->symbolTableLine, table);
 	
 	printReturnFunction(varTypeTable(table->symbolTableLine->type), "0");
 }
@@ -279,13 +292,13 @@ Program *findMain(Program *program){
 	return aux;
 }
 
-void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
+void searchInMain(Program *program, SymbolTableLine *symbolTableLine, SymbolTableHeader *symbolTableHeader){
 	SymbolTableLine *line = symbolTableLine;
 	char *aux = (char*) malloc(sizeof(char)*40);
 
 	if(program != NULL){
 		if(strcmp(program->type, "WriteLn") == 0){
-			searchWriteLn(program->son);
+			searchWriteLn(program->son, symbolTableHeader);
 		}
 
 		if(strcmp(program->type, "Assign")==0){
@@ -304,17 +317,23 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 				strcpy(aux,"%");
 			}
 
+			if(symbolTableHeader==NULL)
+				save_variables_function("main", program->son->value, varTypeTable(line->type), assign_value);
+			else
+				save_variables_function(symbolTableLine->name, program->son->value, varTypeTable(line->type), assign_value);			
+
 			strcat(aux,program->son->value);
 			printf("  store %s %s, %s* %s\n",varTypeTable(line->type),assign_value,varTypeTable(line->type),aux);
 		}
 
-		searchInMain(program->son, symbolTableLine);
-		searchInMain(program->brother, symbolTableLine);
+		searchInMain(program->son, symbolTableLine, symbolTableHeader);
+		searchInMain(program->brother, symbolTableLine, symbolTableHeader);
 	}
 }
 
-void searchWriteLn(Program *program){
+void searchWriteLn(Program *program, SymbolTableHeader *symbolTableHeader){
 	char temp[17];
+	Save_variables *aux;
 	
 	while(program != NULL){
 		if(strcmp(program->type, "IntLit") == 0){
@@ -330,6 +349,28 @@ void searchWriteLn(Program *program){
 			printWriteLn((int)strlen(program->value), temp, "0");
 		}
 
+		else if(strcmp(program->type, "Id") == 0){
+
+
+
+			if(symbolTableHeader==NULL)
+				aux = find_variables_function("main", program->value);
+			else
+				aux = find_variables_function(symbolTableHeader->symbolTableLine->name, program->value);
+
+			if(strcmp(aux->type, "i32")==0)
+				printWriteLnId(SIZE_INT, "@.strInt", aux->registry);
+			else if(strcmp(aux->type, "i1")==0){
+				if(strcmp(aux->name, "true")==0)
+					printWriteLnId(5, "@.strTrue", aux->registry);
+				else
+					printWriteLnId(6, "@.strFalse", aux->registry);
+			}
+
+			else
+				printWriteLnId(SIZE_DOUBLE, "@.strDouble", aux->registry);
+		}
+
 		program = program->brother;
 	}
 
@@ -338,6 +379,10 @@ void searchWriteLn(Program *program){
 
 void printWriteLn(int size, char *id, char *value){
 	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* %s, i32 0, i32 %s))\n", index_variable_name++, size, id, value);
+}
+
+void printWriteLnId(int size, char *id, char *value){
+	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* %s, i32 0, i32 0), i32 %s)\n", index_variable_name++, size, id, value);
 }
 
 char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
@@ -477,6 +522,48 @@ SymbolTableLine *findGlobalLine(char *name){
 		if(strcmp(name, temp->name)==0)
 			return temp;
 		temp=temp->next;
+	}
+
+	return NULL;
+}
+
+void save_variables_function(char* func_name, char* name, char* type, char* registry){
+	Save_variables *temp, *aux = store_variables;
+
+	if(store_variables==NULL){
+		store_variables = (Save_variables*)calloc(1,sizeof(Save_variables));
+		store_variables->func_name = func_name;
+		store_variables->name = name;
+		store_variables->type = type;
+		store_variables->registry = registry;
+		return;
+	}
+
+	temp = (Save_variables*)calloc(1,sizeof(Save_variables));
+
+	while(aux->next!=NULL){
+		if(strcmp(aux->name,name)==0 && strcmp(aux->func_name,func_name)==0){
+			aux->registry = registry;
+			return;
+		}
+
+		aux = aux->next;
+	}
+
+	temp->func_name = func_name;
+	temp->name = name;
+	temp->type = type;
+	temp->registry = registry;
+	aux->next = temp;
+}
+
+Save_variables *find_variables_function(char* func_name, char* name){
+	Save_variables *aux = store_variables;
+	while(aux!=NULL){
+		if(strcmp(aux->func_name,func_name)==0 && strcmp(aux->name,name)==0)
+			return aux;
+
+		aux = aux->next;
 	}
 
 	return NULL;
