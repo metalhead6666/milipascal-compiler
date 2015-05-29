@@ -1,27 +1,9 @@
 program gcd2(output);
-var x, y: integer;
-function gcd(A, B: integer): integer;
-	var test:boolean;
-	begin
-		if A = 0 then
-			gcd := B
-		else
-			begin
-				while B > 0 do
-					if A > B then
-						A := A - B
-					else
-						B := B - A;
-				gcd := A
-			end
-	end;
+var x, y, z, final: integer;
 begin
-	if paramcount >= 2 then
-		begin
-			val(paramstr(1), x);
-			val(paramstr(2), y);
-			writeln(gcd(x, y))
-		end
-	else
-		writeln('Error: two parameters required.')
+	x := 1;
+	y := 2;
+	z := 3;
+	final := x + y;
+	writeln(final)
 end.
