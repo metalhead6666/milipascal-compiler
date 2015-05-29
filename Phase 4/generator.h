@@ -344,27 +344,43 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 
 void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *symbolTableLine){
 	char temp[17], temp2[17];
+	SymbolTableLine *line;
 
 	if(program == NULL){
 		printWriteLn();
-		printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);
+		printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);		
 	}
 	
 	while(program != NULL){
+		if(strcmp(program->type, "String") == 0){
+			sprintf(temp2, "@.str.%d", findId(program->value));			
+			printf("  %%%d = load i8** %s\n", index_variable_name, temp2);
+			sprintf(temp, "%%%d", index_variable_name);
+			++index_variable_name;
+			printWriteLnId((int)strlen(program->value), temp2, "i8*", temp);
+		}
+
+		else{
+			line = findGlobalLine(program->value);
+			strcpy(aux,"@");
+
+			if(line==NULL){
+				line = symbolTableLine;
+				while(strcmp(program->value,line->name)!=0 && line!=NULL){
+					line = line->next;
+				}
+				strcpy(aux,"%");
+			}
+
+			strcat(aux,program->value);
+		}
+
 		if(strcmp(program->type, "IntLit") == 0){
 			printWriteLnId(SIZE_INT, "@.strInt", "i32", program->value);
 		}
 
 		else if(strcmp(program->type, "RealLit") == 0){
 			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", program->value);
-		}
-
-		else if(strcmp(program->type, "String") == 0){
-			sprintf(temp2, "@.str.%d", findId(program->value));			
-			printf("  %%%d = load i8** %s\n", index_variable_name, temp2);
-			sprintf(temp, "%%%d", index_variable_name);
-			++index_variable_name;
-			printWriteLnId((int)strlen(program->value), temp2, "i8*", temp);
 		}
 
 		else if(strcmp(program->type, "Id") == 0){
@@ -375,7 +391,7 @@ void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *sym
 			if(strcmp(type, "_integer_")==0)
 				printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
 			else if(strcmp(type, "_boolean_")==0){
-				if(strcmp(program->son->value, "true")==0)
+				if(strcmp(program->value, "true")==0)
 					printWriteLnId(5, "@.strTrue", "i1", temp);
 				else
 					printWriteLnId(6, "@.strFalse", "i1", temp);
@@ -392,7 +408,6 @@ void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *sym
 		program = program->brother;
 		printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);
 	}
-
 }
 
 void printWriteLn(){
