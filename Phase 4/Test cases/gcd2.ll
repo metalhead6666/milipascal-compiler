@@ -9,20 +9,28 @@
 ; Print Declaration
 declare i32 @printf(i8*, ...)
 
-@x = common global i32 0
-@y = common global i32 0
-@z = common global i32 0
-@final = common global i32 0
+@x = common global double 0.000000e+00
+@y = common global double 0.000000e+00
+@z = common global double 0.000000e+00
+@final = common global double 0.000000e+00
 
 define i32 @main() {
-  store i32 1, i32* @x
-  store i32 2, i32* @y
-  store i32 3, i32* @z
-  %1 = load i32* @x
-  %2 = load i32* @y
-  %3 = add nsw i32 %1, %2
-  store i32 3, i32* @final
-  %4 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([3 x i8]* @.strInt, i32 0, i32 0), i32 3)
-  %5 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))
+  store double 1.0, double* @x
+  store double 2.0, double* @y
+  store double 3.0, double* @z
+  %1 = load double* @x
+  %2 = load double* @y
+  %3 = fadd double %1, %2
+  %4 = load double* @z
+  %5 = fsub double %%3, %4
+  %6 = load double* @x
+  %7 = load double* @y
+  %8 = fadd double %6, %7
+  %9 = load double* @x
+  %10 = fadd double %%8, %9
+  store double 10, double* @final
+  %11 = load double* @final
+  %12 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([6 x i8]* @.strDouble, i32 0, i32 0), double %11)
+  %13 = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))
   ret i32 0
 }

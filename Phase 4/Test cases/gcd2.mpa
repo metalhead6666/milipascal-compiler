@@ -1,9 +1,9 @@
 program gcd2(output);
-var x, y, z, final: integer;
+var x, y, z, final: real;
 begin
-	x := 1;
-	y := 2;
-	z := 3;
-	final := x + y;
+	x := 1.0;
+	y := 2.0;
+	z := 3.0;
+	final := x + y - z + x;
 	writeln(final)
 end.
