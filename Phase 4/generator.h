@@ -384,13 +384,13 @@ void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *sym
 		}
 
 		else if(strcmp(program->type, "Id") == 0){
-			printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(type), aux);
+			printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
 			sprintf(temp, "%%%d", index_variable_name);
 			++index_variable_name;
 
-			if(strcmp(type, "_integer_")==0)
+			if(strcmp(line->type, "_integer_")==0)
 				printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
-			else if(strcmp(type, "_boolean_")==0){
+			else if(strcmp(line->type, "_boolean_")==0){
 				if(strcmp(program->value, "true")==0)
 					printWriteLnId(5, "@.strTrue", "i1", temp);
 				else
@@ -462,8 +462,6 @@ char *operations_function(char* op_name, Program *program, SymbolTableLine *symb
 		}
 	}
 
-
-
 	if(registry1!=0)
 		sprintf(var1, "%%%d",registry1);
 	if (registry1==0)
@@ -473,11 +471,6 @@ char *operations_function(char* op_name, Program *program, SymbolTableLine *symb
 	if (registry2==0)
 		sprintf(var2, "%%%d",index_variable_name-1);
 			
-
-
-	
-	
-	
 
 	if(strcmp(line->type, "_integer_") == 0){
 		printf("  %%%d = %s %s %s, %s\n", index_variable_name++, op_name, varTypeTable(line->type), var1, var2);
