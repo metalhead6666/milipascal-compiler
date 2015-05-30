@@ -1,11 +1,10 @@
 program gcd2(output);
 var a: integer;
 	b: real; 
-	c: boolean;
 
 begin
 	a := 1;
 	b := 1.0;
 
-	WriteLn(b,a);
+	WriteLn(a,b);
 end.
