@@ -328,7 +328,7 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 }
 
 void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine){
-	char temp[17], temp2[17];
+	char temp[17];
 	SymbolTableLine *line;
 
 	if(program == NULL){
@@ -338,12 +338,12 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 	
 	while(program != NULL){
 		if(strcmp(program->type, "String") == 0){
-			sprintf(temp2, "@.str%d", findId(program->value));
-			/*printf("  %%%d = load i8** %s\n", index_variable_name, temp2);
+			/*sprintf(temp2, "@.str%d", findId(program->value));
+			printf("  %%%d = load i8** %s\n", index_variable_name, temp2);
 			sprintf(temp, "%%%d", index_variable_name);
 			++index_variable_name;
 			printWriteLnId(3, temp2, "i8*", temp);*/
-			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* %s, i32 0, i32 0))\n", index_variable_name++, (int)strlen(program->value) + 1, temp2);
+			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str%d, i32 0, i32 0))\n", index_variable_name++, (int)strlen(program->value) + 1, findId(program->value));
 		}
 
 		else if(strcmp(program->type, "IntLit") == 0){
