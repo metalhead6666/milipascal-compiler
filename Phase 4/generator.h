@@ -284,11 +284,7 @@ Program *findMain(Program *program){
 		aux = aux->brother;
 	}
 
-	aux = aux->brother;
-
-	if(strcmp(aux->type, "FuncPart") == 0){
-		aux = aux->brother;
-	}
+	aux = aux->brother->brother;
 
 	return aux;
 }
@@ -299,22 +295,7 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 
 	if(program != NULL){
 		if(strcmp(program->type, "WriteLn") == 0){
-			if(strcmp(program->son->type, "String") != 0){
-				line = findGlobalLine(program->son->value);
-				strcpy(aux,"@");
-
-				if(line==NULL){
-					line = symbolTableLine;
-					while(strcmp(program->son->value,line->name)!=0 && line!=NULL){
-						line = line->next;
-					}
-					strcpy(aux,"%");
-				}
-
-				strcat(aux,program->son->value);
-			}
-
-			searchWriteLn(program->son, aux, line);
+			searchWriteLn(program->son, aux, line);			
 		}
 
 		if(strcmp(program->type, "Assign")==0){
@@ -360,44 +341,58 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 			printWriteLnId((int)strlen(program->value), temp2, "i8*", temp);
 		}
 
+		else if(strcmp(program->type, "IntLit") == 0){
+			printWriteLnId(SIZE_INT, "@.strInt", "i32", program->value);
+		}
+
+		else if(strcmp(program->type, "RealLit") == 0){
+			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", program->value);
+		}
+
 		else{
-			line = findGlobalLine(program->value);
-			strcpy(aux,"@");
-
-			if(line==NULL){
-				line = symbolTableLine;
-				while(strcmp(program->value,line->name)!=0 && line!=NULL){
-					line = line->next;
-				}
-				strcpy(aux,"%");
+			if(strcmp(program->value, "true")==0){
+				printWriteLnId(5, "@.strTrue", "i1", program->value);
 			}
-
-			strcat(aux,program->value);
-
-			if(strcmp(program->type, "IntLit") == 0){
-				printWriteLnId(SIZE_INT, "@.strInt", "i32", program->value);
-			}
-
-			else if(strcmp(program->type, "RealLit") == 0){
-				printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", program->value);
+			
+			else if(strcmp(program->value, "false")==0){
+				printWriteLnId(6, "@.strFalse", "i1", program->value);
 			}
 
 			else if(strcmp(program->type, "Id") == 0){
+				line = findGlobalLine(program->value);
+				strcpy(aux,"@");
+
+				if(line==NULL){
+					line = symbolTableLine;
+					while(strcmp(program->value,line->name)!=0 && line!=NULL){
+						line = line->next;
+					}
+					strcpy(aux,"%");
+				}
+
+				strcat(aux,program->value);				
+
 				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
 				sprintf(temp, "%%%d", index_variable_name);
 				++index_variable_name;
 
-				if(strcmp(line->type, "_integer_")==0)
+				if(strcmp(line->type, "_integer_")==0){
 					printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
-				else if(strcmp(line->type, "_boolean_")==0){
-					if(strcmp(program->value, "true")==0)
-						printWriteLnId(5, "@.strTrue", "i1", temp);
-					else
-						printWriteLnId(6, "@.strFalse", "i1", temp);
 				}
+				
+				/*else if(strcmp(line->type, "_boolean_")==0){
+					if(strcmp(program->value, "true")==0){
+						printWriteLnId(5, "@.strTrue", "i1", program->value);
+					}
+					
+					else if(strcmp(program->value, "false")==0){
+						printWriteLnId(6, "@.strFalse", "i1", program->value);
+					}
+				}*/
 
-				else
+				else{
 					printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
+				}
 			}
 
 			else{
