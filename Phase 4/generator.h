@@ -140,7 +140,7 @@ void insert_into_list_string(char *value){
 }
 
 void printString(char *name){
-	printf("@.str.%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name), name);
+	printf("@.str.%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name) + 1, name);
 }
 
 int typeFunctionGlobalTable(char *type){
@@ -153,7 +153,6 @@ void printGlobalVariable(SymbolTableLine *symbolTableLine){
 
 	if(strcmp(temp, "double") == 0){
 		strcpy(value, "0.000000e+00");
-		
 	}
 
 	else{
@@ -315,6 +314,11 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 			}
 
 			strcat(aux,program->son->value);
+
+			if(strcmp(line->type, "_real_") == 0 && !strchr(assign_value, '.')){
+				strcat(assign_value, ".0");
+			}
+
 			printf("  store %s %s, %s* %s\n",varTypeTable(line->type),assign_value,varTypeTable(line->type),aux);
 		}
 
@@ -400,9 +404,10 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 			}
 		}
 
-		program = program->brother;
-		printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);
+		program = program->brother;		
 	}
+
+	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);
 }
 
 void printWriteLn(){
