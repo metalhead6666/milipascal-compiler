@@ -290,7 +290,7 @@ Program *findMain(Program *program){
 }
 
 void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
-	SymbolTableLine *line = symbolTableLine;
+	SymbolTableLine *line = symbolTableLine, *line2;
 	char *aux = (char*) malloc(sizeof(char)*40);
 
 	if(program != NULL){
@@ -318,11 +318,31 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 
 			if(strcmp(line->type, "_real_") == 0 && !strchr(assign_value, '.')){
 				strcat(assign_value, ".0");
-			}
+			}			
 
 			if(strcmp(program->son->brother->type, "Id") == 0 &&
 				strcmp(to_lower_case(program->son->brother->value), "true") != 0 &&
-				strcmp(to_lower_case(program->son->brother->value), "false") != 0){
+				strcmp(to_lower_case(program->son->brother->value), "false") != 0){				
+
+				line2 = findGlobalLine(to_lower_case(program->son->brother->value));
+
+				if(line2==NULL){
+					line2 = symbolTableLine;
+					while(strcmp(to_lower_case(program->son->brother->value),line2->name)!=0 && line2!=NULL){
+						line2 = line2->next;
+					}
+				}
+
+				if(strcmp(line2->type, "_integer_") == 0 && strcmp(line->type, "_real_") == 0){					
+					printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line2->type), rightAssignFunction(program->son->brother, line2));
+					printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name, index_variable_name - 1);
+					++index_variable_name;
+				}
+
+				else{
+					printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line2->type), aux);
+				}
+
 				printf("  store %s %%%d, %s* %s\n",varTypeTable(line->type),index_variable_name-1,varTypeTable(line->type),aux);
 			}
 
@@ -541,7 +561,6 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
 		strcpy(aux,"%");
 	}		
 	strcat(aux, to_lower_case(temp->value));
-	printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line->type), aux);
 	return aux;
 }
 
