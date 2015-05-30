@@ -249,7 +249,6 @@ Program *findFunction(Program *program, char *name){
 	}
 
 	return findMain(aux->son);
-	//return NULL;
 }
 
 void printReturnFunction(char *type, char *name){
@@ -304,18 +303,18 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 
 			assign_value = rightAssignFunction(program->son->brother, line);
 
-			line = findGlobalLine(program->son->value);
+			line = findGlobalLine(to_lower_case(program->son->value));
 			strcpy(aux,"@");
 
 			if(line==NULL){
 				line = symbolTableLine;
-				while(strcmp(program->son->value,line->name)!=0 && line!=NULL){
+				while(strcmp(to_lower_case(program->son->value),line->name)!=0 && line!=NULL){
 					line = line->next;
 				}
 				strcpy(aux,"%");
 			}
 
-			strcat(aux,program->son->value);
+			strcat(aux,to_lower_case(program->son->value));
 
 			if(strcmp(line->type, "_real_") == 0 && !strchr(assign_value, '.')){
 				strcat(assign_value, ".0");
@@ -357,27 +356,27 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 		}
 
 		else{
-			if(strcmp(program->value, "true")==0){
+			if(strcmp(to_lower_case(program->value), "true")==0){
 				printWriteLnId(5, "@.strTrue", "i1", program->value);
 			}
 			
-			else if(strcmp(program->value, "false")==0){
+			else if(strcmp(to_lower_case(program->value), "false")==0){
 				printWriteLnId(6, "@.strFalse", "i1", program->value);
 			}
 
 			else if(strcmp(program->type, "Id") == 0){
-				line = findGlobalLine(program->value);
+				line = findGlobalLine(to_lower_case(program->value));
 				strcpy(aux,"@");
 
 				if(line==NULL){
 					line = symbolTableLine;
-					while(strcmp(program->value,line->name)!=0 && line!=NULL){
+					while(strcmp(to_lower_case(program->value),line->name)!=0 && line!=NULL){
 						line = line->next;
 					}
 					strcpy(aux,"%");
 				}
 
-				strcat(aux,program->value);				
+				strcat(aux,to_lower_case(program->value));				
 
 				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
 				sprintf(temp, "%%%d", index_variable_name);
@@ -514,26 +513,26 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
 		return program->value;
 	}
 
-	if(strcmp(program->value, "true") == 0){
+	if(strcmp(to_lower_case(program->value), "true") == 0){
 		return "1";
 	}
 
-	if(strcmp(program->value, "false") == 0){
+	if(strcmp(to_lower_case(program->value), "false") == 0){
 		return "0";
 	}
 
-	line = findGlobalLine(temp->value);
+	line = findGlobalLine(to_lower_case(temp->value));
 	strcpy(aux,"@");
 
 	if(line==NULL){
 		line = symbolTableLine;
 		
-		while(strcmp(temp->value,line->name)!=0 && line!=NULL){
+		while(strcmp(to_lower_case(temp->value),line->name)!=0 && line!=NULL){
 			line = line->next;
 		}
 		strcpy(aux,"%");
 	}		
-	strcat(aux, temp->value);
+	strcat(aux, to_lower_case(temp->value));
 	
 	return aux;
 }
