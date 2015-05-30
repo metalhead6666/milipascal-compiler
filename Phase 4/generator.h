@@ -140,7 +140,7 @@ void insert_into_list_string(char *value){
 }
 
 void printString(char *name){
-	printf("@.str.%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name) + 1, name);
+	printf("@.str%d = private unnamed_addr constant [%d x i8] c\"%s\\00\"\n", index_string_name++, (int)strlen(name) + 1, name);
 }
 
 int typeFunctionGlobalTable(char *type){
@@ -338,11 +338,12 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 	
 	while(program != NULL){
 		if(strcmp(program->type, "String") == 0){
-			sprintf(temp2, "@.str.%d", findId(program->value));			
-			printf("  %%%d = load i8** %s\n", index_variable_name, temp2);
+			sprintf(temp2, "@.str%d", findId(program->value));
+			/*printf("  %%%d = load i8** %s\n", index_variable_name, temp2);
 			sprintf(temp, "%%%d", index_variable_name);
 			++index_variable_name;
-			printWriteLnId((int)strlen(program->value), temp2, "i8*", temp);
+			printWriteLnId(3, temp2, "i8*", temp);*/
+			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* %s, i32 0, i32 0))\n", index_variable_name++, (int)strlen(program->value) + 1, temp2);
 		}
 
 		else if(strcmp(program->type, "IntLit") == 0){
@@ -383,16 +384,6 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 				if(strcmp(line->type, "_integer_")==0){
 					printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
 				}
-				
-				/*else if(strcmp(line->type, "_boolean_")==0){
-					if(strcmp(program->value, "true")==0){
-						printWriteLnId(5, "@.strTrue", "i1", program->value);
-					}
-					
-					else if(strcmp(program->value, "false")==0){
-						printWriteLnId(6, "@.strFalse", "i1", program->value);
-					}
-				}*/
 
 				else{
 					printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
