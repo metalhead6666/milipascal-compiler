@@ -43,7 +43,7 @@ char *varTypeTable(char *type);
 int findId(char *value);
 Program *findMain(Program *program);
 void searchInMain(Program *program, SymbolTableLine *symbolTableLine);
-void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *symbolTableLine);
+void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine);
 void printWriteLn();
 void printWriteLnId(int size, char *id, char *type, char *value);
 char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine);
@@ -314,7 +314,7 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 				strcat(aux,program->son->value);
 			}
 
-			searchWriteLn(program->son, line->type, aux, line);
+			searchWriteLn(program->son, aux, line);
 		}
 
 		if(strcmp(program->type, "Assign")==0){
@@ -342,7 +342,7 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 	}
 }
 
-void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *symbolTableLine){
+void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine){
 	char temp[17], temp2[17];
 	SymbolTableLine *line;
 
@@ -373,36 +373,36 @@ void searchWriteLn(Program *program, char *type, char *aux, SymbolTableLine *sym
 			}
 
 			strcat(aux,program->value);
-		}
 
-		if(strcmp(program->type, "IntLit") == 0){
-			printWriteLnId(SIZE_INT, "@.strInt", "i32", program->value);
-		}
-
-		else if(strcmp(program->type, "RealLit") == 0){
-			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", program->value);
-		}
-
-		else if(strcmp(program->type, "Id") == 0){
-			printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
-			sprintf(temp, "%%%d", index_variable_name);
-			++index_variable_name;
-
-			if(strcmp(line->type, "_integer_")==0)
-				printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
-			else if(strcmp(line->type, "_boolean_")==0){
-				if(strcmp(program->value, "true")==0)
-					printWriteLnId(5, "@.strTrue", "i1", temp);
-				else
-					printWriteLnId(6, "@.strFalse", "i1", temp);
+			if(strcmp(program->type, "IntLit") == 0){
+				printWriteLnId(SIZE_INT, "@.strInt", "i32", program->value);
 			}
 
-			else
-				printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
-		}
+			else if(strcmp(program->type, "RealLit") == 0){
+				printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", program->value);
+			}
 
-		else{
-			rightAssignFunction(program->son,symbolTableLine);
+			else if(strcmp(program->type, "Id") == 0){
+				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
+				sprintf(temp, "%%%d", index_variable_name);
+				++index_variable_name;
+
+				if(strcmp(line->type, "_integer_")==0)
+					printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
+				else if(strcmp(line->type, "_boolean_")==0){
+					if(strcmp(program->value, "true")==0)
+						printWriteLnId(5, "@.strTrue", "i1", temp);
+					else
+						printWriteLnId(6, "@.strFalse", "i1", temp);
+				}
+
+				else
+					printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
+			}
+
+			else{
+				rightAssignFunction(program->son,symbolTableLine);
+			}
 		}
 
 		program = program->brother;
