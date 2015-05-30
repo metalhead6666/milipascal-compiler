@@ -320,7 +320,15 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 				strcat(assign_value, ".0");
 			}
 
-			printf("  store %s %s, %s* %s\n",varTypeTable(line->type),assign_value,varTypeTable(line->type),aux);
+			if(strcmp(program->son->brother->type, "Id") == 0 &&
+				strcmp(to_lower_case(program->son->brother->value), "true") != 0 &&
+				strcmp(to_lower_case(program->son->brother->value), "false") != 0){
+				printf("  store %s %%%d, %s* %s\n",varTypeTable(line->type),index_variable_name-1,varTypeTable(line->type),aux);
+			}
+
+			else{
+				printf("  store %s %s, %s* %s\n",varTypeTable(line->type),assign_value,varTypeTable(line->type),aux);
+			}
 		}
 
 		searchInMain(program->son, symbolTableLine);
@@ -533,7 +541,7 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
 		strcpy(aux,"%");
 	}		
 	strcat(aux, to_lower_case(temp->value));
-	
+	printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line->type), aux);
 	return aux;
 }
 
