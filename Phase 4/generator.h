@@ -18,7 +18,7 @@ struct save_strings{
 };
 
 int index_string_name = 1;
-int index_variable_name = 1;
+int index_variable_name = 2;
 save_strings *string_list = NULL;
 SymbolTableLine *globalTableLine;
 
@@ -74,6 +74,8 @@ void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
 
 	printHeaderFunction("i32", "main");
 	printf(") {\n");
+	printf("  %%1 = alloca i32\n");
+	printf("  store i32 0, i32* %%1\n");
 	aux = findMain(program);
 	searchInMain(aux, temp);
 	printReturnFunction("i32", "0");
@@ -386,6 +388,7 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 				}
 
 				else if(strcmp(line->type, "_boolean_") == 0){
+					/* TODO: verify if it's true or false*/
 					printWriteLnId(5, "@.strTrue", "i1", temp);
 				}
 
