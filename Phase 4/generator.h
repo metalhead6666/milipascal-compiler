@@ -50,6 +50,7 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine);
 int hasTerminalSymbol(char* type);
 SymbolTableLine *findGlobalLine(char *name);
 char *operations_function(char* op_name, Program *program, SymbolTableLine *symbolTableLine);
+char *insertPoint(char *assign_value);
 
 
 void generateProgram(Program* program, SymbolTableHeader *symbolTableHeader){
@@ -317,7 +318,13 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 			strcat(aux,to_lower_case(program->son->value));
 
 			if(strcmp(line->type, "_real_") == 0 && !strchr(assign_value, '.')){
-				strcat(assign_value, ".0");
+				if(strchr(assign_value, 'e')){
+					assign_value = insertPoint(assign_value);
+				}
+
+				else{
+					strcat(assign_value, ".0");
+				}
 			}			
 
 			if(strcmp(program->son->brother->type, "Id") == 0 &&
@@ -354,6 +361,25 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 		searchInMain(program->son, symbolTableLine);
 		searchInMain(program->brother, symbolTableLine);
 	}
+}
+
+char *insertPoint(char *assign_value){
+	unsigned int i, j = 0;
+	char *temp = (char *)calloc(1, sizeof(char) * strlen(assign_value) + 1);
+
+	for(i = 0; i < strlen(assign_value); ++i, ++j){
+		if(assign_value[i] == 'e'){
+			temp[j++] = '.';
+			temp[j++] = '0';
+			temp[j] = 'e';
+		}
+
+		else{
+			temp[j] = assign_value[i];
+		}
+	}
+
+	return temp;
 }
 
 void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine){
