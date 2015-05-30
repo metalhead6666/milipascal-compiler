@@ -385,6 +385,10 @@ void searchWriteLn(Program *program, char *aux, SymbolTableLine *symbolTableLine
 					printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
 				}
 
+				else if(strcmp(line->type, "_boolean_") == 0){
+					printWriteLnId(5, "@.strTrue", "i1", temp);
+				}
+
 				else{
 					printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
 				}
@@ -487,40 +491,48 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
 		return operations_function("add", program, symbolTableLine);
 	}
 
-	else if(strcmp(program->type, "Sub")==0){
+	if(strcmp(program->type, "Sub")==0){
 		return operations_function("sub", program, symbolTableLine);
 	}
 
-	else if(strcmp(program->type, "Mul")==0){
+	if(strcmp(program->type, "Mul")==0){
 		return operations_function("mul", program, symbolTableLine);
 	}
 
-	else if(strcmp(program->type, "Div")==0){
+	if(strcmp(program->type, "Div")==0 || strcmp(program->type, "RealDiv") == 0){
 		return operations_function("div", program, symbolTableLine);
 	}
 
-	else if(strcmp(program->type, "IntLit")==0 || strcmp(program->type, "RealLit")==0){ 
+	if(strcmp(program->type, "Mod") == 0){
+		return operations_function("srem", program, symbolTableLine);
+	}
+
+	if(strcmp(program->type, "IntLit")==0 || strcmp(program->type, "RealLit")==0){ 
 		return program->value;
 	}
 
-	else if(strcmp(program->type, "Id")==0){
-
-		line = findGlobalLine(temp->value);
-		strcpy(aux,"@");
-
-		if(line==NULL){
-			line = symbolTableLine;
-			
-			while(strcmp(temp->value,line->name)!=0 && line!=NULL){
-				line = line->next;
-			}
-			strcpy(aux,"%");
-		}		
-		strcat(aux, temp->value);
-		return aux;
+	if(strcmp(program->value, "true") == 0){
+		return "1";
 	}
 
-	return NULL;
+	if(strcmp(program->value, "false") == 0){
+		return "0";
+	}
+
+	line = findGlobalLine(temp->value);
+	strcpy(aux,"@");
+
+	if(line==NULL){
+		line = symbolTableLine;
+		
+		while(strcmp(temp->value,line->name)!=0 && line!=NULL){
+			line = line->next;
+		}
+		strcpy(aux,"%");
+	}		
+	strcat(aux, temp->value);
+	
+	return aux;
 }
 
 
