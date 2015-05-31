@@ -272,17 +272,18 @@ Program *findFunction(Program *program, char *name){
 	Program *aux;
 
 	/* goes to the son of FUNCPART, to find the function name */
-	aux = program->brother->brother->brother->son;
-	name = to_lower_case(name);	
+	aux = program->brother;
+	name = to_lower_case(name);
 
-	while(strcmp(to_lower_case(aux->son->value), name) != 0){
-		printf("dentro, %s %s\n", aux->son->value, aux->son->type);
+	while(strcmp(aux->type, "FuncPart") != 0){
 		aux = aux->brother;
 	}
 
-	printf("fora, %s %s\n", aux->son->value, aux->son->type);
+	while(strcmp(to_lower_case(aux->son->son->value), name) != 0){
+		aux = aux->brother;
+	}
 
-	return findMain(aux->son->brother);
+	return aux->son->son->brother;
 }
 
 void printReturnFunction(char *type, char *name){
@@ -314,7 +315,19 @@ int findId(char *value){
 }
 
 Program *findMain(Program *program){
-	return program->brother->brother->brother;
+	Program *aux;
+
+	aux = program->brother;
+
+	while(strcmp(aux->type, "FuncPart") != 0){
+		aux = aux->brother;
+	}
+
+	while(strcmp(aux->type, "NoPrint") == 0){
+		aux = aux->brother;
+	}
+
+	return aux;
 }
 
 void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
