@@ -12,7 +12,7 @@
 #define SIZE_FALSE 6
 #define SIZE_TRUE 5
 #define BUFFER 1024
-#define MAX_INT_NUMBERS 12
+#define MAX_INT_NUMBERS 13
 
 struct SaveStrings{
 	struct SaveStrings *next;
@@ -24,6 +24,7 @@ int index_string_name;
 int index_variable_name;
 struct SaveStrings *string_list;
 SymbolTableLine *globalTableLine;
+int type_to_print;
 
 /*Functions*/
 void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader);
@@ -119,6 +120,7 @@ void printAllStrings(Program *program){
 }
 
 char *formatString(char *str){
+	unsigned int i, j;
 	char *temp;
 	size_t size;
 
@@ -127,6 +129,16 @@ char *formatString(char *str){
 	temp = (char *)malloc(sizeof(char) * size);
 	strncpy(temp, str + 1, size);
 	strcpy(str, temp);
+	
+	/*for(i = j = 0; i < strlen(str); ++i, ++j){
+		temp[j] = str[i];
+
+		if(str[i] == '\'' && str[i + 1] == '\''){
+		 	++i;
+		}
+	}
+
+	strcpy(str, temp);*/
 	free(temp);
 
 	return str;
@@ -337,7 +349,7 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 
 	if(program != NULL){
 		if(strcmp(program->type, "WriteLn") == 0){
-			searchWriteLn(program->son, symbolTableLine);			
+			searchWriteLn(program, symbolTableLine);			
 		}
 
 		else if(strcmp(program->type, "Assign") == 0){
@@ -446,163 +458,155 @@ void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
 
 	auxP = program;
 	
-	while(auxP != NULL){
-		if(strcmp(auxP->type, "String") == 0){
-			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str%d, i32 0, i32 0))\n", index_variable_name++, (int)strlen(auxP->value) + 1, findId(auxP->value));
+	while(auxP->son != NULL){
+		if(strcmp(auxP->son->type, "String") == 0){
+			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str%d, i32 0, i32 0))\n", index_variable_name++, (int)strlen(auxP->son->value) + 1, findId(auxP->son->value));
 		}
 
-		else if(strcmp(auxP->type, "IntLit") == 0){
-			printWriteLnId(SIZE_INT, "@.strInt", "i32", auxP->value);
+		else if(strcmp(auxP->son->type, "IntLit") == 0){
+			printWriteLnId(SIZE_INT, "@.strInt", "i32", auxP->son->value);
 		}
 
-		else if(strcmp(auxP->type, "RealLit") == 0){
-			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", auxP->value);
-		}
-
-		else{
-			if(strcmp(to_lower_case(auxP->value), "true") == 0){
-				printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", auxP->value);
-			}
-			
-			else if(strcmp(to_lower_case(auxP->value), "false") == 0){
-				printWriteLnId(SIZE_FALSE, "@.strFalse", "i1", auxP->value);
-			}
-
-			else if(strcmp(auxP->type, "Id") == 0){
-				aux = (char *)calloc(1, sizeof(char) * BUFFER);
-				line = findGlobalLine(to_lower_case(auxP->value));
-				strcpy(aux, "@");
-
-				if(line == NULL){
-					line = symbolTableLine;
-					
-					while(line != NULL && strcmp(to_lower_case(auxP->value), line->name) != 0){
-						line = line->next;
-					}
-					
-					strcpy(aux, "%");
-				}
-
-				strcat(aux, to_lower_case(auxP->value));				
-
-				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
-				free(aux);
-
-				temp = (char *)calloc(1, sizeof(char) * MAX_INT_NUMBERS);
-
-				sprintf(temp, "%%%d", index_variable_name);
-				++index_variable_name;
-
-				if(strcmp(line->type, "_integer_") == 0){
-					printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
-				}
-
-				else if(strcmp(line->type, "_boolean_") == 0){
-					/* TODO: verify if it's true or false*/
-					printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", temp);
+		else if(strcmp(auxP->son->type, "RealLit") == 0){
+			if(!strchr(auxP->son->value, '.')){
+				if(strchr(auxP->son->value, 'e')){
+					auxP->son->value = insertPoint(auxP->son->value);
 				}
 
 				else{
-					printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
+					strcat(auxP->son->value, ".0");
 				}
+			}
+			
+			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", auxP->son->value);
+		}
 
-				free(temp);
+		else if(strcmp(to_lower_case(auxP->son->value), "true") == 0){
+			printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", auxP->son->value);
+		}
+		
+		else if(strcmp(to_lower_case(auxP->son->value), "false") == 0){
+			printWriteLnId(SIZE_FALSE, "@.strFalse", "i1", auxP->son->value);
+		}
+
+		else if(strcmp(auxP->son->type, "Id") == 0){
+			aux = (char *)calloc(1, sizeof(char) * BUFFER);
+			line = findGlobalLine(to_lower_case(auxP->son->value));
+			strcpy(aux, "@");
+
+			if(line == NULL){
+				line = symbolTableLine;
+				
+				while(line != NULL && strcmp(to_lower_case(auxP->son->value), line->name) != 0){
+					line = line->next;
+				}
+				
+				strcpy(aux, "%");
+			}
+
+			strcat(aux, to_lower_case(auxP->son->value));			
+
+			printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
+			free(aux);
+
+			temp = (char *)calloc(1, sizeof(char) * MAX_INT_NUMBERS);
+
+			sprintf(temp, "%%%d", index_variable_name);
+			++index_variable_name;
+
+			if(strcmp(line->type, "_integer_") == 0){
+				printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
+			}
+
+			else if(strcmp(line->type, "_boolean_") == 0){
+				/* TODO: verify if it's true or false*/
+				printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", temp);
 			}
 
 			else{
-				rightAssignFunction(auxP->son, symbolTableLine);
+				printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
 			}
+
+			free(temp);
 		}
 
-		auxP = auxP->brother;		
+		else{
+			aux = rightAssignFunction(auxP->son, symbolTableLine);
+			//printWriteLnId(, , , aux);
+		}
+
+		auxP->son = auxP->son->brother;		
 	}
 
 	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);
 }
 
+
 void printWriteLnId(int size, char *id, char *type, char *value){
 	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* %s, i32 0, i32 0), %s %s)\n", index_variable_name++, size, id, type, value);
 }
 
-char *operations_function(char *op_name, Program *program, SymbolTableLine *symbolTableLine){
+char *operations_function(char* op_name, Program *program, SymbolTableLine *symbolTableLine){
 	int registry1, registry2;
 	Program *temp;
-	char *aux;
-	char *var1, *var2;
+	SymbolTableLine *line = symbolTableLine;
+	char *aux = (char*) malloc(sizeof(char)*40);
+	char *var1 = (char*) malloc(sizeof(char)*10);
+	char *var2 = (char*) malloc(sizeof(char)*10);
 	
-	temp = program->son;
-	registry1 = registry2 = 0;
-	aux = (char*) malloc(sizeof(char) * BUFFER);
+	temp = program;
+	registry1 = 0;
+	registry2 = 0;
 
 	//se o 1º filho da operação é simbolo terminal
-	if(hasTerminalSymbol(temp->type)){
-		var1 = rightAssignFunction(temp, symbolTableLine);
+	if(hasTerminalSymbol(program->son->type)==0){
+		temp=temp->son;
+		var1 = rightAssignFunction(temp, line);
 		registry1 = index_variable_name;
-		
-		printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(symbolTableLine->type), var1);
-		
-		if(hasTerminalSymbol(temp->brother->type) == 0){
-			var2 = rightAssignFunction(temp->brother, symbolTableLine);
+		printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line->type), var1);
+		var2 = rightAssignFunction(temp->brother, line);
+
+		if(hasTerminalSymbol(temp->brother->type)==0){			
 			registry2 = index_variable_name;
-			printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(symbolTableLine->type), var2);
-		}
-		
-		else{
-			var2 = rightAssignFunction(temp->brother, symbolTableLine);
+			printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line->type), var2);
 		}
 	}
 
 	//se o 1º filho da operação não é simbolo terminal
-	else{
-		var1 = rightAssignFunction(temp, symbolTableLine);
-		registry1 = index_variable_name - 1;
-		
-		if(hasTerminalSymbol(temp->brother->type) == 0){
-			var2 = rightAssignFunction(temp->brother, symbolTableLine);
+	else if(hasTerminalSymbol(program->son->type)!=0){
+		temp = temp->son;
+		var1 = rightAssignFunction(temp, line);
+		registry1 = index_variable_name -1 ;
+		var2 = rightAssignFunction(temp->brother, line);
+
+		if(hasTerminalSymbol(temp->brother->type)==0){			
 			registry2 = index_variable_name;
-			printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(symbolTableLine->type), var2);
+			printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line->type), var2);
 		}
-		
-		else{
-			var2 = rightAssignFunction(temp->brother, symbolTableLine);
-		}
-	}	
-	
-	if(registry1 == 0){
-		sprintf(var1, "%%%d", index_variable_name - 1);
 	}
 
-	else{
-		sprintf(var1, "%%%d", registry1);
+	if(registry1!=0)
+		sprintf(var1, "%%%d",registry1);
+	if (registry1==0)
+		sprintf(var1, "%%%d",index_variable_name-1);
+	if(registry2!=0)
+		sprintf(var2, "%%%d",registry2);
+	if (registry2==0)
+		sprintf(var2, "%%%d",index_variable_name-1);
+			
+
+	if(strcmp(line->type, "_integer_") == 0){
+		printf("  %%%d = %s %s %s, %s\n", index_variable_name++, op_name, varTypeTable(line->type), var1, var2);
 	}
 
-	if(registry2 == 0){
-		sprintf(var2, "%%%d", index_variable_name - 1);
-	}
-	
-	else{
-		sprintf(var2, "%%%d", registry2);
-	}	
-
-	if(strcmp(symbolTableLine->type, "_real_") == 0){
-		printf("  %%%d = f%s %s %s, %s\n", index_variable_name++, op_name, varTypeTable(symbolTableLine->type), var1, var2);
+	else if(strcmp(line->type, "_real_") == 0){
+		printf("  %%%d = f%s %s %s, %s\n", index_variable_name++,op_name, varTypeTable(line->type), var1, var2);
 	}
 
-	else{
-		printf("  %%%d = %s %s %s, %s\n", index_variable_name++, op_name, varTypeTable(symbolTableLine->type), var1, var2);
-	}
-
-	free(var1);
-	free(var2);
-
-	if(aux[0] == '%'){
-		sprintf(aux, "%d", index_variable_name - 1);
-	}
-	
-	else{
-		sprintf(aux, "%%%d", index_variable_name - 1);
-	}
-	
+	if(aux[0]=='%')
+		sprintf(aux,"%d", index_variable_name-1);
+	else
+		sprintf(aux,"%%%d", index_variable_name-1);
 	return aux;
 }
 
@@ -642,33 +646,37 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
 		return "0";
 	}
 
-	aux = (char*) malloc(sizeof(char) * BUFFER);
+	if(strcmp(program->type, "Id") == 0){
+		aux = (char*) malloc(sizeof(char) * BUFFER);
 
-	line = findGlobalLine(to_lower_case(program->value));
-	strcpy(aux, "@");
+		line = findGlobalLine(to_lower_case(program->value));
+		strcpy(aux, "@");
 
-	if(line == NULL){
-		line = symbolTableLine;
+		if(line == NULL){
+			line = symbolTableLine;
+			
+			while(line != NULL && strcmp(to_lower_case(program->value), line->name) != 0){
+				line = line->next;
+			}
+			
+			strcpy(aux, "%");
+		}		
 		
-		while(line != NULL && strcmp(to_lower_case(program->value), line->name) != 0){
-			line = line->next;
-		}
+		strcat(aux, to_lower_case(program->value));
 		
-		strcpy(aux, "%");
-	}		
-	
-	strcat(aux, to_lower_case(program->value));
-	
-	return aux;
+		return aux;
+	}
+
+	return "";
 }
 
 
 int hasTerminalSymbol(char* type){
 	if(strcmp(type, "IntLit") == 0 || strcmp(type, "RealLit") == 0 || strcmp(type, "Id") == 0){
-		return 1;
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 SymbolTableLine *findGlobalLine(char *name){
