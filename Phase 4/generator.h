@@ -63,9 +63,9 @@ void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader){
 
 	/* global variables */
 	index_string_name = 1;
-	index_variable_name = 2;
+	index_variable_name = 4;
 	string_list = NULL;
-	globalTableLine = temp;
+	globalTableLine = symbolTableHeader->symbolTableLine;
 
 	declarePrint();
 	printAllStrings(program);
@@ -83,10 +83,14 @@ void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader){
 	}
 
 	printHeaderFunction("i32", "main");
-	printf(") {\n");
+	printf("i32 %%paramcount, i8** %%paramstr) {\n");
 
-	printf("  %%1 = alloca i32\n");
+	printf("  %%1 = alloca i32\n");	
+	printf("  %%2 = alloca i32\n");	
+	printf("  %%3 = alloca i8**\n");
 	printf("  store i32 0, i32* %%1\n");
+	printf("  store i32 %%paramcount, i32* %%2\n");
+	printf("  store i8** %%paramstr, i8*** %%3\n");
 
 	searchInMain(findMain(program), symbolTableHeader->symbolTableLine);
 	printReturnFunction("i32", "0");
@@ -120,7 +124,7 @@ void printAllStrings(Program *program){
 }
 
 char *formatString(char *str){
-	//unsigned int i, j;
+	unsigned int i, j;
 	char *temp;
 	size_t size;
 
@@ -128,16 +132,15 @@ char *formatString(char *str){
 
 	temp = (char *)malloc(sizeof(char) * size);
 	strncpy(temp, str + 1, size);
+	strcpy(str, temp);
 	
-	/*for(i = j = 0; i < strlen(str); ++i, ++j){
+	for(i = j = 0; i < strlen(str); ++i, ++j){
 		temp[j] = str[i];
 
 		if(str[i] == '\'' && str[i + 1] == '\''){
 		 	++i;
 		}
 	}
-
-	strcpy(str, temp);*/
 
 	return temp;
 }
@@ -485,38 +488,44 @@ void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
 			printWriteLnId(SIZE_FALSE, "@.strFalse", "i1", auxP->son->value);
 		}
 
-		else if(strcmp(auxP->son->type, "Id") == 0){			
-			line = findGlobalLine(to_lower_case(auxP->son->value));
-			strcpy(aux, "@");
-
-			if(line == NULL){
-				line = symbolTableLine;
-				
-				while(line != NULL && strcmp(to_lower_case(auxP->son->value), line->name) != 0){
-					line = line->next;
-				}
-				
-				strcpy(aux, "%");
-			}
-
-			strcat(aux, to_lower_case(auxP->son->value));			
-
-			printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);			
-
-			sprintf(temp, "%%%d", index_variable_name);
-			++index_variable_name;
-
-			if(strcmp(line->type, "_integer_") == 0){
-				printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
-			}
-
-			else if(strcmp(line->type, "_boolean_") == 0){
-				/* TODO: verify if it's true or false*/
-				printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", temp);
+		else if(strcmp(auxP->son->type, "Id") == 0){
+			if(strcmp(to_lower_case(auxP->son->value), "paramcount") == 0){
+				printWriteLnId(SIZE_INT, "@.strInt", "i32", "%paramcount");
 			}
 
 			else{
-				printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
+				line = findGlobalLine(to_lower_case(auxP->son->value));
+				strcpy(aux, "@");
+
+				if(line == NULL){
+					line = symbolTableLine;
+					
+					while(line != NULL && strcmp(to_lower_case(auxP->son->value), line->name) != 0){
+						line = line->next;
+					}
+					
+					strcpy(aux, "%");
+				}
+
+				strcat(aux, to_lower_case(auxP->son->value));			
+
+				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
+
+				sprintf(temp, "%%%d", index_variable_name);
+				++index_variable_name;
+
+				if(strcmp(line->type, "_integer_") == 0){
+					printWriteLnId(SIZE_INT, "@.strInt", "i32", temp);
+				}
+
+				else if(strcmp(line->type, "_boolean_") == 0){
+					// TODO: verify if it's true or false
+					printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", temp);
+				}
+
+				else{
+					printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", temp);
+				}
 			}
 		}
 
@@ -674,7 +683,7 @@ SymbolTableLine *findGlobalLine(char *name){
 
 	temp = globalTableLine;
 
-	while(temp != NULL){
+	while(temp != NULL && !typeFunctionGlobalTable(temp->type)){
 		if(strcmp(name, temp->name) == 0){
 			return temp;
 		}
