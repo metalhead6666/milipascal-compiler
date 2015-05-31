@@ -440,52 +440,50 @@ char *insertPoint(char *assign_value){
 }
 
 void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
+	Program *auxP;
 	char *temp, *aux;
 	SymbolTableLine *line;
 
-	if(program == NULL){
-		printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([1 x i8]* @.str, i32 0, i32 0))\n", index_variable_name++);
-		printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);		
-	}
+	auxP = program;
 	
-	while(program != NULL){
-		if(strcmp(program->type, "String") == 0){
-			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str%d, i32 0, i32 0))\n", index_variable_name++, (int)strlen(program->value) + 1, findId(program->value));
+	while(auxP != NULL){
+		if(strcmp(auxP->type, "String") == 0){
+			printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([%d x i8]* @.str%d, i32 0, i32 0))\n", index_variable_name++, (int)strlen(auxP->value) + 1, findId(auxP->value));
 		}
 
-		else if(strcmp(program->type, "IntLit") == 0){
-			printWriteLnId(SIZE_INT, "@.strInt", "i32", program->value);
+		else if(strcmp(auxP->type, "IntLit") == 0){
+			printWriteLnId(SIZE_INT, "@.strInt", "i32", auxP->value);
 		}
 
-		else if(strcmp(program->type, "RealLit") == 0){
-			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", program->value);
+		else if(strcmp(auxP->type, "RealLit") == 0){
+			printWriteLnId(SIZE_DOUBLE, "@.strDouble", "double", auxP->value);
 		}
 
 		else{
-			if(strcmp(to_lower_case(program->value), "true") == 0){
-				printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", program->value);
+			if(strcmp(to_lower_case(auxP->value), "true") == 0){
+				printWriteLnId(SIZE_TRUE, "@.strTrue", "i1", auxP->value);
 			}
 			
-			else if(strcmp(to_lower_case(program->value), "false") == 0){
-				printWriteLnId(SIZE_FALSE, "@.strFalse", "i1", program->value);
+			else if(strcmp(to_lower_case(auxP->value), "false") == 0){
+				printWriteLnId(SIZE_FALSE, "@.strFalse", "i1", auxP->value);
 			}
 
-			else if(strcmp(program->type, "Id") == 0){
+			else if(strcmp(auxP->type, "Id") == 0){
 				aux = (char *)calloc(1, sizeof(char) * BUFFER);
-				line = findGlobalLine(to_lower_case(program->value));
+				line = findGlobalLine(to_lower_case(auxP->value));
 				strcpy(aux, "@");
 
 				if(line == NULL){
 					line = symbolTableLine;
 					
-					while(line != NULL && strcmp(to_lower_case(program->value), line->name) != 0){
+					while(line != NULL && strcmp(to_lower_case(auxP->value), line->name) != 0){
 						line = line->next;
 					}
 					
 					strcpy(aux, "%");
 				}
 
-				strcat(aux, to_lower_case(program->value));				
+				strcat(aux, to_lower_case(auxP->value));				
 
 				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
 				free(aux);
@@ -512,11 +510,11 @@ void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
 			}
 
 			else{
-				rightAssignFunction(program->son, symbolTableLine);
+				rightAssignFunction(auxP->son, symbolTableLine);
 			}
 		}
 
-		program = program->brother;		
+		auxP = auxP->brother;		
 	}
 
 	printf("  %%%d = call i32 (i8*, ...)* @printf(i8* getelementptr inbounds ([2 x i8]* @.strNewLine, i32 0, i32 0))\n", index_variable_name++);
