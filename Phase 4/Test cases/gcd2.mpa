@@ -1,10 +1,9 @@
 program gcd2(output);
-var a: integer;
-	b: real; 
-
+var merda, cona:integer;
+pila:boolean;
 begin
-	a := 1;
-	b := 1.0;
-
-	WriteLn(a,b);
+	cona := 1;
+	merda := 2;
+	pila := merda > cona;
+	writeln(pila)
 end.

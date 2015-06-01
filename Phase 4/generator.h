@@ -675,7 +675,7 @@ void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
 					strcpy(aux, "%");
 				}
 
-				strcat(aux, to_lower_case(auxP->son->value));			
+				strcat(aux, to_lower_case(auxP->son->value));
 
 				printf("  %%%d = load %s* %s\n", index_variable_name, varTypeTable(line->type), aux);
 
@@ -705,8 +705,8 @@ void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
 		}
 
 		else{
-			aux = rightAssignFunction(auxP->son, symbolTableLine,varTypeTable(line->type));
-			//printWriteLnId(, , , aux);
+			aux = rightAssignFunction(auxP->son, symbolTableLine, varTypeTable(symbolTableLine->type));
+			//printWriteLnId();
 		}
 
 		auxP->son = auxP->son->brother;		
@@ -720,7 +720,6 @@ void printWriteLnId(int size, char *id, char *type, char *value){
 }
 
 char *find_type(Program *program, SymbolTableLine *symbolTableLine){
-
 	if(strcmp(program->type,"IntLit")==0)
 		return "_integer_";
 
@@ -763,7 +762,7 @@ char *operations_function(char* op_name, Program *program, SymbolTableLine *symb
 			printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(find_type(program->son, symbolTableLine)), var1);
 		
 		if(strcmp(type, varTypeTable(find_type(program->son, symbolTableLine)))!=0){
-			printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry1);
+			//printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry1);
 			registry1++;
 		}
 		var2 = rightAssignFunction(temp->brother, line,type);
@@ -773,7 +772,7 @@ char *operations_function(char* op_name, Program *program, SymbolTableLine *symb
 			if(strcmp(temp->brother->type,"RealLit")!=0 && strcmp(temp->brother->type,"IntLit")!=0 )
 				printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(find_type(temp->brother, symbolTableLine)), var2);
 			if(strcmp(type, varTypeTable(find_type(temp->brother, symbolTableLine)))!=0){
-				printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry2);
+				//printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry2);
 				registry2++;	
 			}
 		}
@@ -787,7 +786,7 @@ char *operations_function(char* op_name, Program *program, SymbolTableLine *symb
 		var2 = rightAssignFunction(temp->brother, line,type);
 
 		if(strcmp(type, varTypeTable(find_type(program->son, symbolTableLine)))!=0){
-			printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry1);
+			//printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry1);
 			registry1++;
 		}
 
@@ -796,7 +795,7 @@ char *operations_function(char* op_name, Program *program, SymbolTableLine *symb
 			if(strcmp(temp->brother->type,"RealLit")!=0 && strcmp(temp->brother->type,"IntLit")!=0 )
 			printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(find_type(temp->brother, symbolTableLine)), var2);
 			if(strcmp(type, varTypeTable(find_type(temp->brother, symbolTableLine)))!=0){
-				printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry2);
+				//printf("  %%%d = sitofp i32 %%%d to double\n", index_variable_name++, registry2);
 				registry2++;
 			}
 		}
@@ -855,6 +854,30 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine, ch
 
 	if(strcmp(program->type, "IntLit") == 0 || strcmp(program->type, "RealLit") == 0){ 
 		return program->value;
+	}
+
+	if(strcmp(program->type, "Eq") == 0){
+		return operations_function("icmp eq", program, symbolTableLine, type);
+	}
+
+	if(strcmp(program->type, "Gt") == 0){
+		return operations_function("icmp sgt", program, symbolTableLine, type);		
+	}
+
+	if(strcmp(program->type, "Lt") == 0){
+		return operations_function("icmp slt", program, symbolTableLine, type);
+	}
+
+	if(strcmp(program->type, "Neq") == 0){
+		return operations_function("icmp ne", program, symbolTableLine, type);		
+	}
+
+	if(strcmp(program->type, "Leq") == 0){
+		return operations_function("icmp sle", program, symbolTableLine, type);
+	}
+
+	if(strcmp(program->type, "Geq") == 0){
+		return operations_function("icmp sge", program, symbolTableLine, type);
 	}
 
 	if(strcmp(to_lower_case(program->value), "true") == 0){
