@@ -77,7 +77,7 @@ void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader){
 
 	/* global variables */
 	index_string_name = 1;
-	index_variable_name = 4;
+	index_variable_name = 3;
 	string_list = NULL;
 	boolean_list = NULL;
 	globalTableLine = symbolTableHeader->symbolTableLine;
@@ -102,14 +102,13 @@ void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader){
 	//printf("declare i32 @atoi(i8*)\n");
 
 	printHeaderFunction("i32", "main");
-	printf("i32 %%paramcount, i8** %%paramstr) {\n");
+	printf("i32 %%argc, i8** %%argv) {\n");
 
-	printf("  %%1 = alloca i32\n");	
-	printf("  %%2 = alloca i32\n");	
-	printf("  %%3 = alloca i8**\n");
-	printf("  store i32 0, i32* %%1\n");
-	printf("  store i32 %%paramcount, i32* %%2\n");
-	printf("  store i8** %%paramstr, i8*** %%3\n");
+	printf("  store i32 %%argc, i32* @paramcount\n");
+	printf("  %%1 = load i32* @paramcount\n");
+	printf("  %%2 = sub i32 %%1, 1\n");
+	printf("  store i32 %%2, i32* @paramcount\n");
+	printf("  store i8** %%argv, i8*** @paramstr\n");	
 
 	strcpy(actual_function, "main");
 	searchInMain(findMain(program), symbolTableHeader->symbolTableLine);
@@ -128,6 +127,11 @@ void declarePrint(){
 
 	printf("; Print Declaration\n");
 	printf("declare i32 @printf(i8*, ...)\n");
+	printf("declare i32 @atoi(i8*)\n");
+	printf("\n");
+
+	printf("@paramcount = common global i32 0\n");
+  	printf("@paramstr = common global i8** null\n");
 	printf("\n");
 }
 
@@ -389,10 +393,49 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 			searchWriteLn(program, symbolTableLine);			
 		}
 
+		else if(strcmp(program->type, "ValParam") == 0){
+			printf("  %%%d = load i8*** @paramstr\n", index_variable_name++);
+			
+			if(strcmp(program->son->type, "IntLit") == 0){
+				printf("  %%%d = getelementptr inbounds i8** %%%d, i32 %s\n", index_variable_name, index_variable_name - 1, to_lower_case(program->son->value));
+			}
+
+			else{
+				line = findGlobalLine(to_lower_case(program->son->value));
+
+				if(line == NULL){
+					printf("  %%%d = load i32* @%s\n", index_variable_name++, program->son->value);
+				}
+
+				else{
+					printf("  %%%d = load i32* %%%s\n", index_variable_name++, program->son->value);		
+				}
+
+				printf("  %%%d = getelementptr inbounds i8** %%%d, i32 %%%d\n", index_variable_name, index_variable_name - 2, index_variable_name - 1);				
+			}
+
+			++index_variable_name;
+			printf("  %%%d = load i8** %%%d\n", index_variable_name, index_variable_name - 1);
+			++index_variable_name;
+			printf("  %%%d = call i32 @atoi(i8* %%%d)\n", index_variable_name, index_variable_name - 1);			
+
+			line = findGlobalLine(to_lower_case(program->son->brother->value));
+
+			if(line == NULL){
+				printf("  store i32 %%%d, i32* %%%s\n", index_variable_name, program->son->brother->value);
+			}
+
+			else{
+				printf("  store i32 %%%d, i32* @%s\n", index_variable_name, program->son->brother->value);
+			}
+
+			++index_variable_name;
+		}
+
 		else if(strcmp(program->type, "Assign") == 0){
 			assign_value = rightAssignFunction(program->son->brother, symbolTableLine);
 			
-			line = findGlobalLine(to_lower_case(program->son->value));			
+			line = findGlobalLine(to_lower_case(program->son->value));
 			strcpy(aux, "@");
 
 			if(line == NULL){
@@ -612,7 +655,9 @@ void searchWriteLn(Program *program, SymbolTableLine *symbolTableLine){
 
 		else if(strcmp(auxP->son->type, "Id") == 0){
 			if(strcmp(to_lower_case(auxP->son->value), "paramcount") == 0){
-				printWriteLnId(SIZE_INT, "@.strInt", "i32", "%paramcount");
+				printf("  %%%d = load i32* @paramcount\n", index_variable_name++);
+				sprintf(aux, "%%%d", index_variable_name - 1);
+				printWriteLnId(SIZE_INT, "@.strInt", "i32", aux);
 			}
 
 			else{
