@@ -66,6 +66,8 @@ char *insertPoint(char *assign_value);
 int searchValue(char *name, char *function);
 int replaceValue(char *name, int value, char *function);
 void insertValue(char *name, int value, char *function);
+char *return_expr_operation(char *expr);
+void print_expression(Program *program, SymbolTableLine *line, char* var1, char* var2);
 
 
 void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader){
@@ -96,6 +98,8 @@ void generateProgram(Program *program, SymbolTableHeader *symbolTableHeader){
 
 		temp = temp->next;
 	}
+
+	//printf("declare i32 @atoi(i8*)\n");
 
 	printHeaderFunction("i32", "main");
 	printf("i32 %%paramcount, i8** %%paramstr) {\n");
@@ -479,9 +483,71 @@ void searchInMain(Program *program, SymbolTableLine *symbolTableLine){
 			}		
 		}
 
-		searchInMain(program->son, symbolTableLine);
-		searchInMain(program->brother, symbolTableLine);
+		else if(strcmp(program->type, "IfElse") == 0){
+			Program *op = program->son;
+			Program *ex = op->son;
+			char *var1 = (char*) malloc(sizeof(char) * BUFFER);
+			char *var2 = (char*) malloc(sizeof(char) * BUFFER);
+
+			while(ex != NULL){
+				if(strcmp(ex->type,"Id")==0){
+					line = findGlobalLine(to_lower_case(ex->value));			
+					strcpy(aux, "@");
+					if(line == NULL){
+						line = symbolTableLine;
+						
+						while(line != NULL && strcmp(to_lower_case(ex->value), line->name) != 0){
+							line = line->next;				
+						}
+
+						strcpy(aux, "%");
+					}
+					strcat(aux, to_lower_case(ex->value));
+					printf("  %%%d = load %s* %s\n", index_variable_name++, varTypeTable(line->type), aux);
+					
+					strcpy(aux, "%");
+					sprintf(aux2, "%d", index_variable_name - 1);
+					strcat(aux,aux2);
+
+					if(strcmp(var1,"")==0)
+						strcpy(var1, aux);
+					else{
+						strcpy(var2, aux);
+					}
+				}
+
+				else if(strcmp(var1,"")==0){
+					strcpy(var1,ex->value);
+				}
+
+				else if(strcmp(var2,"")==0){
+					strcpy(var2,ex->value);
+				}
+				ex = ex->brother;
+			}
+
+
+			print_expression(op, line, var1, var2);
+			program = program->brother;
+
+		}
+
+		if(program!=NULL){
+			searchInMain(program->son, symbolTableLine);
+			searchInMain(program->brother, symbolTableLine);
+		}
 	}
+}
+
+void print_expression(Program *program, SymbolTableLine *line, char* var1, char* var2){
+	int registry = index_variable_name;
+	printf("  %%%d = icmp %s %s %s, %s\n", index_variable_name++, return_expr_operation(program->type), varTypeTable(line->type), var1, var2);
+	printf("  br i1 %%%d, label %%%d, label %%%d\n", registry, registry + 1, registry + 2);
+	index_variable_name += 2;
+	printf("\n  ; <label>:%d\n", registry+1);
+	searchInMain(program->brother, line);
+	printf("  br label %%%d\n", registry+2);
+	printf("\n  ; <label>:%d\n", registry+2);
 }
 
 char *insertPoint(char *assign_value){
@@ -728,7 +794,7 @@ char *rightAssignFunction(Program *program, SymbolTableLine *symbolTableLine){
 		return aux;
 	}
 
-	return "";
+	return NULL;
 }
 
 
@@ -812,6 +878,34 @@ void insertValue(char *name, int value, char *function){
 		new->function = function;
 		aux->next = new;
 	}
+}
+
+char *return_expr_operation(char *expr){
+	if(strcmp(expr, "Eq") == 0){
+		return "eq";
+	}
+
+	if(strcmp(expr, "Gt") == 0){
+		return "sgt";
+	}
+
+	if(strcmp(expr, "Lt") == 0){
+		return "slt";
+	}
+
+	if(strcmp(expr, "Neq") == 0){
+		return "ne";
+	}
+
+	if(strcmp(expr, "Leq") == 0){
+		return "sle";
+	}
+
+	if(strcmp(expr, "Geq") == 0){
+		return "sle";
+	}
+
+	return NULL;
 }
 
 #endif
